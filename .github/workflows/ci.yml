@@ -52,7 +52,18 @@ jobs:
       # help slice read from it, stay as committed.
       - uses: ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda # 4.0.0
         with: { composer-options: '--with=guzzlehttp/guzzle:^7.9' }
+      # Should `--with` stop holding, this job would run on Guzzle 8 and stay green.
+      - name: guzzle 7 is what got installed
+        run: |
+          version=$(php -r 'require "vendor/autoload.php"; echo Composer\InstalledVersions::getPrettyVersion("guzzlehttp/guzzle");')
+          echo "guzzlehttp/guzzle $version"
+          case "$version" in
+            7.*) ;;
+            *) echo "::error::guzzlehttp/guzzle $version is installed, not 7"; exit 1 ;;
+          esac
       - run: vendor/bin/phpunit
+      # A real Guzzle 7 request to a closed port, beside the doubles of the suite.
+      - run: php bin/floor.php
 
   # composer.json declares `php: ^8.3`. The suite cannot run there, so the
   # floor is held by what ships and by running it: `php -l` on 8.3 over src/,
