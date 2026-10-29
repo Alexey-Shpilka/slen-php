@@ -110,6 +110,13 @@ docker run --rm -v "$PWD":/app -w /app php:8.4-cli php bin/export-help-slice.php
 ```
 The floor on 8.3 needs the dependencies 8.3 resolves: on a copy, `composer config --global platform.php 8.3.0 && composer update`, then `php:8.3-cli` runs `php -l` over `src config bin examples/help` and `php bin/floor.php` — what CI's `php-floor` does.
 
+## Releasing
+A release is an annotated tag `vX.Y.Z` on `master`: Packagist lists `slen/sdk` from this repository and its hook updates the package on every push, so the pushed tag is the release. No workflow publishes anything.
+1. On a branch: the `CHANGELOG.md` section `## [X.Y.Z] - YYYY-MM-DD` with its link at the bottom. `composer.json` has no `version` field and gets none: Composer reads the version off the tag.
+2. A pull request, green, merged to `master`.
+3. On that commit of `master`: `git tag -a vX.Y.Z -m "slen-php X.Y.Z"`, then `git push origin vX.Y.Z`; Packagist shows `X.Y.Z` within minutes.
+4. A pushed tag is never moved or deleted: Packagist and every `composer.lock` that took it hold its commit, so a fix is a new version.
+
 ## Help examples
 `examples/help/<id>/` is code the console's Help & Docs prints: an article shows a region of `php.php`, never code of its own. `example.json` (`languages`, `regions`, `responses` — the answers in order) and `expect.json` (`calls` — every request, compared whole; `prints` — every line written) are the same files in both SDKs.
 - **`php.php` is included as it is**, in a scope of its own; it builds its SDK for real and hands it over on a line outside every region: `$slen = $offline($slen);`. `$offline` answers the same SDK on a `FakeHttpClient` fed from `responses`.
