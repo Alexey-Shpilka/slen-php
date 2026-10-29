@@ -12,6 +12,8 @@ use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\TestCase;
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
 use RuntimeException;
 use Slen\Sdk\Exceptions\AuthenticationException;
 use Slen\Sdk\Exceptions\ConnectionException;
@@ -263,7 +265,7 @@ final class WaitForExecutionActionTest extends TestCase
 
     public function testEachReadLastsNoLongerThanTheWaitHasLeftButAtLeastFiveSeconds(): void
     {
-        /** @var ArrayObject<int, array<mixed>> $history */
+        /** @var ArrayObject<int, array{request: RequestInterface, response: ResponseInterface|null, error: mixed, options: array<mixed>}> $history */
         $history = new ArrayObject();
         $container = $history;
         $handlerStack = HandlerStack::create(new MockHandler([
@@ -283,7 +285,7 @@ final class WaitForExecutionActionTest extends TestCase
 
     public function testAReadOfALongWaitTakesNoLongerThanTheTimeoutOfTheConfig(): void
     {
-        /** @var ArrayObject<int, array<mixed>> $history */
+        /** @var ArrayObject<int, array{request: RequestInterface, response: ResponseInterface|null, error: mixed, options: array<mixed>}> $history */
         $history = new ArrayObject();
         $container = $history;
         $handlerStack = HandlerStack::create(new MockHandler([
@@ -300,7 +302,7 @@ final class WaitForExecutionActionTest extends TestCase
     }
 
     /**
-     * @param ArrayObject<int, array<mixed>> $history
+     * @param ArrayObject<int, array{request: RequestInterface, response: ResponseInterface|null, error: mixed, options: array<mixed>}> $history
      *
      * @return list<mixed> the timeout each request of the history was sent with
      */
@@ -309,8 +311,7 @@ final class WaitForExecutionActionTest extends TestCase
         $timeouts = [];
 
         foreach ($history as $sent) {
-            $options = $sent['options'] ?? [];
-            $timeouts[] = \is_array($options) ? $options['timeout'] ?? null : null;
+            $timeouts[] = $sent['options']['timeout'] ?? null;
         }
 
         return $timeouts;

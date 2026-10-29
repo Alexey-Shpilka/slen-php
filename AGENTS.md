@@ -50,7 +50,7 @@ This repository is the package itself. `contract/` and the JSON of `examples/hel
 - **Every path of the API is a case of `Endpoint`** (`Shared/Http/Enums`), its value the `operation` of `contract/calls.json` (`'PUT /v1/customers/{externalUserId}/accounts/{creditType}'`), not snake_case: the one table `EndpointTest` holds against the call table both ways, and no `/v1/` or `/health` literal lives outside it.
 - **Refused before the wire** (`InvalidRequestException`, `invalid_request`; nothing sent, nothing written): a missing or blank path value, a blank idempotency key — never swapped for a generated one, that turns the caller's retry into a second run — a `timeout` not finite or not above zero, `retries` below zero, a body that is not JSON. An empty body goes as `{}`.
 - **The end of the chain sends once**: `Accept: application/json`, `Content-Type` only with a body, `Idempotency-Key` when there is one; the query drops nulls and writes booleans as `true`/`false`.
-- **No answer** is `TimeoutException` when the cause chain says so (Symfony `TimeoutExceptionInterface`, cURL errno 28, "timed out"), else `ConnectionException`; no code, no status, the transport's exception as `previous`.
+- **No answer** is `TimeoutException` when the cause chain says so (Symfony `TimeoutExceptionInterface`, Guzzle 8's `ConnectTimeoutException`, `NetworkTimeoutException`, `ResponseTimeoutException`, Guzzle 7's cURL errno 28 read only where `getHandlerContext()` exists, "timed out"), else `ConnectionException`; no code, no status, the transport's exception as `previous`. Guzzle 8 has no `getHandlerContext()`: called unguarded it is an `\Error` that escapes every `catch (SlenException)`.
 - **An unreadable 2xx is flagged, not thrown** (`ApiResponseDTO::$readable`), so the journal knows its attempt; the task throws `InvalidResponseException` (`invalid_response`, with status and request id), never repeated.
 - **Retry** (`RetryPolicy`): no answer, 429 and any 503, with the same key on every attempt. 500, 502, 504 are never repeated — a provider may have been paid. A call's `retries` (`ApiRequestDTO::$retries`) replaces the config's; `0` is one attempt.
 - **The pause**: `Retry-After` (seconds or an HTTP date) up to 30 s is waited out; past 30 s the answer goes back at once as its error; without it 200 ms × 2ⁿ ±25 %, at most 5 s after the jitter.
@@ -112,7 +112,7 @@ The floor on 8.3 needs the dependencies 8.3 resolves: on a copy, `composer confi
 
 ## Releasing
 A release is an annotated tag `vX.Y.Z` on `master`: Packagist lists `slen/sdk` from this repository and its hook updates the package on every push, so the pushed tag is the release. No workflow publishes anything.
-1. On a branch: the `CHANGELOG.md` section `## [X.Y.Z] - YYYY-MM-DD` with its link at the bottom. `composer.json` has no `version` field and gets none: Composer reads the version off the tag.
+1. On a branch: what `## [Unreleased]` of `CHANGELOG.md` gathered becomes `## [X.Y.Z] - YYYY-MM-DD` under a new, empty `## [Unreleased]`, and the links at the bottom follow. Every PR writes its line under `[Unreleased]` as it lands. `composer.json` has no `version` field and gets none: Composer reads the version off the tag.
 2. A pull request, green, merged to `master`.
 3. On that commit of `master`: `git tag -a vX.Y.Z -m "slen-php X.Y.Z"`, then `git push origin vX.Y.Z`; Packagist shows `X.Y.Z` within minutes.
 4. A pushed tag is never moved or deleted: Packagist and every `composer.lock` that took it hold its commit, so a fix is a new version.

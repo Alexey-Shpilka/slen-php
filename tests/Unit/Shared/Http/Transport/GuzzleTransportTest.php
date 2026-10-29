@@ -11,6 +11,8 @@ use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\TestCase;
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
 use Slen\Sdk\Exceptions\CustomerNotFoundException;
 use Slen\Sdk\RequestOptions;
 use Slen\Sdk\SlenConfig;
@@ -21,7 +23,7 @@ use Slen\Sdk\Tests\Unit\Support\RecordingLogger;
 
 final class GuzzleTransportTest extends TestCase
 {
-    /** @var ArrayObject<int, array<mixed>> */
+    /** @var ArrayObject<int, array{request: RequestInterface, response: ResponseInterface|null, error: mixed, options: array<mixed>}> */
     private ArrayObject $history;
 
     protected function setUp(): void
@@ -60,9 +62,7 @@ final class GuzzleTransportTest extends TestCase
 
     private function option(int $request, string $name): mixed
     {
-        $options = $this->history[$request]['options'] ?? [];
-
-        return \is_array($options) ? $options[$name] ?? null : null;
+        return $this->history[$request]['options'][$name] ?? null;
     }
 
     private function customer(): Response
@@ -71,7 +71,7 @@ final class GuzzleTransportTest extends TestCase
     }
 
     /**
-     * @param array<string, mixed> $config
+     * @param array{timeout?: float} $config
      */
     private function sdk(array $config, RecordingLogger $logger, Response ...$answers): SlenSdk
     {

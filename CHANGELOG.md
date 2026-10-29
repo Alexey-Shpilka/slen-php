@@ -2,6 +2,16 @@
 
 All notable changes to `slen/sdk` are written here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow [Semantic Versioning](https://semver.org/), and before 1.0 a minor version may break.
 
+## [Unreleased]
+
+## [0.3.1] - 2026-10-30
+
+### Fixed
+- On Guzzle 8 a call that got no answer — a refused connection, a host that does not resolve, a connect timeout — threw `\Error` (Guzzle 8 has no `getHandlerContext()`), past the retries, the journal and a `catch (SlenException)`. It is a `ConnectionException` again, a timeout a `TimeoutException`, on Guzzle 7 and 8.
+
+### Changed
+- Guzzle 7.9+ and 8 are both supported; the suite runs on each.
+
 ## [0.3.0] - 2026-10-29
 
 ### Breaking
@@ -22,4 +32,6 @@ All notable changes to `slen/sdk` are written here. The format follows [Keep a C
 
 The first tag; not published.
 
+[Unreleased]: https://github.com/Alexey-Shpilka/slen-php/compare/v0.3.1...HEAD
+[0.3.1]: https://github.com/Alexey-Shpilka/slen-php/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/Alexey-Shpilka/slen-php/releases/tag/v0.3.0

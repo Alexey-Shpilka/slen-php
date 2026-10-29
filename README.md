@@ -20,7 +20,7 @@ Any PSR-18 client does. With Guzzle, or with Symfony HttpClient and `nyholm/psr7
 |---|---|---|
 | PHP | 8.3, 8.4, 8.5 | the suite on 8.4 and 8.5; the package run on 8.3 (`bin/floor.php`) |
 | Laravel | 11 and 12 | the provider's tests on `illuminate/*` 11–12; `conflict` refuses an older `illuminate/support` |
-| HTTP clients | any PSR-18 client with PSR-17 factories | Guzzle 7 and Symfony HttpClient 6.2+ take the timeout of a single call; any other client keeps its own timeouts |
+| HTTP clients | any PSR-18 client with PSR-17 factories | Guzzle 7.9+ and 8 (the suite runs on both) and Symfony HttpClient 6.2+ take the timeout of a single call; any other client keeps its own timeouts |
 
 ## The SDK
 
