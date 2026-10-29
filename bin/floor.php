@@ -6,12 +6,14 @@ declare(strict_types=1);
 // without PHPUnit, whose suite is written for 8.4. A failed check names itself and exits 1.
 
 use GuzzleHttp\Client as GuzzleClient;
+use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Response;
 use Psr\Log\AbstractLogger;
 use Psr\Log\NullLogger;
+use Slen\Sdk\Exceptions\ConnectionException;
 use Slen\Sdk\Exceptions\InsufficientCreditsException;
 use Slen\Sdk\Exceptions\InvalidResponseException;
 use Slen\Sdk\Exceptions\WebhookSignatureException;
@@ -149,6 +151,24 @@ $checks = [
 
         $sent = $history[0] ?? [];
         $holds(\is_array($sent) === true && ($sent['options']['timeout'] ?? null) === 3.5, 'Guzzle was not given the timeout of the call');
+    },
+    'a closed port of the loopback is a ConnectionException, on the Guzzle the SDK builds' => static function () use ($holds): void {
+        // A port nobody listens on: bound for a free number, then closed.
+        $listener = stream_socket_server('tcp://127.0.0.1:0');
+        $holds($listener !== false, 'no port of the loopback could be bound');
+        $address = (string) stream_socket_get_name($listener, false);
+        fclose($listener);
+        $slen = SlenSdk::create(new SlenConfig('sl_live_floor', baseUrl: 'http://' . $address, timeout: 2.0, connectTimeout: 2.0, retries: 0));
+
+        try {
+            $slen->customers()->get('user_8421');
+        } catch (ConnectionException $connectionException) {
+            $holds($connectionException->getPrevious() instanceof ConnectException, 'the refusal did not come from Guzzle');
+
+            return;
+        }
+
+        $holds(false, 'the closed port answered');
     },
     'every webhook vector of the contract' => static function () use ($holds): void {
         /** @var array{secret: string, tolerance_seconds: int, cases: list<array{name: string, payload: string, header: ?string, now: int, valid: bool, reason: ?string, event: ?array{id: string, type: string}}>} $vectors */
