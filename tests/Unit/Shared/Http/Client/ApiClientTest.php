@@ -5,9 +5,14 @@ declare(strict_types=1);
 namespace Slen\Sdk\Tests\Unit\Shared\Http\Client;
 
 use GuzzleHttp\Exception\ConnectException;
+use GuzzleHttp\Exception\ConnectTimeoutException;
+use GuzzleHttp\Exception\NetworkTimeoutException;
+use GuzzleHttp\Exception\ResponseTimeoutException;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7\Request;
+use Nyholm\Psr7\Response;
 use PHPUnit\Framework\TestCase;
+use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Log\NullLogger;
 use Slen\Sdk\Exceptions\ConnectionException;
 use Slen\Sdk\Exceptions\TimeoutException;
@@ -18,6 +23,7 @@ use Slen\Sdk\Shared\Http\Data\ApiRequestDTO;
 use Slen\Sdk\Shared\Http\Enums\Endpoint;
 use Slen\Sdk\Shared\Http\Transport\Psr18Transport;
 use Slen\Sdk\Shared\Logging\Journal;
+use Slen\Sdk\Tests\Unit\Support\HandlerContextFailure;
 use Slen\Sdk\Tests\Unit\Support\NetworkFailure;
 use Slen\Sdk\Tests\Unit\Support\QueuedHttpClient;
 use Symfony\Component\HttpClient\Exception\TimeoutException as SymfonyTimeoutException;
@@ -166,13 +172,47 @@ final class ApiClientTest extends TestCase
 
     public function testSendTellsATimeoutFromOtherNetworkFailures(): void
     {
-        $request = new Request('GET', 'https://api.slen.ai/api/health');
-        $timeouts = [
-            'guzzle, cURL errno 28' => new ConnectException('cURL error 28', $request, null, ['errno' => 28]),
+        $this->assertTimeouts([
+            'guzzle 7, cURL errno 28' => new HandlerContextFailure('cURL error 28', 28),
             'symfony, under a network exception' => new NetworkFailure('Idle timeout reached', new SymfonyTimeoutException('Idle timeout reached')),
             'any client, by its message' => new NetworkFailure('Operation timed out after 5001 milliseconds'),
+        ]);
+
+        $refusals = [
+            'guzzle, refused' => new ConnectException('cURL error 7: refused', new Request('GET', 'https://api.slen.ai/api/health')),
+            'guzzle 7, cURL errno 7' => new HandlerContextFailure('cURL error 7: refused', 7),
         ];
 
+        foreach ($refusals as $case => $failure) {
+            $http = (new QueuedHttpClient())->pushException($failure);
+
+            try {
+                $this->client($http)->send(new ApiRequestDTO(Endpoint::Health, envelope: false));
+                self::fail('Expected ConnectionException: ' . $case);
+            } catch (ConnectionException $connectionException) {
+                self::assertSame($failure, $connectionException->getPrevious(), $case);
+            }
+        }
+    }
+
+    public function testSendTellsAGuzzle8TimeoutByItsType(): void
+    {
+        if (class_exists(ConnectTimeoutException::class) === false) {
+            self::markTestSkipped('Guzzle 7 is installed: its timeouts carry a cURL errno, held by the test above.');
+        }
+
+        $request = new Request('GET', 'https://api.slen.ai/api/health');
+
+        $this->assertTimeouts([
+            'a connect timeout' => new ConnectTimeoutException('cURL error 28', $request),
+            'a timeout before the headers' => new NetworkTimeoutException('cURL error 28', $request),
+            'a timeout after the headers' => new ResponseTimeoutException('cURL error 28', $request, new Response(200)),
+        ]);
+    }
+
+    /** @param array<string, ClientExceptionInterface> $timeouts */
+    private function assertTimeouts(array $timeouts): void
+    {
         foreach ($timeouts as $case => $failure) {
             $http = (new QueuedHttpClient())->pushException($failure);
 
@@ -183,10 +223,6 @@ final class ApiClientTest extends TestCase
                 self::assertSame($failure, $timeoutException->getPrevious(), $case);
             }
         }
-
-        $refused = (new QueuedHttpClient())->pushException(new ConnectException('cURL error 7: refused', $request, null, ['errno' => 7]));
-        $this->expectException(ConnectionException::class);
-        $this->client($refused)->send(new ApiRequestDTO(Endpoint::Health, envelope: false));
     }
 
     private function client(QueuedHttpClient $http, string $baseUrl = 'https://api.slen.ai'): ApiClient

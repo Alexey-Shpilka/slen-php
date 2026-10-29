@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace Slen\Sdk\Shared\Http\Client;
 
-use GuzzleHttp\Exception\ConnectException;
-use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Exception\ConnectTimeoutException;
+use GuzzleHttp\Exception\NetworkTimeoutException;
+use GuzzleHttp\Exception\ResponseTimeoutException;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -147,21 +148,31 @@ final readonly class ApiClient implements ApiClientInterface
     private function timedOut(Throwable $throwable): bool
     {
         for ($cause = $throwable; $cause instanceof Throwable; $cause = $cause->getPrevious()) {
-            if ($cause instanceof TimeoutExceptionInterface) {
-                return true;
-            }
-
-            $guzzle = $cause instanceof ConnectException || $cause instanceof RequestException;
-
-            if ($guzzle === true && ($cause->getHandlerContext()['errno'] ?? null) === self::CURL_TIMED_OUT) {
-                return true;
-            }
-
-            if (stripos($cause->getMessage(), 'timed out') !== false) {
+            if ($this->isTimeout($cause) === true) {
                 return true;
             }
         }
 
         return false;
+    }
+
+    private function isTimeout(Throwable $cause): bool
+    {
+        if ($cause instanceof TimeoutExceptionInterface || $cause instanceof ConnectTimeoutException) {
+            return true;
+        }
+
+        if ($cause instanceof NetworkTimeoutException || $cause instanceof ResponseTimeoutException) {
+            return true;
+        }
+
+        // Guzzle 7 tells a cURL timeout by its errno alone; Guzzle 8 has no such method.
+        $context = method_exists($cause, 'getHandlerContext') === true ? $cause->getHandlerContext() : [];
+
+        if (\is_array($context) === true && ($context['errno'] ?? null) === self::CURL_TIMED_OUT) {
+            return true;
+        }
+
+        return stripos($cause->getMessage(), 'timed out') !== false;
     }
 }
