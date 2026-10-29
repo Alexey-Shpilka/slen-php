@@ -1,0 +1,15 @@
+{
+  "calls": [
+    {
+      "method": "POST",
+      "path": "/v1/operations/execute",
+      "headers": { "Idempotency-Key": "order-42:email" },
+      "body": {
+        "operation": "generate_email",
+        "input": { "messages": [{ "role": "user", "content": "Write a short follow-up email." }] }
+      }
+    },
+    { "method": "GET", "path": "/v1/customers/user_8421" }
+  ],
+  "prints": ["completed", "default 95.0000"]
+}

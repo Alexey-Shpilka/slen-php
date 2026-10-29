@@ -1,0 +1,76 @@
+name: ci
+on:
+  push:
+    branches: [master]
+  pull_request: {}
+  # No composer.lock (a library): once a week the suite also runs on whatever
+  # composer.json resolves to that day, not only when somebody pushes.
+  schedule:
+    - cron: '17 3 * * 1'
+  workflow_dispatch: {}
+permissions: { contents: read }
+concurrency: { group: 'ci-${{ github.event_name }}-${{ github.ref }}', cancel-in-progress: true }
+
+# No job reads a secret. Every checkout is `persist-credentials: false`: no job
+# pushes, and the steps that follow run other people's code (composer install).
+# See .github/AGENTS.md.
+
+jobs:
+  php:
+    name: php ${{ matrix.php }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        # The suite is written in 8.4; the floor composer.json declares (8.3)
+        # has the job below.
+        php: ['8.4', '8.5']
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with: { persist-credentials: false }
+      - uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
+        with: { php-version: '${{ matrix.php }}', coverage: none }
+      - uses: ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda # 4.0.0
+      - run: vendor/bin/phpunit
+      # phpcs, php-cs-fixer, phpstan (level max) and rector.
+      - run: composer quality
+      - run: php bin/export-help-slice.php --check
+
+  # composer.json declares `php: ^8.3`. The suite cannot run there, so the
+  # floor is held by what ships and by running it: `php -l` on 8.3 over src/,
+  # config/, bin/ and the help examples, then bin/floor.php on the dependencies
+  # 8.3 resolves.
+  php-floor:
+    name: php 8.3 floor
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with: { persist-credentials: false }
+      - uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
+        with: { php-version: '8.3', coverage: none }
+      # One `php -l` per file, judged by its exit status, so the log names every
+      # offender; a run that linted nothing fails too.
+      - name: php -l over src/, config/, bin/ and the help examples
+        run: |
+          clean=0
+          failed=0
+          for file in $(find src config bin examples/help -name '*.php' | sort); do
+            if output=$(php -l "$file" 2>&1); then
+              clean=$((clean + 1))
+            else
+              echo "::error file=$file::Does not parse on PHP 8.3, the floor composer.json declares."
+              echo "$output"
+              failed=1
+            fi
+          done
+          echo "clean files: $clean"
+          if [ "$clean" -eq 0 ]; then
+            echo "::error::No PHP file was found."
+            failed=1
+          fi
+          exit "$failed"
+      - uses: ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda # 4.0.0
+      - name: run the package on 8.3
+        run: php bin/floor.php

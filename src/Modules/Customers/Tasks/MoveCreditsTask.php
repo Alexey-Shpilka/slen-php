@@ -1,0 +1,81 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Slen\Sdk\Modules\Customers\Tasks;
+
+use Slen\Sdk\Exceptions\InvalidRequestException;
+use Slen\Sdk\Exceptions\SlenException;
+use Slen\Sdk\Modules\Customers\Data\CreditMovementDTO;
+use Slen\Sdk\Modules\Customers\Data\CustomerAccountDTO;
+use Slen\Sdk\Modules\Customers\Resources\CustomerAccountResource;
+use Slen\Sdk\Shared\Http\ApiTransport;
+use Slen\Sdk\Shared\Http\Data\ApiRequestDTO;
+use Slen\Sdk\Shared\Tasks\AbstractTask;
+
+/** @internal */
+final readonly class MoveCreditsTask extends AbstractTask
+{
+    private const string CREDITS = '/^-?\d+(\.\d{1,4})?$/';
+
+    public function __construct(
+        ApiTransport $apiTransport,
+        private CustomerAccountResource $customerAccountResource,
+    ) {
+        parent::__construct($apiTransport);
+    }
+
+    /**
+     * @throws InvalidRequestException nothing sent: credits that are not an amount this movement takes,
+     *                                 an empty customer, credit type or key
+     * @throws SlenException
+     */
+    public function execute(CreditMovementDTO $creditMovementDTO): CustomerAccountDTO
+    {
+        $creditMovement = $creditMovementDTO->movement;
+        $credits = $creditMovementDTO->credits;
+        $options = $creditMovementDTO->options;
+        $route = $creditMovement->endpoint()->value;
+
+        if (preg_match(self::CREDITS, $credits) !== 1) {
+            throw $this->refused(\sprintf('the credits of %s are not a decimal string of at most four places', $route));
+        }
+
+        // Zero in any spelling: no digit but 0.
+        $zero = trim($credits, '-0.') === '';
+
+        if ($creditMovement->isSigned() === true && $zero === true) {
+            throw $this->refused(\sprintf('the credits of %s are zero; a correction moves something', $route));
+        }
+
+        if ($creditMovement->isSigned() === false && ($zero === true || str_starts_with($credits, '-') === true)) {
+            throw $this->refused(\sprintf('the credits of %s are not above zero', $route));
+        }
+
+        if (trim($options->creditType) === '') {
+            throw $this->refused(\sprintf('the creditType of %s is empty', $route));
+        }
+
+        $body = ['credits' => $credits, 'credit_type' => $options->creditType];
+
+        if ($options->note !== null) {
+            $body['note'] = $options->note;
+        }
+
+        $apiRequest = new ApiRequestDTO(
+            $creditMovement->endpoint(),
+            ['externalUserId' => $creditMovementDTO->externalUserId],
+            body: $body,
+            idempotencyKey: $this->idempotencyKey($options->idempotencyKey),
+            retries: $options->retries,
+            timeout: $options->timeout,
+        );
+
+        return $this->customerAccountResource->map($this->send($apiRequest));
+    }
+
+    private function refused(string $what): InvalidRequestException
+    {
+        return new InvalidRequestException('Slen: ' . $what . '.', 'invalid_request');
+    }
+}

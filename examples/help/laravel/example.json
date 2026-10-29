@@ -1,0 +1,65 @@
+{
+  "id": "laravel",
+  "status": "ready",
+  "summary": "The SDK of a Laravel application: the Slen facade runs an operation, and the same SDK, resolved from the container, reads a customer; the key comes from SLEN_API_KEY through config/slen-sdk.php.",
+  "languages": ["php"],
+  "laravel": true,
+  "regions": ["facade", "container"],
+  "responses": [
+    {
+      "status": 200,
+      "body": {
+        "data": {
+          "execution_id": "74438200973594700",
+          "status": "completed",
+          "operation": "generate_email",
+          "output": {
+            "model": "gpt-4o",
+            "content": "Hi Ada, just checking in on the proposal I sent last week.",
+            "finish_reason": "stop",
+            "tool_calls": null,
+            "usage": { "input_tokens": 14, "output_tokens": 16, "cached_input_tokens": 0 }
+          },
+          "error": null,
+          "error_code": null,
+          "error_message": null,
+          "cost": { "estimated": "0.00412500", "actual": null },
+          "cache": { "hit": false, "cached_at": null },
+          "replayed": false,
+          "waiting_on": null,
+          "trace_url": "/v1/executions/74438200973594700"
+        }
+      }
+    },
+    {
+      "status": 200,
+      "body": {
+        "data": {
+          "customer_id": "74438200973595100",
+          "external_user_id": "user_8421",
+          "status": "active",
+          "blocked_at": null,
+          "block_reason": null,
+          "accounts": [
+            {
+              "customer_account_id": "74438200973595100",
+              "customer_id": "74438200973595100",
+              "project_id": "74438200973590001",
+              "external_user_id": "user_8421",
+              "credit_type": "default",
+              "balance": "95.0000",
+              "reserved": "0.0000",
+              "available": "95.0000",
+              "allow_negative": false,
+              "low_balance_threshold": "10.0000",
+              "created_at": "2026-10-17T09:05:00+00:00",
+              "updated_at": "2026-10-17T09:10:00+00:00"
+            }
+          ],
+          "created_at": "2026-10-17T09:00:00+00:00",
+          "updated_at": "2026-10-17T09:10:00+00:00"
+        }
+      }
+    }
+  ]
+}

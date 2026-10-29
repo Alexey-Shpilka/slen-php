@@ -1,0 +1,11 @@
+version: 2
+updates:
+  # The actions are pinned by commit; Dependabot moves the pin and its comment together.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule: { interval: weekly }
+  # Only the dev dependencies and the ranges of composer.json: there is no lock file to update.
+  - package-ecosystem: composer
+    directory: /
+    schedule: { interval: weekly }
+    versioning-strategy: increase-if-necessary

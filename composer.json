@@ -1,0 +1,112 @@
+{
+    "name": "slen/sdk",
+    "description": "Slen PHP/Laravel SDK — run flows and read their outcome, manage end customers and their credits, verify webhooks.",
+    "type": "library",
+    "license": "MIT",
+    "homepage": "https://slen.ai",
+    "support": {
+        "issues": "https://github.com/Alexey-Shpilka/slen-php/issues",
+        "source": "https://github.com/Alexey-Shpilka/slen-php",
+        "docs": "https://slen.ai/en/docs/sdk/overview"
+    },
+    "authors": [
+        {
+            "name": "Alexey Shpilka"
+        }
+    ],
+    "require": {
+        "php": "^8.3",
+        "ext-json": "*",
+        "php-http/discovery": "^1.19",
+        "psr/http-client": "^1.0",
+        "psr/http-factory": "^1.0",
+        "psr/http-message": "^1.1 || ^2.0",
+        "psr/log": "^1.1 || ^2.0 || ^3.0"
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^3.65",
+        "guzzlehttp/guzzle": "^7.9",
+        "illuminate/container": "^11.0 || ^12.0",
+        "illuminate/support": "^11.0 || ^12.0",
+        "nyholm/psr7": "^1.8",
+        "phpstan/extension-installer": "^1.4",
+        "phpstan/phpstan": "^2.1",
+        "phpstan/phpstan-phpunit": "^2.0",
+        "phpstan/phpstan-strict-rules": "^2.0",
+        "phpunit/phpunit": "^11.5",
+        "rector/rector": "^2.0",
+        "slevomat/coding-standard": "^8.22",
+        "squizlabs/php_codesniffer": "^3.13",
+        "symfony/http-client": "^7.0",
+        "symfony/yaml": "^7.0"
+    },
+    "conflict": {
+        "illuminate/support": "<11"
+    },
+    "suggest": {
+        "guzzlehttp/guzzle": "PSR-18 client; the SDK gives it the timeouts of SlenConfig",
+        "symfony/http-client": "PSR-18 client (with nyholm/psr7); the SDK gives it the timeouts of SlenConfig",
+        "nyholm/psr7": "PSR-17 factories for symfony/http-client",
+        "illuminate/support": "Laravel service provider, facade and config integration"
+    },
+    "autoload": {
+        "psr-4": {
+            "Slen\\Sdk\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Slen\\Sdk\\Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true,
+            "php-http/discovery": false,
+            "phpstan/extension-installer": true
+        }
+    },
+    "scripts": {
+        "test": "phpunit",
+        "phpcs": "phpcs",
+        "phpcbf": "phpcbf",
+        "cs": "php-cs-fixer check --diff",
+        "cs-fix": "php-cs-fixer fix",
+        "phpstan": "phpstan analyse --memory-limit=1024M --no-progress",
+        "rector": "rector process --dry-run --no-progress-bar",
+        "rector-fix": "rector process",
+        "quality": [
+            "@phpcs",
+            "@cs",
+            "@phpstan",
+            "@rector"
+        ],
+        "quality-fix": [
+            "@phpcbf",
+            "@cs-fix",
+            "@rector-fix"
+        ]
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Slen\\Sdk\\Laravel\\SlenServiceProvider"
+            ],
+            "aliases": {
+                "Slen": "Slen\\Sdk\\Laravel\\Slen"
+            }
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "keywords": [
+        "slen",
+        "llm",
+        "flows",
+        "credits",
+        "webhooks",
+        "laravel",
+        "sdk"
+    ]
+}
