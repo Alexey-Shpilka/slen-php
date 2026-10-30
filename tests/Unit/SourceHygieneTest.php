@@ -44,10 +44,14 @@ final class SourceHygieneTest extends TestCase
         '~sn[o]vio|sp[e]ndguard|l[i]mly~i' => 'an earlier name',
         '~(?<![\p{L}\p{N}_])[НРПЗВФХ](?:-\d|\d+\.\d)~iu' => 'a number of a finding, a decision or a task',
         '~sl_live_[A-Za-z0-9]{20,}~' => 'a key that looks real',
+        '~(?<![\p{L}\p{N}./])v\d{2,}/~i' => 'a branch of an iteration',
+        '~_v\d+_~i' => 'the number of an iteration in a name',
+        '~\b(?:since|until) v\d{2,}(?![.\d])~i' => 'the number of an iteration',
+        '~\b(?:backend|frontend|infra|sdk|master|main)[ @:#][0-9a-f]{7,40}\b~i' => 'a branch pinned to a commit',
     ];
 
-    /** What the package's tools leave in it and a public tree never gets. */
-    private const array LEFT_BEHIND = ['vendor', 'composer.lock', '.phpunit.cache'];
+    /** What the package's tools leave in it and a public tree never gets; and git's own directory, no file of the package. */
+    private const array LEFT_BEHIND = ['vendor', 'composer.lock', '.phpunit.cache', '.git'];
 
     public function testShippedCodeKeepsItsCommentsShortAndFreeOfHistory(): void
     {
@@ -94,7 +98,12 @@ final class SourceHygieneTest extends TestCase
             "fixes \u{41D}-17",
             "dropped in \u{412}3.1",
             'sl_live_' . str_repeat('x', 20),
+            \sprintf('signed on backend v%d/backend', 26),
+            \sprintf('whsec_v%d_contract_vectors', 26),
+            \sprintf('kept until v%d', 29),
+            \sprintf('%s a72a940', 'backend'),
             'H-1 is not Cyrillic; https://api.test; sl_live_…; docs/configuration; v0.3.0 on PHP 8.4, 1.2.3',
+            't=1792238400,v1=d90c1b78be2a0b86, v0=deadbeef; GET /v1/customers; since v1.2; whsec_contract_vectors_7f3a91c2',
         ]);
 
         self::assertSame(
@@ -109,6 +118,10 @@ final class SourceHygieneTest extends TestCase
                 'line 8: a number of a finding, a decision or a task',
                 'line 9: a number of a finding, a decision or a task',
                 'line 10: a key that looks real',
+                'line 11: a branch of an iteration',
+                'line 12: the number of an iteration in a name',
+                'line 13: the number of an iteration',
+                'line 14: a branch pinned to a commit',
             ],
             self::internalIn($text),
         );
@@ -241,8 +254,8 @@ final class SourceHygieneTest extends TestCase
         self::assertSame(['line 2: a reference to docs, findings or decisions'], self::offencesIn("<?php\n// dropped in \u{412}3.1\n"));
         self::assertSame([], self::offencesIn("<?php\n// as of 0.3.0, on PHP 8.4\n"));
         self::assertSame(['line 2: history'], self::offencesIn("<?php\n// this used to retry\n"));
-        self::assertSame(['line 2: history'], self::offencesIn("<?php\n// Since v24 the key is kept\n"));
-        self::assertSame(['line 2: history'], self::offencesIn("<?php\n// kept until v30\n"));
+        self::assertSame(['line 2: history'], self::offencesIn("<?php\n// Since \u{76}24 the key is kept\n"));
+        self::assertSame(['line 2: history'], self::offencesIn("<?php\n// kept until \u{76}30\n"));
     }
 
     public function testTheReaderLetsShortCommentsAndTagsThrough(): void

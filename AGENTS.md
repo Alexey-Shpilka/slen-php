@@ -50,7 +50,7 @@ This repository is the package itself. `contract/` and the JSON of `examples/hel
 - **Every path of the API is a case of `Endpoint`** (`Shared/Http/Enums`), its value the `operation` of `contract/calls.json` (`'PUT /v1/customers/{externalUserId}/accounts/{creditType}'`), not snake_case: the one table `EndpointTest` holds against the call table both ways, and no `/v1/` or `/health` literal lives outside it.
 - **Refused before the wire** (`InvalidRequestException`, `invalid_request`; nothing sent, nothing written): a missing or blank path value, a blank idempotency key — never swapped for a generated one, that turns the caller's retry into a second run — a `timeout` not finite or not above zero, `retries` below zero, a body that is not JSON. An empty body goes as `{}`.
 - **The end of the chain sends once**: `Accept: application/json`, `Content-Type` only with a body, `Idempotency-Key` when there is one; the query drops nulls and writes booleans as `true`/`false`.
-- **No answer** is `TimeoutException` when the cause chain says so (Symfony `TimeoutExceptionInterface`, cURL errno 28, "timed out"), else `ConnectionException`; no code, no status, the transport's exception as `previous`.
+- **No answer** is `TimeoutException` when the cause chain says so (Symfony `TimeoutExceptionInterface`, Guzzle 8's `ConnectTimeoutException`, `NetworkTimeoutException`, `ResponseTimeoutException`, Guzzle 7's cURL errno 28 read only where `getHandlerContext()` exists, "timed out"), else `ConnectionException`; no code, no status, the transport's exception as `previous`. Guzzle 8 has no `getHandlerContext()`: called unguarded it is an `\Error` that escapes every `catch (SlenException)`.
 - **An unreadable 2xx is flagged, not thrown** (`ApiResponseDTO::$readable`), so the journal knows its attempt; the task throws `InvalidResponseException` (`invalid_response`, with status and request id), never repeated.
 - **Retry** (`RetryPolicy`): no answer, 429 and any 503, with the same key on every attempt. 500, 502, 504 are never repeated — a provider may have been paid. A call's `retries` (`ApiRequestDTO::$retries`) replaces the config's; `0` is one attempt.
 - **The pause**: `Retry-After` (seconds or an HTTP date) up to 30 s is waited out; past 30 s the answer goes back at once as its error; without it 200 ms × 2ⁿ ±25 %, at most 5 s after the jitter.
@@ -95,7 +95,7 @@ This repository is the package itself. `contract/` and the JSON of `examples/hel
 - **A release** is a line of `CHANGELOG.md` (Keep a Changelog) and a tag; `composer validate --strict` is clean; `conflict` keeps `illuminate/support` at 11 or newer (the README's Compatibility, held by `ReadmeTest`).
 - **The help slice lists every class of `src/`**: after a change there, `php bin/export-help-slice.php --write` and commit `help-slice.json` with it (`HelpSliceTest`). The calls are the methods of the facades and `health`; `config()` and `withLogger()` are not calls.
 - **A key of `config/slen-sdk.php` feeds** the parameter named as it in camel case, else the one that name begins (`webhook_tolerance` → `webhookToleranceSeconds`); `log_channel`, `spans`, `span_level` feed none.
-- **The floor is 8.3, held by running the package**: `bin/floor.php` (no PHPUnit) drives the SDK on its doubles on 8.3 and exits 1 naming the check that failed; `src/`, `config/`, `bin/` and the PHP examples parse there (`php -l` in CI, `SourceFloorTest` early). The suite itself is 8.4 and runs on 8.4 and 8.5.
+- **The floor is 8.3, held by running the package**: `bin/floor.php` (no PHPUnit) drives the SDK on its doubles on 8.3 and exits 1 naming the check that failed; one check is real: the Guzzle the SDK builds sends to a closed port of the loopback and must end in `ConnectionException` (Guzzle 8 on 8.3 in `php-floor`, Guzzle 7 in `php-guzzle7`); `src/`, `config/`, `bin/` and the PHP examples parse there (`php -l` in CI, `SourceFloorTest` early). The suite itself is 8.4 and runs on 8.4 and 8.5.
 - **The suite reads `contract/` and `examples/` where `tests/Paths.php` says**, and fails — it does not skip — when the files are not there.
 - **Nothing internal in any file of the package** (`SourceHygieneTest`, the patterns this tree was checked with before its first commit): no path of a machine, plan or its numbers, private repository, local stack, earlier name of the product or real-looking key; a test address is `https://api.test`. A guard spells its own patterns with character classes.
 
@@ -109,6 +109,13 @@ docker run --rm -v "$PWD":/app -w /app php:8.4-cli php bin/export-help-slice.php
 # against the API's spec: add -v <dir of the spec>:/spec:ro -e SLEN_OPENAPI_SPEC=/spec/v1.yaml
 ```
 The floor on 8.3 needs the dependencies 8.3 resolves: on a copy, `composer config --global platform.php 8.3.0 && composer update`, then `php:8.3-cli` runs `php -l` over `src config bin examples/help` and `php bin/floor.php` — what CI's `php-floor` does.
+
+## Releasing
+A release is an annotated tag `vX.Y.Z` on `master`: Packagist lists `slen/sdk` from this repository and its hook updates the package on every push, so the pushed tag is the release. No workflow publishes anything.
+1. On a branch: what `## [Unreleased]` of `CHANGELOG.md` gathered becomes `## [X.Y.Z] - YYYY-MM-DD` under a new, empty `## [Unreleased]`, and the links at the bottom follow. Every PR writes its line under `[Unreleased]` as it lands. `composer.json` has no `version` field and gets none: Composer reads the version off the tag.
+2. A pull request, green, merged to `master`.
+3. On that commit of `master`: `git tag -a vX.Y.Z -m "slen-php X.Y.Z"`, then `git push origin vX.Y.Z`; Packagist shows `X.Y.Z` within minutes.
+4. A pushed tag is never moved or deleted: Packagist and every `composer.lock` that took it hold its commit, so a fix is a new version.
 
 ## Help examples
 `examples/help/<id>/` is code the console's Help & Docs prints: an article shows a region of `php.php`, never code of its own. `example.json` (`languages`, `regions`, `responses` — the answers in order) and `expect.json` (`calls` — every request, compared whole; `prints` — every line written) are the same files in both SDKs.
