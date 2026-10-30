@@ -9,7 +9,11 @@ All notable changes to `slen/sdk` are written here. The format follows [Keep a C
 - A page is one `final` `Slen\Sdk\Data\Page` (`Page<Customer>`, `Page<CreditEntry>`) instead of `PageDTO`, `CustomerPageDTO` and `CreditEntryPageDTO`; `hasMore()` is gone — a full last page carries a cursor to an empty one, so the end is a page whose `nextCursor` is null.
 - `customers()->prices()` answers a `CreditPriceList` (its `data` is the list) instead of an array.
 
-## [0.3.1] - 2026-10-30
+## [0.3.2] - 2026-10-31
+
+The same code as 0.3.1, released again because 0.3.1 was withdrawn from Packagist; its changes are listed below.
+
+## [0.3.1] - 2026-10-30 [YANKED]
 
 ### Fixed
 - On Guzzle 8 a call that got no answer — a refused connection, a host that does not resolve, a connect timeout — threw `\Error` (Guzzle 8 has no `getHandlerContext()`), past the retries, the journal and a `catch (SlenException)`. It is a `ConnectionException` again, a timeout a `TimeoutException`, on Guzzle 7 and 8.
@@ -37,6 +41,7 @@ All notable changes to `slen/sdk` are written here. The format follows [Keep a C
 
 The first tag; not published.
 
-[Unreleased]: https://github.com/Alexey-Shpilka/slen-php/compare/v0.3.1...HEAD
+[Unreleased]: https://github.com/Alexey-Shpilka/slen-php/compare/v0.3.2...HEAD
+[0.3.2]: https://github.com/Alexey-Shpilka/slen-php/compare/v0.3.1...v0.3.2
 [0.3.1]: https://github.com/Alexey-Shpilka/slen-php/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/Alexey-Shpilka/slen-php/releases/tag/v0.3.0
