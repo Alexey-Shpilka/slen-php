@@ -14,6 +14,9 @@ All notable changes to `slen/sdk` are written here. The format follows [Keep a C
 - `requestId` in the options of every call that goes over the network: the caller's own id, sent as `X-Request-Id` on every attempt (8 to 128 of `A-Z a-z 0-9 . _ : -`, refused before the wire otherwise).
 - `customers()->listAll()` and `customers()->entriesAll()`: every customer, every entry of a statement, read page by page as a `foreach` goes on (generators; the options' `cursor` is where they start, `limit` the size of a page).
 
+### Changed
+- Laravel 13 and Symfony HttpClient 8 are supported; the suite runs on them.
+
 ## [0.3.2] - 2026-10-31
 
 The same code as 0.3.1, released again because 0.3.1 was withdrawn from Packagist; its changes are listed below.
