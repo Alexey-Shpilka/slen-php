@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Slen\Sdk\Modules\Customers;
 
+use Generator;
 use Slen\Sdk\Data\Page;
 use Slen\Sdk\Exceptions\CustomerNotFoundException;
 use Slen\Sdk\Exceptions\IdempotencyConflictException;
 use Slen\Sdk\Exceptions\InsufficientCreditsException;
 use Slen\Sdk\Exceptions\InvalidRequestException;
+use Slen\Sdk\Exceptions\InvalidResponseException;
 use Slen\Sdk\Exceptions\SlenException;
 use Slen\Sdk\Modules\Customers\Data\CreditEntry;
 use Slen\Sdk\Modules\Customers\Data\CreditMovementDTO;
@@ -46,19 +48,26 @@ final readonly class CustomersFacade
     public function list(?CustomerListOptions $options = null): Page
     {
         $options ??= new CustomerListOptions();
-        // Without the view an older API answers the page of accounts.
-        $query = [
-            'view' => 'customers',
-            'cursor' => $options->cursor,
-            'limit' => $options->limit,
-            'q' => $options->search,
-            'status' => $options->status?->value,
-            'credit_type' => $options->creditType,
-            'low_balance' => $options->lowBalance,
-        ];
-        $apiRequest = new ApiRequestDTO(Endpoint::ListCustomers, query: $query, retries: $options->retries, timeout: $options->timeout);
 
-        return $this->customersModuleFactory->customerResource()->page($this->customersModuleFactory->api()->exchange($apiRequest)->body);
+        return $this->customerPage($options, $options->cursor);
+    }
+
+    /**
+     * Every customer from the page of `cursor` on, `limit` a page, read as the loop goes; nothing sent before it does.
+     *
+     * @return Generator<int, Customer, mixed, void>
+     *
+     * @throws InvalidRequestException  a timeout or retries out of range; nothing sent
+     * @throws InvalidResponseException a page whose cursor is the one it was asked with
+     * @throws SlenException
+     */
+    public function listAll(?CustomerListOptions $options = null): Generator
+    {
+        $options ??= new CustomerListOptions();
+
+        return $this->customersModuleFactory->cursorPager()->pages(function (?string $cursor) use ($options): Page {
+            return $this->customerPage($options, $cursor);
+        }, $options->cursor);
     }
 
     /**
@@ -233,20 +242,27 @@ final readonly class CustomersFacade
     public function entries(string $externalUserId, ?EntryListOptions $options = null): Page
     {
         $options ??= new EntryListOptions();
-        $apiRequest = new ApiRequestDTO(
-            Endpoint::ListEntries,
-            ['externalUserId' => $externalUserId],
-            [
-                'cursor' => $options->cursor,
-                'limit' => $options->limit,
-                'credit_type' => $options->creditType,
-                'entry_type' => $options->entryType?->value,
-            ],
-            retries: $options->retries,
-            timeout: $options->timeout,
-        );
 
-        return $this->customersModuleFactory->creditEntryResource()->page($this->customersModuleFactory->api()->exchange($apiRequest)->body);
+        return $this->entryPage($externalUserId, $options, $options->cursor);
+    }
+
+    /**
+     * The statement from the page of `cursor` on, `limit` a page, read as the loop goes; nothing sent before it does.
+     *
+     * @return Generator<int, CreditEntry, mixed, void>
+     *
+     * @throws InvalidRequestException   nothing sent: an empty id, a timeout or retries out of range
+     * @throws CustomerNotFoundException the project has no such customer
+     * @throws InvalidResponseException  a page whose cursor is the one it was asked with
+     * @throws SlenException
+     */
+    public function entriesAll(string $externalUserId, ?EntryListOptions $options = null): Generator
+    {
+        $options ??= new EntryListOptions();
+
+        return $this->customersModuleFactory->cursorPager()->pages(function (?string $cursor) use ($externalUserId, $options): Page {
+            return $this->entryPage($externalUserId, $options, $cursor);
+        }, $options->cursor);
     }
 
     /**
@@ -272,6 +288,51 @@ final readonly class CustomersFacade
     private function move(CreditMovementDTO $creditMovementDTO): CustomerAccount
     {
         return $this->customersModuleFactory->moveCreditsTask()->execute($creditMovementDTO);
+    }
+
+    /**
+     * @return Page<Customer>
+     *
+     * @throws SlenException
+     */
+    private function customerPage(CustomerListOptions $options, ?string $cursor): Page
+    {
+        // Without the view an older API answers the page of accounts.
+        $query = [
+            'view' => 'customers',
+            'cursor' => $cursor,
+            'limit' => $options->limit,
+            'q' => $options->search,
+            'status' => $options->status?->value,
+            'credit_type' => $options->creditType,
+            'low_balance' => $options->lowBalance,
+        ];
+        $apiRequest = new ApiRequestDTO(Endpoint::ListCustomers, query: $query, retries: $options->retries, timeout: $options->timeout);
+
+        return $this->customersModuleFactory->customerResource()->page($this->customersModuleFactory->api()->exchange($apiRequest)->body);
+    }
+
+    /**
+     * @return Page<CreditEntry>
+     *
+     * @throws SlenException
+     */
+    private function entryPage(string $externalUserId, EntryListOptions $options, ?string $cursor): Page
+    {
+        $apiRequest = new ApiRequestDTO(
+            Endpoint::ListEntries,
+            ['externalUserId' => $externalUserId],
+            [
+                'cursor' => $cursor,
+                'limit' => $options->limit,
+                'credit_type' => $options->creditType,
+                'entry_type' => $options->entryType?->value,
+            ],
+            retries: $options->retries,
+            timeout: $options->timeout,
+        );
+
+        return $this->customersModuleFactory->creditEntryResource()->page($this->customersModuleFactory->api()->exchange($apiRequest)->body);
     }
 
     /** @throws SlenException */

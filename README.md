@@ -132,6 +132,7 @@ $account = $slen->customers()->charge('user_8421', '5.0000', new MovementOptions
 | `topUp($id, $credits, MovementOptions)`, `charge($id, $credits, MovementOptions)` | add credits; take them for a service of your own application. Above zero |
 | `adjust($id, $credits, MovementOptions)` | an operator's correction, with a sign; not zero |
 | `entries($id, EntryListOptions(cursor:, limit:, creditType:, entryType:))` | the statement of the customer's accounts, a `Page` at a time |
+| `listAll(CustomerListOptions)`, `entriesAll($id, EntryListOptions)` | every customer, every entry of the statement: a generator that reads the next page when the loop gets to it |
 | `prices(PriceListOptions(operationCode:, creditType:))` | what an operation costs in credits: a `CreditPriceList` (`data`) |
 
 Credits are a decimal string of at most four places (`'5'`, `'5.25'`, `'-3.0000'`); anything else is refused before the wire. `MovementOptions` carries `creditType` (default `'default'`), `note` and `idempotencyKey`; under the same key the server moves the credits once.

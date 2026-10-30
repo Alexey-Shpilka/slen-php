@@ -9,6 +9,9 @@ All notable changes to `slen/sdk` are written here. The format follows [Keep a C
 - A page is one `final` `Slen\Sdk\Data\Page` (`Page<Customer>`, `Page<CreditEntry>`) instead of `PageDTO`, `CustomerPageDTO` and `CreditEntryPageDTO`; `hasMore()` is gone — a full last page carries a cursor to an empty one, so the end is a page whose `nextCursor` is null.
 - `customers()->prices()` answers a `CreditPriceList` (its `data` is the list) instead of an array.
 
+### Added
+- `customers()->listAll()` and `customers()->entriesAll()`: every customer, every entry of a statement, read page by page as a `foreach` goes on (generators; the options' `cursor` is where they start, `limit` the size of a page).
+
 ## [0.3.2] - 2026-10-31
 
 The same code as 0.3.1, released again because 0.3.1 was withdrawn from Packagist; its changes are listed below.
