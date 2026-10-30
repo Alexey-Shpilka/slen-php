@@ -42,11 +42,12 @@ final readonly class CreditEntryResource extends BaseResource
      *
      * @throws InvalidResponseException
      */
-    public function page(array $body): Page
+    public function page(array $body, ?string $requestId = null): Page
     {
         return new Page(
             array_map($this->map(...), $this->objects($body, 'data')),
             $this->nullableString($this->array($body, 'meta'), 'next_cursor'),
+            $requestId,
         );
     }
 }

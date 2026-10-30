@@ -17,6 +17,7 @@ final readonly class Health
         public ?string $broadcast,
         public ?int $opcachePreloadedFiles,
         public ?int $opcacheCachedScripts,
+        public ?string $requestId = null,
     ) {
     }
 }

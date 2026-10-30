@@ -620,13 +620,22 @@
           "signature": "readonly ?int $opcacheCachedScripts"
         },
         {
+          "name": "requestId",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly ?string $requestId"
+        },
+        {
           "name": "__construct",
           "kind": "constructor",
           "static": false,
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "__construct(string $app, ?string $release, string $server, string $mysql, string $redis, ?string $queue, ?string $broadcast, ?int $opcachePreloadedFiles, ?int $opcacheCachedScripts)"
+          "signature": "__construct(string $app, ?string $release, string $server, string $mysql, string $redis, ?string $queue, ?string $broadcast, ?int $opcachePreloadedFiles, ?int $opcacheCachedScripts, ?string $requestId = null)"
         }
       ]
     },
@@ -665,13 +674,22 @@
           "signature": "readonly ?string $nextCursor"
         },
         {
+          "name": "requestId",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly ?string $requestId"
+        },
+        {
           "name": "__construct",
           "kind": "constructor",
           "static": false,
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "__construct(array $data, ?string $nextCursor)"
+          "signature": "__construct(array $data, ?string $nextCursor, ?string $requestId = null)"
         }
       ]
     },
@@ -1844,13 +1862,22 @@
           "signature": "readonly array $data"
         },
         {
+          "name": "requestId",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly ?string $requestId"
+        },
+        {
           "name": "__construct",
           "kind": "constructor",
           "static": false,
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "__construct(array $data)"
+          "signature": "__construct(array $data, ?string $requestId = null)"
         }
       ]
     },
@@ -1943,13 +1970,22 @@
           "signature": "readonly DateTimeImmutable $updatedAt"
         },
         {
+          "name": "requestId",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly ?string $requestId"
+        },
+        {
           "name": "__construct",
           "kind": "constructor",
           "static": false,
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "__construct(string $customerId, string $externalUserId, Slen\\Sdk\\Modules\\Customers\\Enums\\CustomerStatus $status, ?DateTimeImmutable $blockedAt, ?string $blockReason, array $accounts, DateTimeImmutable $createdAt, DateTimeImmutable $updatedAt)"
+          "signature": "__construct(string $customerId, string $externalUserId, Slen\\Sdk\\Modules\\Customers\\Enums\\CustomerStatus $status, ?DateTimeImmutable $blockedAt, ?string $blockReason, array $accounts, DateTimeImmutable $createdAt, DateTimeImmutable $updatedAt, ?string $requestId = null)"
         },
         {
           "name": "isBlocked",
@@ -2096,13 +2132,22 @@
           "signature": "readonly DateTimeImmutable $updatedAt"
         },
         {
+          "name": "requestId",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly ?string $requestId"
+        },
+        {
           "name": "__construct",
           "kind": "constructor",
           "static": false,
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "__construct(string $customerAccountId, string $customerId, string $projectId, string $externalUserId, string $creditType, string $balance, string $reserved, string $available, bool $allowNegative, string $lowBalanceThreshold, DateTimeImmutable $createdAt, DateTimeImmutable $updatedAt)"
+          "signature": "__construct(string $customerAccountId, string $customerId, string $projectId, string $externalUserId, string $creditType, string $balance, string $reserved, string $available, bool $allowNegative, string $lowBalanceThreshold, DateTimeImmutable $createdAt, DateTimeImmutable $updatedAt, ?string $requestId = null)"
         }
       ]
     },
@@ -2567,13 +2612,22 @@
           "signature": "readonly ?int $retries"
         },
         {
+          "name": "requestId",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly ?string $requestId"
+        },
+        {
           "name": "__construct",
           "kind": "constructor",
           "static": false,
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "__construct(bool $allowNegative = false, string $lowBalanceThreshold = '0', ?float $timeout = null, ?int $retries = null)"
+          "signature": "__construct(bool $allowNegative = false, string $lowBalanceThreshold = '0', ?float $timeout = null, ?int $retries = null, ?string $requestId = null)"
         }
       ]
     },
@@ -2621,13 +2675,22 @@
           "signature": "readonly ?int $retries"
         },
         {
+          "name": "requestId",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly ?string $requestId"
+        },
+        {
           "name": "__construct",
           "kind": "constructor",
           "static": false,
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "__construct(?string $reason = null, ?float $timeout = null, ?int $retries = null)"
+          "signature": "__construct(?string $reason = null, ?float $timeout = null, ?int $retries = null, ?string $requestId = null)"
         }
       ]
     },
@@ -2720,13 +2783,22 @@
           "signature": "readonly ?int $retries"
         },
         {
+          "name": "requestId",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly ?string $requestId"
+        },
+        {
           "name": "__construct",
           "kind": "constructor",
           "static": false,
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "__construct(?string $cursor = null, int $limit = 50, ?string $search = null, ?Slen\\Sdk\\Modules\\Customers\\Enums\\CustomerStatus $status = null, ?string $creditType = null, ?string $lowBalance = null, ?float $timeout = null, ?int $retries = null)"
+          "signature": "__construct(?string $cursor = null, int $limit = 50, ?string $search = null, ?Slen\\Sdk\\Modules\\Customers\\Enums\\CustomerStatus $status = null, ?string $creditType = null, ?string $lowBalance = null, ?float $timeout = null, ?int $retries = null, ?string $requestId = null)"
         }
       ]
     },
@@ -2801,13 +2873,22 @@
           "signature": "readonly ?int $retries"
         },
         {
+          "name": "requestId",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly ?string $requestId"
+        },
+        {
           "name": "__construct",
           "kind": "constructor",
           "static": false,
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "__construct(?string $cursor = null, int $limit = 50, ?string $creditType = null, ?Slen\\Sdk\\Modules\\Customers\\Enums\\CreditEntryType $entryType = null, ?float $timeout = null, ?int $retries = null)"
+          "signature": "__construct(?string $cursor = null, int $limit = 50, ?string $creditType = null, ?Slen\\Sdk\\Modules\\Customers\\Enums\\CreditEntryType $entryType = null, ?float $timeout = null, ?int $retries = null, ?string $requestId = null)"
         }
       ]
     },
@@ -2873,13 +2954,22 @@
           "signature": "readonly ?int $retries"
         },
         {
+          "name": "requestId",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly ?string $requestId"
+        },
+        {
           "name": "__construct",
           "kind": "constructor",
           "static": false,
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "__construct(string $creditType = 'default', ?string $note = null, ?string $idempotencyKey = null, ?float $timeout = null, ?int $retries = null)"
+          "signature": "__construct(string $creditType = 'default', ?string $note = null, ?string $idempotencyKey = null, ?float $timeout = null, ?int $retries = null, ?string $requestId = null)"
         }
       ]
     },
@@ -2936,13 +3026,22 @@
           "signature": "readonly ?int $retries"
         },
         {
+          "name": "requestId",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly ?string $requestId"
+        },
+        {
           "name": "__construct",
           "kind": "constructor",
           "static": false,
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "__construct(?string $operationCode = null, ?string $creditType = null, ?float $timeout = null, ?int $retries = null)"
+          "signature": "__construct(?string $operationCode = null, ?string $creditType = null, ?float $timeout = null, ?int $retries = null, ?string $requestId = null)"
         }
       ]
     },
@@ -2980,7 +3079,7 @@
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "page(array $body): Slen\\Sdk\\Data\\Page"
+          "signature": "page(array $body, ?string $requestId = null): Slen\\Sdk\\Data\\Page"
         }
       ]
     },
@@ -3018,7 +3117,7 @@
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "list(array $body): Slen\\Sdk\\Modules\\Customers\\Data\\CreditPriceList"
+          "signature": "list(array $body, ?string $requestId = null): Slen\\Sdk\\Modules\\Customers\\Data\\CreditPriceList"
         }
       ]
     },
@@ -3047,7 +3146,7 @@
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "map(array $data): Slen\\Sdk\\Modules\\Customers\\Data\\CustomerAccount"
+          "signature": "map(array $data, ?string $requestId = null): Slen\\Sdk\\Modules\\Customers\\Data\\CustomerAccount"
         }
       ]
     },
@@ -3085,7 +3184,7 @@
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "map(array $data): Slen\\Sdk\\Modules\\Customers\\Data\\Customer"
+          "signature": "map(array $data, ?string $requestId = null): Slen\\Sdk\\Modules\\Customers\\Data\\Customer"
         },
         {
           "name": "page",
@@ -3094,7 +3193,7 @@
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "page(array $body): Slen\\Sdk\\Data\\Page"
+          "signature": "page(array $body, ?string $requestId = null): Slen\\Sdk\\Data\\Page"
         }
       ]
     },
@@ -3448,13 +3547,22 @@
           "signature": "readonly ?int $retryAfterSeconds"
         },
         {
+          "name": "requestId",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly ?string $requestId"
+        },
+        {
           "name": "__construct",
           "kind": "constructor",
           "static": false,
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "__construct(string $executionId, Slen\\Sdk\\Modules\\Operations\\Enums\\ExecutionStatus $status, string $operationCode, ?array $output, ?string $errorCode, ?string $errorMessage, Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionCost $cost, Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionCache $cache, ?Slen\\Sdk\\Modules\\Operations\\Data\\WaitingOn $waitingOn, string $traceUrl, ?int $retryAfterSeconds)"
+          "signature": "__construct(string $executionId, Slen\\Sdk\\Modules\\Operations\\Enums\\ExecutionStatus $status, string $operationCode, ?array $output, ?string $errorCode, ?string $errorMessage, Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionCost $cost, Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionCache $cache, ?Slen\\Sdk\\Modules\\Operations\\Data\\WaitingOn $waitingOn, string $traceUrl, ?int $retryAfterSeconds, ?string $requestId = null)"
         },
         {
           "name": "isCompleted",
@@ -3655,13 +3763,22 @@
           "signature": "readonly array $events"
         },
         {
+          "name": "requestId",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly ?string $requestId"
+        },
+        {
           "name": "__construct",
           "kind": "constructor",
           "static": false,
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "__construct(string $executionId, string $flowId, string $flowVersionId, ?string $flowName, ?string $operationCode, ?string $operationId, Slen\\Sdk\\Modules\\Operations\\Enums\\ExecutionStatus $status, ?string $errorCode, ?string $errorMessage, Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionCost $cost, Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionCache $cache, DateTimeImmutable $startedAt, ?DateTimeImmutable $finishedAt, ?int $durationMs, array $nodes, array $events)"
+          "signature": "__construct(string $executionId, string $flowId, string $flowVersionId, ?string $flowName, ?string $operationCode, ?string $operationId, Slen\\Sdk\\Modules\\Operations\\Enums\\ExecutionStatus $status, ?string $errorCode, ?string $errorMessage, Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionCost $cost, Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionCache $cache, DateTimeImmutable $startedAt, ?DateTimeImmutable $finishedAt, ?int $durationMs, array $nodes, array $events, ?string $requestId = null)"
         }
       ]
     },
@@ -4158,7 +4275,7 @@
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "map(array $data): Slen\\Sdk\\Modules\\Executions\\Data\\ExecutionStatusView"
+          "signature": "map(array $data, ?string $requestId = null): Slen\\Sdk\\Modules\\Executions\\Data\\ExecutionStatusView"
         }
       ]
     },
@@ -4196,7 +4313,7 @@
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "map(array $data): Slen\\Sdk\\Modules\\Executions\\Data\\ExecutionTrace"
+          "signature": "map(array $data, ?string $requestId = null): Slen\\Sdk\\Modules\\Executions\\Data\\ExecutionTrace"
         }
       ]
     },
@@ -4640,13 +4757,22 @@
           "signature": "readonly bool $replayed"
         },
         {
+          "name": "requestId",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly ?string $requestId"
+        },
+        {
           "name": "__construct",
           "kind": "constructor",
           "static": false,
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "__construct(string $executionId, Slen\\Sdk\\Modules\\Operations\\Enums\\ExecutionStatus $status, string $operationCode, ?array $output, ?string $errorCode, ?string $errorMessage, Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionCost $cost, Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionCache $cache, ?Slen\\Sdk\\Modules\\Operations\\Data\\WaitingOn $waitingOn, string $traceUrl, ?int $retryAfterSeconds, ?Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionError $error, bool $replayed)"
+          "signature": "__construct(string $executionId, Slen\\Sdk\\Modules\\Operations\\Enums\\ExecutionStatus $status, string $operationCode, ?array $output, ?string $errorCode, ?string $errorMessage, Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionCost $cost, Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionCache $cache, ?Slen\\Sdk\\Modules\\Operations\\Data\\WaitingOn $waitingOn, string $traceUrl, ?int $retryAfterSeconds, ?Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionError $error, bool $replayed, ?string $requestId = null)"
         },
         {
           "name": "isCompleted",
@@ -5055,13 +5181,22 @@
           "signature": "readonly ?int $retries"
         },
         {
+          "name": "requestId",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly ?string $requestId"
+        },
+        {
           "name": "__construct",
           "kind": "constructor",
           "static": false,
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "__construct(?string $customer = null, ?string $creditType = null, array $context = [], ?string $idempotencyKey = null, ?float $timeout = null, ?int $retries = null)"
+          "signature": "__construct(?string $customer = null, ?string $creditType = null, array $context = [], ?string $idempotencyKey = null, ?float $timeout = null, ?int $retries = null, ?string $requestId = null)"
         }
       ]
     },
@@ -5090,7 +5225,7 @@
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "map(array $data): Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionResult"
+          "signature": "map(array $data, ?string $requestId = null): Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionResult"
         },
         {
           "name": "status",
@@ -6600,13 +6735,22 @@
           "signature": "readonly ?int $retries"
         },
         {
+          "name": "requestId",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly ?string $requestId"
+        },
+        {
           "name": "__construct",
           "kind": "constructor",
           "static": false,
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "__construct(?float $timeout = null, ?int $retries = null)"
+          "signature": "__construct(?float $timeout = null, ?int $retries = null, ?string $requestId = null)"
         }
       ]
     },
@@ -6724,15 +6868,6 @@
           "deprecated": false,
           "internal": false,
           "signature": "exchange(Slen\\Sdk\\Shared\\Http\\Data\\ApiRequestDTO $request): Slen\\Sdk\\Shared\\Http\\Data\\ApiResponseDTO"
-        },
-        {
-          "name": "data",
-          "kind": "method",
-          "static": false,
-          "optional": false,
-          "deprecated": false,
-          "internal": false,
-          "signature": "data(Slen\\Sdk\\Shared\\Http\\Data\\ApiRequestDTO $request): array"
         }
       ]
     },
@@ -7334,13 +7469,22 @@
           "signature": "readonly int $attempt"
         },
         {
+          "name": "requestId",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly ?string $requestId"
+        },
+        {
           "name": "__construct",
           "kind": "constructor",
           "static": false,
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "__construct(Slen\\Sdk\\Shared\\Http\\Enums\\Endpoint $endpoint, array $pathParams = [], array $query = [], ?array $body = null, ?string $idempotencyKey = null, bool $envelope = true, ?int $retries = null, ?float $timeout = null, array $headers = [], int $attempt = 1)"
+          "signature": "__construct(Slen\\Sdk\\Shared\\Http\\Enums\\Endpoint $endpoint, array $pathParams = [], array $query = [], ?array $body = null, ?string $idempotencyKey = null, bool $envelope = true, ?int $retries = null, ?float $timeout = null, array $headers = [], int $attempt = 1, ?string $requestId = null)"
         },
         {
           "name": "withHeader",
@@ -7476,6 +7620,15 @@
           "deprecated": false,
           "internal": false,
           "signature": "isSuccessful(): bool"
+        },
+        {
+          "name": "data",
+          "kind": "method",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "data(): array"
         },
         {
           "name": "header",
@@ -8715,7 +8868,7 @@
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "map(array $data): Slen\\Sdk\\Data\\Health"
+          "signature": "map(array $data, ?string $requestId = null): Slen\\Sdk\\Data\\Health"
         }
       ]
     },

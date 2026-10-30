@@ -95,7 +95,12 @@ final class ContractTest extends TestCase
      * reason. Held both ways: a null not listed here is a field read from nothing, and a listed one that is filled
      * is a stale line.
      */
-    private const array KNOWN_NULLS = [];
+    private const array KNOWN_NULLS = [
+        'Customer.requestId' => 'a row of a page carries none: the id is the one of the page',
+        'CustomerAccount.requestId' => 'an account inside a customer carries none: the id is the one of the customer',
+    ];
+
+    private const string REQUEST_ID = 'req_contract_answer';
 
     /**
      * A refusal in the two bodies the API answers one with — the envelope (`Error`) and a field validation of the
@@ -1009,7 +1014,8 @@ final class ContractTest extends TestCase
 
         foreach ($answers as [$status, $schema]) {
             foreach ($this->alternativesOf($schema) as $alternative) {
-                $fakeHttpClient = (new FakeHttpClient())->pushJson($status, $this->answer($alternative, $fullest, $row['pins']));
+                $fakeHttpClient = (new FakeHttpClient())
+                    ->pushJson($status, $this->answer($alternative, $fullest, $row['pins']), ['X-Request-Id' => self::REQUEST_ID]);
 
                 try {
                     $read = $row['call'](self::sdk($fakeHttpClient));
@@ -1027,6 +1033,11 @@ final class ContractTest extends TestCase
 
                 if (\count($fakeHttpClient->requests()) !== 1) {
                     $problems[] = $name . ' made more than one request for one answer';
+                }
+
+                // A row of every page carries no id: it is the page's.
+                if (str_ends_with($name, 'All') === false && (\is_object($read) === false || ($read->requestId ?? null) !== self::REQUEST_ID)) {
+                    $problems[] = $name . ' does not carry the X-Request-Id of its answer as requestId';
                 }
 
                 return $read;

@@ -26,6 +26,7 @@ use Slen\Sdk\Modules\Customers\Options\EntryListOptions;
 use Slen\Sdk\Modules\Customers\Options\MovementOptions;
 use Slen\Sdk\Modules\Customers\Options\PriceListOptions;
 use Slen\Sdk\RequestOptions;
+use Slen\Sdk\Shared\Http\CursorPager;
 use Slen\Sdk\Shared\Http\Data\ApiRequestDTO;
 use Slen\Sdk\Shared\Http\Enums\Endpoint;
 
@@ -57,7 +58,7 @@ final readonly class CustomersFacade
      *
      * @return Generator<int, Customer, mixed, void>
      *
-     * @throws InvalidRequestException  a timeout or retries out of range; nothing sent
+     * @throws InvalidRequestException  nothing sent: a requestId (one id names one request), a timeout or retries out of range
      * @throws InvalidResponseException a page whose cursor is the one it was asked with
      * @throws SlenException
      */
@@ -65,7 +66,7 @@ final readonly class CustomersFacade
     {
         $options ??= new CustomerListOptions();
 
-        return $this->customersModuleFactory->cursorPager()->pages(function (?string $cursor) use ($options): Page {
+        return $this->everyPage(Endpoint::ListCustomers, $options->requestId)->pages(function (?string $cursor) use ($options): Page {
             return $this->customerPage($options, $cursor);
         }, $options->cursor);
     }
@@ -86,6 +87,7 @@ final readonly class CustomersFacade
             ['externalUserId' => $externalUserId],
             retries: $options->retries,
             timeout: $options->timeout,
+            requestId: $options->requestId,
         ));
     }
 
@@ -105,6 +107,7 @@ final readonly class CustomersFacade
             body: [],
             retries: $options->retries,
             timeout: $options->timeout,
+            requestId: $options->requestId,
         ));
     }
 
@@ -123,9 +126,11 @@ final readonly class CustomersFacade
             body: ['allow_negative' => $options->allowNegative, 'low_balance_threshold' => $options->lowBalanceThreshold],
             retries: $options->retries,
             timeout: $options->timeout,
+            requestId: $options->requestId,
         );
+        $apiResponse = $this->customersModuleFactory->api()->exchange($apiRequest);
 
-        return $this->customersModuleFactory->customerAccountResource()->map($this->customersModuleFactory->api()->data($apiRequest));
+        return $this->customersModuleFactory->customerAccountResource()->map($apiResponse->data(), $apiResponse->requestId());
     }
 
     /**
@@ -145,6 +150,7 @@ final readonly class CustomersFacade
             body: $options->reason === null ? [] : ['reason' => $options->reason],
             retries: $options->retries,
             timeout: $options->timeout,
+            requestId: $options->requestId,
         ));
     }
 
@@ -165,6 +171,7 @@ final readonly class CustomersFacade
             body: [],
             retries: $options->retries,
             timeout: $options->timeout,
+            requestId: $options->requestId,
         ));
     }
 
@@ -251,7 +258,7 @@ final readonly class CustomersFacade
      *
      * @return Generator<int, CreditEntry, mixed, void>
      *
-     * @throws InvalidRequestException   nothing sent: an empty id, a timeout or retries out of range
+     * @throws InvalidRequestException   nothing sent: an empty id, a requestId, a timeout or retries out of range
      * @throws CustomerNotFoundException the project has no such customer
      * @throws InvalidResponseException  a page whose cursor is the one it was asked with
      * @throws SlenException
@@ -260,7 +267,7 @@ final readonly class CustomersFacade
     {
         $options ??= new EntryListOptions();
 
-        return $this->customersModuleFactory->cursorPager()->pages(function (?string $cursor) use ($externalUserId, $options): Page {
+        return $this->everyPage(Endpoint::ListEntries, $options->requestId)->pages(function (?string $cursor) use ($externalUserId, $options): Page {
             return $this->entryPage($externalUserId, $options, $cursor);
         }, $options->cursor);
     }
@@ -279,15 +286,31 @@ final readonly class CustomersFacade
             query: ['operation_code' => $options->operationCode, 'credit_type' => $options->creditType],
             retries: $options->retries,
             timeout: $options->timeout,
+            requestId: $options->requestId,
         );
+        $apiResponse = $this->customersModuleFactory->api()->exchange($apiRequest);
 
-        return $this->customersModuleFactory->creditPriceResource()->list($this->customersModuleFactory->api()->exchange($apiRequest)->body);
+        return $this->customersModuleFactory->creditPriceResource()->list($apiResponse->body, $apiResponse->requestId());
     }
 
     /** @throws SlenException */
     private function move(CreditMovementDTO $creditMovementDTO): CustomerAccount
     {
         return $this->customersModuleFactory->moveCreditsTask()->execute($creditMovementDTO);
+    }
+
+    /** @throws InvalidRequestException */
+    private function everyPage(Endpoint $endpoint, ?string $requestId): CursorPager
+    {
+        // An id names one request, and every page is a request of its own.
+        if ($requestId !== null) {
+            throw new InvalidRequestException(
+                \sprintf('Slen: a request id names one request, and each page of %s is one; give it to a call of one page.', $endpoint->value),
+                'invalid_request',
+            );
+        }
+
+        return $this->customersModuleFactory->cursorPager();
     }
 
     /**
@@ -307,9 +330,16 @@ final readonly class CustomersFacade
             'credit_type' => $options->creditType,
             'low_balance' => $options->lowBalance,
         ];
-        $apiRequest = new ApiRequestDTO(Endpoint::ListCustomers, query: $query, retries: $options->retries, timeout: $options->timeout);
+        $apiRequest = new ApiRequestDTO(
+            Endpoint::ListCustomers,
+            query: $query,
+            retries: $options->retries,
+            timeout: $options->timeout,
+            requestId: $options->requestId,
+        );
+        $apiResponse = $this->customersModuleFactory->api()->exchange($apiRequest);
 
-        return $this->customersModuleFactory->customerResource()->page($this->customersModuleFactory->api()->exchange($apiRequest)->body);
+        return $this->customersModuleFactory->customerResource()->page($apiResponse->body, $apiResponse->requestId());
     }
 
     /**
@@ -330,14 +360,18 @@ final readonly class CustomersFacade
             ],
             retries: $options->retries,
             timeout: $options->timeout,
+            requestId: $options->requestId,
         );
+        $apiResponse = $this->customersModuleFactory->api()->exchange($apiRequest);
 
-        return $this->customersModuleFactory->creditEntryResource()->page($this->customersModuleFactory->api()->exchange($apiRequest)->body);
+        return $this->customersModuleFactory->creditEntryResource()->page($apiResponse->body, $apiResponse->requestId());
     }
 
     /** @throws SlenException */
     private function customer(ApiRequestDTO $apiRequest): Customer
     {
-        return $this->customersModuleFactory->customerResource()->map($this->customersModuleFactory->api()->data($apiRequest));
+        $apiResponse = $this->customersModuleFactory->api()->exchange($apiRequest);
+
+        return $this->customersModuleFactory->customerResource()->map($apiResponse->data(), $apiResponse->requestId());
     }
 }

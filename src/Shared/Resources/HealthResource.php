@@ -15,7 +15,7 @@ final readonly class HealthResource extends BaseResource
      *
      * @throws InvalidResponseException
      */
-    public function map(array $data): Health
+    public function map(array $data, ?string $requestId = null): Health
     {
         return new Health(
             app: $this->string($data, 'app'),
@@ -27,6 +27,7 @@ final readonly class HealthResource extends BaseResource
             broadcast: $this->nullableString($data, 'broadcast'),
             opcachePreloadedFiles: $this->nullableInt($data, 'opcache_preloaded_files'),
             opcacheCachedScripts: $this->nullableInt($data, 'opcache_cached_scripts'),
+            requestId: $requestId,
         );
     }
 }

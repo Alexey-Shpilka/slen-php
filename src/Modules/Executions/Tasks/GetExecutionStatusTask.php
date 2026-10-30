@@ -33,13 +33,16 @@ final readonly class GetExecutionStatusTask
             ['id' => $executionId],
             retries: $options->retries,
             timeout: $options->timeout,
+            requestId: $options->requestId,
         );
     }
 
     /** @throws SlenException */
     public function execute(ApiRequestDTO $request): ExecutionStatusView
     {
-        return $this->executionStatusResource->map($this->apiCaller->data($request));
+        $apiResponse = $this->apiCaller->exchange($request);
+
+        return $this->executionStatusResource->map($apiResponse->data(), $apiResponse->requestId());
     }
 
     /** @throws SlenException */

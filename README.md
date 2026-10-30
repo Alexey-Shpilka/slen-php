@@ -301,6 +301,20 @@ A credit movement (`topUp`, `charge`, `adjust`) moves credits once per key: afte
 
 A success the SDK cannot read — a 2xx whose body is not the API's envelope, such as the page of a proxy — is an `InvalidResponseException` with the status it came with. The call may have gone through; it is not repeated, and the body is never quoted.
 
+## Request ids
+
+Every answer of the API names its request in `X-Request-Id`, and so does what the SDK hands back: the result of a call that reads an answer carries it as `requestId` — `Health`, `ExecutionResult`, `ExecutionStatusView`, `ExecutionTrace`, `Customer`, `CustomerAccount`, `Page`, `CreditPriceList`. A row of a page and an account inside a customer carry none: the id is the one of the page, or of the customer. `executions()->wait()` answers with the id of its last read; an exception carries its own `requestId`, from the header or else from `error.request_id`.
+
+```php
+use Slen\Sdk\RequestOptions;
+
+$customer = $slen->customers()->get('user_8421', new RequestOptions(requestId: 'order-42:customer'));
+
+$logger->info('customer read', ['request_id' => $customer->requestId]);
+```
+
+A call may name its request itself: `requestId` of its options — 8 to 128 characters of `A-Z a-z 0-9 . _ : -`, anything else is refused before the wire — goes as `X-Request-Id` on every attempt, and the API answers under it, so your own trace and Slen's meet. `listAll()` and `entriesAll()` make a request a page and take none: give the id to `list()` or `entries()`.
+
 ## Testing your own code
 
 ```php

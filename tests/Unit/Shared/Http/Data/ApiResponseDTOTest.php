@@ -31,6 +31,13 @@ final class ApiResponseDTOTest extends TestCase
         self::assertNull($response->header('Retry-After'));
     }
 
+    public function testDataIsTheDataOfTheEnvelopeAndNothingElse(): void
+    {
+        self::assertSame(['id' => 'e1'], (new ApiResponseDTO(200, [], ['data' => ['id' => 'e1'], 'meta' => []]))->data());
+        self::assertSame([], (new ApiResponseDTO(200, [], ['app' => 'slen']))->data());
+        self::assertSame([], (new ApiResponseDTO(200, [], ['data' => 'a string']))->data());
+    }
+
     public function testRequestIdComesFromTheHeaderAndElseFromTheEnvelope(): void
     {
         $body = ['error' => ['request_id' => 'from-body']];

@@ -24,7 +24,7 @@ final readonly class ExecutionTraceResource extends BaseResource
      *
      * @throws InvalidResponseException
      */
-    public function map(array $data): ExecutionTrace
+    public function map(array $data, ?string $requestId = null): ExecutionTrace
     {
         return new ExecutionTrace(
             executionId: $this->string($data, 'execution_id'),
@@ -43,6 +43,7 @@ final readonly class ExecutionTraceResource extends BaseResource
             durationMs: $this->nullableInt($data, 'duration_ms'),
             nodes: array_map($this->node(...), $this->objects($data, 'nodes')),
             events: array_map($this->event(...), $this->objects($data, 'events')),
+            requestId: $requestId,
         );
     }
 

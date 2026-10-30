@@ -41,7 +41,7 @@ final readonly class ExecutionsFacade
      * Reads the run until it is over or the time is up, at the pace the server asks for; then the last state read.
      *
      * @throws InvalidRequestException an empty id; nothing sent
-     * @throws SlenException            no read succeeded, or one failed for good (a 404, a 401)
+     * @throws SlenException           no read succeeded, or one failed for good (a 404, a 401)
      */
     public function wait(string $executionId, ?WaitOptions $options = null): ExecutionStatusView
     {
@@ -71,8 +71,15 @@ final readonly class ExecutionsFacade
     public function trace(string $executionId, ?RequestOptions $options = null): ExecutionTrace
     {
         $options ??= new RequestOptions();
-        $apiRequest = new ApiRequestDTO(Endpoint::GetExecutionTrace, ['id' => $executionId], retries: $options->retries, timeout: $options->timeout);
+        $apiRequest = new ApiRequestDTO(
+            Endpoint::GetExecutionTrace,
+            ['id' => $executionId],
+            retries: $options->retries,
+            timeout: $options->timeout,
+            requestId: $options->requestId,
+        );
+        $apiResponse = $this->executionsModuleFactory->api()->exchange($apiRequest);
 
-        return $this->executionsModuleFactory->executionTraceResource()->map($this->executionsModuleFactory->api()->data($apiRequest));
+        return $this->executionsModuleFactory->executionTraceResource()->map($apiResponse->data(), $apiResponse->requestId());
     }
 }

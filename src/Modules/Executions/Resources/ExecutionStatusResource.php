@@ -21,7 +21,7 @@ final readonly class ExecutionStatusResource extends BaseResource
      *
      * @throws InvalidResponseException
      */
-    public function map(array $data): ExecutionStatusView
+    public function map(array $data, ?string $requestId = null): ExecutionStatusView
     {
         return new ExecutionStatusView(
             executionId: $this->string($data, 'execution_id'),
@@ -35,6 +35,7 @@ final readonly class ExecutionStatusResource extends BaseResource
             waitingOn: $this->executionResource->waitingOn($data),
             traceUrl: $this->string($data, 'trace_url'),
             retryAfterSeconds: $this->nullableInt($data, 'retry_after_seconds'),
+            requestId: $requestId,
         );
     }
 }

@@ -38,6 +38,7 @@ final readonly class CursorPager
                 throw new InvalidResponseException(
                     'Slen answered a page with the cursor it was asked for; reading on would read the same page forever.',
                     'invalid_response',
+                    requestId: $page->requestId,
                 );
             }
 

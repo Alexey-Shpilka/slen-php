@@ -26,6 +26,7 @@ final readonly class DeleteCustomerTask
             envelope: false,
             retries: $options->retries,
             timeout: $options->timeout,
+            requestId: $options->requestId,
         );
         $apiResponse = $this->apiTransport->client->send($apiRequest);
 

@@ -8,12 +8,12 @@ namespace Slen\Sdk\Observability;
 final readonly class SlenSpan
 {
     /**
-     * @param string      $operation     the call: operations.execute, operations.execute_async or executions.wait
-     * @param string      $outcome       ok, refused (a 402, a policy, a rejected run) or error
-     * @param string|null $status        the status of the run; null when the call threw
-     * @param string|null $estimated     a decimal string of money
-     * @param string|null $actual        a decimal string of money; null until the run is captured
-     * @param bool|null   $cacheHit      whether a finished run answered from the cache; null until it finished
+     * @param string      $operation the call: operations.execute, operations.execute_async or executions.wait
+     * @param string      $outcome   ok, refused (a 402, a policy, a rejected run) or error
+     * @param string|null $status    the status of the run; null when the call threw
+     * @param string|null $estimated a decimal string of money
+     * @param string|null $actual    a decimal string of money; null until the run is captured
+     * @param bool|null   $cacheHit  whether a finished run answered from the cache; null until it finished
      */
     public function __construct(
         public string $operation,

@@ -10,6 +10,7 @@ final readonly class CreditPriceList
     /** @param list<CreditPrice> $data */
     public function __construct(
         public array $data,
+        public ?string $requestId = null,
     ) {
     }
 }

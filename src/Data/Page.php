@@ -15,6 +15,7 @@ final readonly class Page
     public function __construct(
         public array $data,
         public ?string $nextCursor,
+        public ?string $requestId = null,
     ) {
     }
 }

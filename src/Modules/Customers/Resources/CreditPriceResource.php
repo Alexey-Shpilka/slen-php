@@ -35,8 +35,8 @@ final readonly class CreditPriceResource extends BaseResource
      *
      * @throws InvalidResponseException
      */
-    public function list(array $body): CreditPriceList
+    public function list(array $body, ?string $requestId = null): CreditPriceList
     {
-        return new CreditPriceList(array_map($this->map(...), $this->objects($body, 'data')));
+        return new CreditPriceList(array_map($this->map(...), $this->objects($body, 'data')), $requestId);
     }
 }

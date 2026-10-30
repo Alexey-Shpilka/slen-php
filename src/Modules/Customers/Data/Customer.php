@@ -11,8 +11,8 @@ use Slen\Sdk\Modules\Customers\Enums\CustomerStatus;
 final readonly class Customer
 {
     /**
-     * @param DateTimeImmutable|null   $blockedAt      when it was first blocked; null while it is active
-     * @param list<CustomerAccount> $accounts
+     * @param DateTimeImmutable|null $blockedAt when it was first blocked; null while it is active
+     * @param list<CustomerAccount>  $accounts
      */
     public function __construct(
         public string $customerId,
@@ -23,6 +23,7 @@ final readonly class Customer
         public array $accounts,
         public DateTimeImmutable $createdAt,
         public DateTimeImmutable $updatedAt,
+        public ?string $requestId = null,
     ) {
     }
 

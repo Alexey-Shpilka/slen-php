@@ -36,20 +36,4 @@ final readonly class ApiCaller
 
         return $response;
     }
-
-    /**
-     * @return array<mixed>
-     *
-     * @throws SlenException
-     */
-    public function data(ApiRequestDTO $request): array
-    {
-        $body = $this->exchange($request)->body;
-
-        if ($request->envelope === false) {
-            return $body;
-        }
-
-        return \is_array($body['data'] ?? null) === true ? $body['data'] : [];
-    }
 }

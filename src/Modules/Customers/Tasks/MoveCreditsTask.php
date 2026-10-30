@@ -68,9 +68,11 @@ final readonly class MoveCreditsTask
             idempotencyKey: $options->idempotencyKey ?? IdempotencyKeys::generate(),
             retries: $options->retries,
             timeout: $options->timeout,
+            requestId: $options->requestId,
         );
+        $apiResponse = $this->apiCaller->exchange($apiRequest);
 
-        return $this->customerAccountResource->map($this->apiCaller->data($apiRequest));
+        return $this->customerAccountResource->map($apiResponse->data(), $apiResponse->requestId());
     }
 
     private function refused(string $what): InvalidRequestException

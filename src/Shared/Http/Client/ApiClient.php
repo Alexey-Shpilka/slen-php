@@ -67,6 +67,10 @@ final readonly class ApiClient implements ApiClientInterface
             $message = $message->withHeader('Idempotency-Key', $request->idempotencyKey);
         }
 
+        if ($request->requestId !== null) {
+            $message = $message->withHeader('X-Request-Id', $request->requestId);
+        }
+
         if ($request->json === null) {
             return $message;
         }
