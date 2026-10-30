@@ -9,10 +9,15 @@ use Generator;
 use Slen\Sdk\Data\Page;
 use Slen\Sdk\Exceptions\InvalidResponseException;
 use Slen\Sdk\Exceptions\SlenException;
+use Slen\Sdk\Shared\Http\Enums\Endpoint;
 
 /** @internal */
 final readonly class CursorPager
 {
+    public function __construct(private Endpoint $endpoint)
+    {
+    }
+
     /**
      * @template T
      *
@@ -36,7 +41,10 @@ final readonly class CursorPager
 
             if ($page->nextCursor !== null && $page->nextCursor === $cursor) {
                 throw new InvalidResponseException(
-                    'Slen answered a page with the cursor it was asked for; reading on would read the same page forever.',
+                    \sprintf(
+                        'Slen answered a page of %s with the cursor it was asked for; reading on would read the same page forever.',
+                        $this->endpoint->value,
+                    ),
                     'invalid_response',
                     requestId: $page->requestId,
                 );

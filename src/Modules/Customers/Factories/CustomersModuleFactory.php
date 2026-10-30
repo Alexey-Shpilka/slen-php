@@ -13,6 +13,7 @@ use Slen\Sdk\Modules\Customers\Tasks\MoveCreditsTask;
 use Slen\Sdk\Shared\Http\ApiCaller;
 use Slen\Sdk\Shared\Http\ApiTransport;
 use Slen\Sdk\Shared\Http\CursorPager;
+use Slen\Sdk\Shared\Http\Enums\Endpoint;
 
 /** @internal */
 final readonly class CustomersModuleFactory
@@ -26,9 +27,9 @@ final readonly class CustomersModuleFactory
         return new ApiCaller($this->apiTransport);
     }
 
-    public function cursorPager(): CursorPager
+    public function cursorPager(Endpoint $endpoint): CursorPager
     {
-        return new CursorPager();
+        return new CursorPager($endpoint);
     }
 
     public function customerResource(): CustomerResource

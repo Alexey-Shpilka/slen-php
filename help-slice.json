@@ -2501,7 +2501,7 @@
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "cursorPager(): Slen\\Sdk\\Shared\\Http\\CursorPager"
+          "signature": "cursorPager(Slen\\Sdk\\Shared\\Http\\Enums\\Endpoint $endpoint): Slen\\Sdk\\Shared\\Http\\CursorPager"
         },
         {
           "name": "customerResource",
@@ -7342,6 +7342,15 @@
       "implements": [],
       "signature": null,
       "members": [
+        {
+          "name": "__construct",
+          "kind": "constructor",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "__construct(Slen\\Sdk\\Shared\\Http\\Enums\\Endpoint $endpoint)"
+        },
         {
           "name": "pages",
           "kind": "method",

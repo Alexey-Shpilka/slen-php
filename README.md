@@ -19,7 +19,7 @@ Any PSR-18 client does. With Guzzle, or with Symfony HttpClient and `nyholm/psr7
 | | Versions | Held by |
 |---|---|---|
 | PHP | 8.3, 8.4, 8.5 | the suite on 8.4 and 8.5; the package run on 8.3 (`bin/floor.php`) |
-| Laravel | 11, 12 and 13 | the provider's tests on `illuminate/*`, the newest of 11–13 the suite installs; `conflict` refuses an older `illuminate/support` |
+| Laravel | 11, 12 and 13 | the provider's tests on `illuminate/*` 13 and 11, the newest and the oldest; `conflict` refuses an older `illuminate/support` |
 | HTTP clients | any PSR-18 client with PSR-17 factories | Guzzle 7.9+ and 8 (the suite runs on both) and Symfony HttpClient 6.2 to 8 take the timeout of a single call; any other client keeps its own timeouts |
 
 ## The SDK
@@ -315,7 +315,7 @@ A success the SDK cannot read — a 2xx whose body is not the API's envelope, su
 
 ## Request ids
 
-Every answer of the API names its request in `X-Request-Id`, and so does what the SDK hands back: the result of a call that reads an answer carries it as `requestId` — `Health`, `ExecutionResult`, `ExecutionStatusView`, `ExecutionTrace`, `Customer`, `CustomerAccount`, `Page`, `CreditPriceList`. A row of a page and an account inside a customer carry none: the id is the one of the page, or of the customer. `executions()->wait()` answers with the id of its last read; an exception carries its own `requestId`, from the header or else from `error.request_id`.
+Every answer of the API names its request in `X-Request-Id`, and so does what the SDK hands back: the result of a call that reads an answer carries it as `requestId` — `Health`, `ExecutionResult`, `ExecutionStatusView`, `ExecutionTrace`, `Customer`, `CustomerAccount`, `Page`, `CreditPriceList`. A row of a page and an account inside a customer carry none: the id is the one of the page, or of the customer. `executions()->wait()` answers with the id of its last read; an exception carries its own `requestId`, from the header or else from `error.request_id`; one of a call that got no answer at all carries the id the call gave, if it gave one.
 
 ```php
 use Slen\Sdk\RequestOptions;
