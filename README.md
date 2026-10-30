@@ -137,6 +137,18 @@ $account = $slen->customers()->charge('user_8421', '5.0000', new MovementOptions
 
 Credits are a decimal string of at most four places (`'5'`, `'5.25'`, `'-3.0000'`); anything else is refused before the wire. `MovementOptions` carries `creditType` (default `'default'`), `note` and `idempotencyKey`; under the same key the server moves the credits once.
 
+**Every page.** `list()` and `entries()` read one page: its `data` and the `nextCursor` of the next, null on the last. `listAll()` and `entriesAll()` read them all, a request a page as the `foreach` gets there: nothing is sent before the loop starts, and a `break` sends no more. Their options are those of a page: `cursor` is where the read starts, `limit` the size of each page (1 to 100, 50), `timeout` and `retries` hold for every page. A list that ends exactly at the end of a full page takes one request more, answered with an empty page.
+
+```php
+use Slen\Sdk\Modules\Customers\Options\EntryListOptions;
+
+foreach ($slen->customers()->entriesAll('user_8421', new EntryListOptions(limit: 100)) as $entry) {
+    echo $entry->createdAt->format('Y-m-d'), ' ', $entry->entryType->value, ' ', $entry->credits, PHP_EOL;
+}
+```
+
+To come back later to where a read stopped, keep the `nextCursor` of a page and pass it as `cursor` to `list()` or `entries()`.
+
 ## Webhooks
 
 ```php
