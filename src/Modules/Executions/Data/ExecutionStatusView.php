@@ -28,6 +28,7 @@ final readonly class ExecutionStatusView
         public ?WaitingOn $waitingOn,
         public string $traceUrl,
         public ?int $retryAfterSeconds,
+        public ?string $requestId = null,
     ) {
     }
 

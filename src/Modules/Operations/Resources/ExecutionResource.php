@@ -21,7 +21,7 @@ final readonly class ExecutionResource extends BaseResource
      *
      * @throws InvalidResponseException
      */
-    public function map(array $data): ExecutionResult
+    public function map(array $data, ?string $requestId = null): ExecutionResult
     {
         $error = $this->nullableArray($data, 'error');
 
@@ -39,6 +39,7 @@ final readonly class ExecutionResource extends BaseResource
             retryAfterSeconds: $this->nullableInt($data, 'retry_after_seconds'),
             error: $error === null ? null : new ExecutionError($this->string($error, 'code'), $this->string($error, 'message')),
             replayed: $this->bool($data, 'replayed'),
+            requestId: $requestId,
         );
     }
 

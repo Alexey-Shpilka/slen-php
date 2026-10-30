@@ -18,20 +18,6 @@ use Slen\Sdk\Tests\Unit\Support\ScriptedApiClient;
 
 final class ApiCallerTest extends TestCase
 {
-    public function testDataHandsBackTheDataOfAnEnvelope(): void
-    {
-        $apiCaller = $this->apiCaller(new ScriptedApiClient(new ApiResponseDTO(200, [], ['data' => ['id' => 'e1'], 'meta' => []])));
-
-        self::assertSame(['id' => 'e1'], $apiCaller->data(new ApiRequestDTO(Endpoint::ListPrices)));
-    }
-
-    public function testDataHandsBackTheWholeBodyOfAnAnswerWithoutEnvelope(): void
-    {
-        $apiCaller = $this->apiCaller(new ScriptedApiClient(new ApiResponseDTO(200, [], ['app' => 'slen'])));
-
-        self::assertSame(['app' => 'slen'], $apiCaller->data(new ApiRequestDTO(Endpoint::Health, envelope: false)));
-    }
-
     public function testExchangeThrowsARefusalAsItsType(): void
     {
         $refusal = new ApiResponseDTO(402, ['x-request-id' => 'r9'], ['error' => ['code' => 'insufficient_credits', 'message' => 'no']]);

@@ -22,7 +22,7 @@ final readonly class CustomerResource extends BaseResource
      *
      * @throws InvalidResponseException
      */
-    public function map(array $data): Customer
+    public function map(array $data, ?string $requestId = null): Customer
     {
         return new Customer(
             customerId: $this->string($data, 'customer_id'),
@@ -33,6 +33,7 @@ final readonly class CustomerResource extends BaseResource
             accounts: array_map($this->customerAccountResource->map(...), $this->objects($data, 'accounts')),
             createdAt: $this->dateTime($data, 'created_at'),
             updatedAt: $this->dateTime($data, 'updated_at'),
+            requestId: $requestId,
         );
     }
 
@@ -43,11 +44,12 @@ final readonly class CustomerResource extends BaseResource
      *
      * @throws InvalidResponseException
      */
-    public function page(array $body): Page
+    public function page(array $body, ?string $requestId = null): Page
     {
         return new Page(
             array_map($this->map(...), $this->objects($body, 'data')),
             $this->nullableString($this->array($body, 'meta'), 'next_cursor'),
+            $requestId,
         );
     }
 }

@@ -14,6 +14,7 @@ final readonly class ExecuteOptions
      * @param string|null                $idempotencyKey one per unit of work; generated when null
      * @param float|null                 $timeout        seconds each attempt may take, above zero; the config's when null
      * @param int|null                   $retries        attempts after the first, zero or more; the config's when null
+     * @param string|null                $requestId      8 to 128 of A-Za-z0-9._:-, the X-Request-Id of every attempt; the server's own when null
      */
     public function __construct(
         public ?string $customer = null,
@@ -22,6 +23,7 @@ final readonly class ExecuteOptions
         public ?string $idempotencyKey = null,
         public ?float $timeout = null,
         public ?int $retries = null,
+        public ?string $requestId = null,
     ) {
     }
 }

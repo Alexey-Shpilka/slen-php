@@ -31,6 +31,12 @@ final readonly class ApiResponseDTO
         return $this->status >= 200 && $this->status < 300;
     }
 
+    /** @return array<mixed> */
+    public function data(): array
+    {
+        return \is_array($this->body['data'] ?? null) === true ? $this->body['data'] : [];
+    }
+
     public function header(string $name): ?string
     {
         return $this->headers[strtolower($name)] ?? null;

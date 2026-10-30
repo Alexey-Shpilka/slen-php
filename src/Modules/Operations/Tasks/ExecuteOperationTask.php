@@ -50,13 +50,16 @@ final readonly class ExecuteOperationTask
             idempotencyKey: $options->idempotencyKey ?? IdempotencyKeys::generate(),
             retries: $options->retries,
             timeout: $options->timeout,
+            requestId: $options->requestId,
         );
     }
 
     /** @throws SlenException */
     public function execute(ApiRequestDTO $request): ExecutionResult
     {
-        return $this->executionResource->map($this->apiCaller->data($request));
+        $apiResponse = $this->apiCaller->exchange($request);
+
+        return $this->executionResource->map($apiResponse->data(), $apiResponse->requestId());
     }
 
     /**

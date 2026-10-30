@@ -64,7 +64,7 @@ final readonly class SlenSdk
         return $this->sdkModulesDTO->executions;
     }
 
-    /** End customers: list(), listAll(), get(), create(), updateAccount(), block(), unblock(), delete(), topUp(), charge(), adjust(), entries(), entriesAll(), prices(). */
+    /** End customers and their credits: get(), create(), block(), topUp(), charge(), adjust(), list(), listAll(), entries(), entriesAll(), prices()… */
     public function customers(): CustomersFacade
     {
         return $this->sdkModulesDTO->customers;
@@ -85,8 +85,15 @@ final readonly class SlenSdk
     public function health(?RequestOptions $options = null): Health
     {
         $options ??= new RequestOptions();
-        $apiRequest = new ApiRequestDTO(Endpoint::Health, envelope: false, retries: $options->retries, timeout: $options->timeout);
+        $apiRequest = new ApiRequestDTO(
+            Endpoint::Health,
+            envelope: false,
+            retries: $options->retries,
+            timeout: $options->timeout,
+            requestId: $options->requestId,
+        );
+        $apiResponse = $this->sdkModulesDTO->api->exchange($apiRequest);
 
-        return $this->sdkModulesDTO->health->map($this->sdkModulesDTO->api->data($apiRequest));
+        return $this->sdkModulesDTO->health->map($apiResponse->body, $apiResponse->requestId());
     }
 }

@@ -13,7 +13,7 @@ use Slen\Sdk\Modules\Operations\Enums\ExecutionStatus;
 final readonly class ExecutionTrace
 {
     /**
-     * @param string|null         $flowName      the flow's name as it is now; null for a flow out of reach
+     * @param string|null              $flowName the flow's name as it is now; null for a flow out of reach
      * @param list<FlowExecutionNode>  $nodes
      * @param list<FlowExecutionEvent> $events
      */
@@ -34,6 +34,7 @@ final readonly class ExecutionTrace
         public ?int $durationMs,
         public array $nodes,
         public array $events,
+        public ?string $requestId = null,
     ) {
     }
 }

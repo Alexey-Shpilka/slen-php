@@ -11,8 +11,8 @@ use Slen\Sdk\Modules\Customers\Enums\CreditEntryType;
 final readonly class CreditEntry
 {
     /**
-     * @param string      $credits        signed: negative took credits, positive gave them back
-     * @param string|null $reservationId  the hold a commit or a release settles; null otherwise
+     * @param string      $credits       signed: negative took credits, positive gave them back
+     * @param string|null $reservationId the hold a commit or a release settles; null otherwise
      */
     public function __construct(
         public string $entryId,

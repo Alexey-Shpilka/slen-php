@@ -26,6 +26,7 @@ final readonly class CustomerAccount
         public string $lowBalanceThreshold,
         public DateTimeImmutable $createdAt,
         public DateTimeImmutable $updatedAt,
+        public ?string $requestId = null,
     ) {
     }
 }

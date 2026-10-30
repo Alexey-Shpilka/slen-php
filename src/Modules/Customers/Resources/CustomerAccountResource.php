@@ -16,7 +16,7 @@ final readonly class CustomerAccountResource extends BaseResource
      *
      * @throws InvalidResponseException
      */
-    public function map(array $data): CustomerAccount
+    public function map(array $data, ?string $requestId = null): CustomerAccount
     {
         return new CustomerAccount(
             customerAccountId: $this->string($data, 'customer_account_id'),
@@ -31,6 +31,7 @@ final readonly class CustomerAccountResource extends BaseResource
             lowBalanceThreshold: $this->decimal($data, 'low_balance_threshold'),
             createdAt: $this->dateTime($data, 'created_at'),
             updatedAt: $this->dateTime($data, 'updated_at'),
+            requestId: $requestId,
         );
     }
 }

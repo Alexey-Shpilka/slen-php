@@ -10,6 +10,8 @@ All notable changes to `slen/sdk` are written here. The format follows [Keep a C
 - `customers()->prices()` answers a `CreditPriceList` (its `data` is the list) instead of an array.
 
 ### Added
+- `requestId` on every result read from an answer — `Health`, `ExecutionResult`, `ExecutionStatusView`, `ExecutionTrace`, `Customer`, `CustomerAccount`, `Page`, `CreditPriceList` — from the answer's `X-Request-Id`.
+- `requestId` in the options of every call that goes over the network: the caller's own id, sent as `X-Request-Id` on every attempt (8 to 128 of `A-Z a-z 0-9 . _ : -`, refused before the wire otherwise).
 - `customers()->listAll()` and `customers()->entriesAll()`: every customer, every entry of a statement, read page by page as a `foreach` goes on (generators; the options' `cursor` is where they start, `limit` the size of a page).
 
 ## [0.3.2] - 2026-10-31
