@@ -64,7 +64,7 @@ final readonly class SlenSdk
         return $this->sdkModulesDTO->executions;
     }
 
-    /** End customers: list(), get(), create(), updateAccount(), block(), unblock(), delete(), topUp(), charge(), adjust(), entries(), prices(). */
+    /** End customers: list(), listAll(), get(), create(), updateAccount(), block(), unblock(), delete(), topUp(), charge(), adjust(), entries(), entriesAll(), prices(). */
     public function customers(): CustomersFacade
     {
         return $this->sdkModulesDTO->customers;

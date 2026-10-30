@@ -12,6 +12,7 @@ use Slen\Sdk\Modules\Customers\Tasks\DeleteCustomerTask;
 use Slen\Sdk\Modules\Customers\Tasks\MoveCreditsTask;
 use Slen\Sdk\Shared\Http\ApiCaller;
 use Slen\Sdk\Shared\Http\ApiTransport;
+use Slen\Sdk\Shared\Http\CursorPager;
 
 /** @internal */
 final readonly class CustomersModuleFactory
@@ -23,6 +24,11 @@ final readonly class CustomersModuleFactory
     public function api(): ApiCaller
     {
         return new ApiCaller($this->apiTransport);
+    }
+
+    public function cursorPager(): CursorPager
+    {
+        return new CursorPager();
     }
 
     public function customerResource(): CustomerResource

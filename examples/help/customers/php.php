@@ -53,6 +53,13 @@ foreach ($statement->data as $entry) {
 }
 // docs:end
 
+// docs:start statement-all
+// Every page of the statement, two entries at a time: the next page is read when the loop gets to it.
+foreach ($slen->customers()->entriesAll('user_8421', new EntryListOptions(limit: 2)) as $entry) {
+    echo $entry->entryType->value, ' ', $entry->credits, ' ', $entry->note, PHP_EOL;
+}
+// docs:end
+
 // docs:start refused
 use Slen\Sdk\Exceptions\InsufficientCreditsException;
 use Slen\Sdk\Modules\Operations\Options\ExecuteOptions;

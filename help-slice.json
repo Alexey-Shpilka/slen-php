@@ -377,6 +377,15 @@
       "operation": "GET /v1/customers/{externalUserId}/entries"
     },
     {
+      "name": "customers.entriesAll",
+      "symbol": "Slen\\Sdk\\Modules\\Customers\\CustomersFacade",
+      "member": "entriesAll",
+      "deprecated": false,
+      "internal": false,
+      "signature": "entriesAll(string $externalUserId, ?Slen\\Sdk\\Modules\\Customers\\Options\\EntryListOptions $options = null): Generator",
+      "operation": "GET /v1/customers/{externalUserId}/entries"
+    },
+    {
       "name": "customers.get",
       "symbol": "Slen\\Sdk\\Modules\\Customers\\CustomersFacade",
       "member": "get",
@@ -392,6 +401,15 @@
       "deprecated": false,
       "internal": false,
       "signature": "list(?Slen\\Sdk\\Modules\\Customers\\Options\\CustomerListOptions $options = null): Slen\\Sdk\\Data\\Page",
+      "operation": "GET /v1/customers"
+    },
+    {
+      "name": "customers.listAll",
+      "symbol": "Slen\\Sdk\\Modules\\Customers\\CustomersFacade",
+      "member": "listAll",
+      "deprecated": false,
+      "internal": false,
+      "signature": "listAll(?Slen\\Sdk\\Modules\\Customers\\Options\\CustomerListOptions $options = null): Generator",
       "operation": "GET /v1/customers"
     },
     {
@@ -1403,6 +1421,15 @@
           "signature": "list(?Slen\\Sdk\\Modules\\Customers\\Options\\CustomerListOptions $options = null): Slen\\Sdk\\Data\\Page"
         },
         {
+          "name": "listAll",
+          "kind": "method",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "listAll(?Slen\\Sdk\\Modules\\Customers\\Options\\CustomerListOptions $options = null): Generator"
+        },
+        {
           "name": "get",
           "kind": "method",
           "static": false,
@@ -1491,6 +1518,15 @@
           "deprecated": false,
           "internal": false,
           "signature": "entries(string $externalUserId, ?Slen\\Sdk\\Modules\\Customers\\Options\\EntryListOptions $options = null): Slen\\Sdk\\Data\\Page"
+        },
+        {
+          "name": "entriesAll",
+          "kind": "method",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "entriesAll(string $externalUserId, ?Slen\\Sdk\\Modules\\Customers\\Options\\EntryListOptions $options = null): Generator"
         },
         {
           "name": "prices",
@@ -2412,6 +2448,15 @@
           "deprecated": false,
           "internal": false,
           "signature": "api(): Slen\\Sdk\\Shared\\Http\\ApiCaller"
+        },
+        {
+          "name": "cursorPager",
+          "kind": "method",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "cursorPager(): Slen\\Sdk\\Shared\\Http\\CursorPager"
         },
         {
           "name": "customerResource",
@@ -7143,6 +7188,33 @@
           "deprecated": false,
           "internal": false,
           "signature": "pause(Slen\\Sdk\\Shared\\Http\\Data\\RetryDecisionDTO $retryDecision): void"
+        }
+      ]
+    },
+    {
+      "name": "Slen\\Sdk\\Shared\\Http\\CursorPager",
+      "kind": "class",
+      "source": "src/Shared/Http/CursorPager.php",
+      "deprecated": false,
+      "internal": true,
+      "alias_of": null,
+      "modifiers": [
+        "final",
+        "readonly"
+      ],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": null,
+      "members": [
+        {
+          "name": "pages",
+          "kind": "method",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "pages(Closure $fetch, ?string $from): Generator"
         }
       ]
     },

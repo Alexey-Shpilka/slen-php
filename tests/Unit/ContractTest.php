@@ -18,6 +18,7 @@ use Slen\Sdk\Data\Page;
 use Slen\Sdk\Exceptions\BudgetExceededException;
 use Slen\Sdk\Exceptions\InvalidRequestException;
 use Slen\Sdk\Exceptions\SlenException;
+use Slen\Sdk\Modules\Customers\Data\CreditEntry;
 use Slen\Sdk\Modules\Customers\Data\CreditPriceList;
 use Slen\Sdk\Modules\Customers\Data\Customer;
 use Slen\Sdk\Modules\Customers\Data\CustomerAccount;
@@ -301,7 +302,7 @@ final class ContractTest extends TestCase
         $problems = [];
         $table = self::callTable();
 
-        self::assertCount(18, $table);
+        self::assertCount(20, $table);
 
         foreach ($table as $name => $line) {
             if (preg_match('#^(?:GET|POST|PUT|PATCH|DELETE) /\S*$#', $line['operation']) !== 1) {
@@ -333,6 +334,59 @@ final class ContractTest extends TestCase
         }
 
         self::assertSame([], $problems, implode("\n", $problems));
+    }
+
+    /**
+     * A call of every page reads the fullest answer of the spec with a cursor, then the next page with that cursor,
+     * and stops at the leanest answer, which has none: one row a page, two requests.
+     */
+    public function testACallOfEveryPageReadsPageAfterPageOfTheSpec(): void
+    {
+        $operations = $this->operationsOfTheSpec();
+        $problems = [];
+
+        foreach (self::iterations() as $name => $call) {
+            $declared = $operations[self::wire(self::callTable()[$name]['operation'] ?? '')] ?? [];
+            [$status, $schema] = $this->answersOf($declared)[0] ?? [200, null];
+            $alternative = $this->alternativesOf($schema)[0];
+            $fakeHttpClient = (new FakeHttpClient())
+                ->pushJson($status, $this->answer($alternative, true, ['meta.next_cursor' => 'cursor-2']))
+                ->pushJson($status, $this->answer($alternative, false, ['meta.next_cursor' => null]));
+
+            $rows = $call(self::sdk($fakeHttpClient));
+            $requests = $fakeHttpClient->requests();
+            parse_str($requests[0]->getUri()->getQuery(), $first);
+            parse_str(($requests[1] ?? $requests[0])->getUri()->getQuery(), $second);
+
+            if (\count($rows) !== 2 || \count($requests) !== 2 || isset($first['cursor']) || ($second['cursor'] ?? null) !== 'cursor-2') {
+                $problems[] = \sprintf('%s read %d rows in %d requests, the second with %s', $name, \count($rows), \count($requests), json_encode($second));
+            }
+        }
+
+        self::assertSame([], $problems, implode("\n", $problems));
+    }
+
+    /**
+     * The calls of every page, read to the end; each is a row of the table too.
+     *
+     * @return array<string, Closure(SlenSdk): list<object>>
+     */
+    private static function iterations(): array
+    {
+        $iterations = [
+            'customers.entriesAll' => static function (SlenSdk $s): array {
+                return iterator_to_array($s->customers()->entriesAll('user 42'), false);
+            },
+            'customers.listAll' => static function (SlenSdk $s): array {
+                return iterator_to_array($s->customers()->listAll(), false);
+            },
+        ];
+
+        self::assertSame(array_keys($iterations), array_values(array_filter(array_keys(self::callTable()), static function (string $name): bool {
+            return str_ends_with($name, 'All');
+        })));
+
+        return $iterations;
     }
 
     /**
@@ -730,6 +784,18 @@ final class ContractTest extends TestCase
             'dto' => Page::class,
             'pins' => [],
         ];
+        yield 'customers.listAll' => [
+            'call' => static function (SlenSdk $s): Customer {
+                return $s->customers()->listAll(
+                    new CustomerListOptions(self::ID, 30, 'user', CustomerStatus::Active, 'default', '10', 5.0, 0),
+                )->current();
+            },
+            'bare' => static function (SlenSdk $s): Customer {
+                return $s->customers()->listAll()->current();
+            },
+            'dto' => Customer::class,
+            'pins' => [],
+        ];
         yield 'customers.get' => self::row(static function (SlenSdk $s): Customer {
             return $s->customers()->get('user 42');
         }, Customer::class);
@@ -804,6 +870,18 @@ final class ContractTest extends TestCase
                 return $s->customers()->entries('user 42');
             },
             'dto' => Page::class,
+            'pins' => [],
+        ];
+        yield 'customers.entriesAll' => [
+            'call' => static function (SlenSdk $s): CreditEntry {
+                return $s->customers()
+                    ->entriesAll('user 42', new EntryListOptions(self::ID, 30, 'default', CreditEntryType::Charge))
+                    ->current();
+            },
+            'bare' => static function (SlenSdk $s): CreditEntry {
+                return $s->customers()->entriesAll('user 42')->current();
+            },
+            'dto' => CreditEntry::class,
             'pins' => [],
         ];
         yield 'customers.prices' => [
