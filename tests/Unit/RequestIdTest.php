@@ -8,7 +8,10 @@ use Closure;
 use Iterator;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Slen\Sdk\Exceptions\ConnectionException;
 use Slen\Sdk\Exceptions\InvalidRequestException;
+use Slen\Sdk\Exceptions\SlenException;
+use Slen\Sdk\Exceptions\TimeoutException;
 use Slen\Sdk\Modules\Customers\Options\AccountOptions;
 use Slen\Sdk\Modules\Customers\Options\BlockOptions;
 use Slen\Sdk\Modules\Customers\Options\CustomerListOptions;
@@ -23,6 +26,7 @@ use Slen\Sdk\Testing\FakeHttpClient;
 use Slen\Sdk\Tests\Paths;
 use Slen\Sdk\Tests\Unit\Support\Answers;
 use Slen\Sdk\Tests\Unit\Support\CustomerAnswers;
+use Slen\Sdk\Tests\Unit\Support\NetworkFailure;
 
 /**
  * The id of a request: the one of the answer on every result read from it, and the caller's own on the wire.
@@ -163,6 +167,46 @@ final class RequestIdTest extends TestCase
 
         self::assertSame([self::OWN, self::OWN, self::OWN], $sent);
         self::assertSame(self::OWN, $customer->requestId);
+    }
+
+    /**
+     * @return Iterator<string, array{string, class-string<SlenException>}>
+     */
+    public static function noAnswerProvider(): Iterator
+    {
+        yield 'a refused connection' => ['Connection refused', ConnectionException::class];
+        yield 'a timeout' => ['Operation timed out after 5000 milliseconds', TimeoutException::class];
+    }
+
+    /**
+     * @param class-string<SlenException> $thrown
+     */
+    #[DataProvider('noAnswerProvider')]
+    public function testACallThatGotNoAnswerThrowsWithTheCallersOwnId(string $failure, string $thrown): void
+    {
+        $fakeHttpClient = (new FakeHttpClient())->pushException(new NetworkFailure($failure))->pushException(new NetworkFailure($failure));
+
+        try {
+            Answers::sdk($fakeHttpClient, retries: 1)->customers()->get('user_8421', new RequestOptions(requestId: self::OWN));
+            self::fail('Expected ' . $thrown);
+        } catch (SlenException $slenException) {
+            self::assertInstanceOf($thrown, $slenException);
+            self::assertSame(self::OWN, $slenException->requestId);
+        }
+
+        self::assertCount(2, $fakeHttpClient->requests());
+    }
+
+    public function testAnAnswerNamesItsOwnIdOverTheCallers(): void
+    {
+        $fakeHttpClient = (new FakeHttpClient())->pushJson(404, Answers::refusal('customer_not_found'), ['X-Request-Id' => 'req_answer']);
+
+        try {
+            Answers::sdk($fakeHttpClient)->customers()->get('user_8421', new RequestOptions(requestId: self::OWN));
+            self::fail('Expected a refusal');
+        } catch (SlenException $slenException) {
+            self::assertSame('req_answer', $slenException->requestId);
+        }
     }
 
     public function testNoIdIsSentUnlessTheCallerGivesOne(): void

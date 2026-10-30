@@ -310,7 +310,7 @@ final readonly class CustomersFacade
             );
         }
 
-        return $this->customersModuleFactory->cursorPager();
+        return $this->customersModuleFactory->cursorPager($endpoint);
     }
 
     /**

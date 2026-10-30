@@ -29,6 +29,8 @@ use Slen\Sdk\Tests\Unit\Support\CustomerAnswers;
  */
 final class CursorPagerTest extends TestCase
 {
+    private const string ENTRIES = 'GET /v1/customers/{externalUserId}/entries';
+
     public function testEveryPageIsReadWithTheCursorOfThePageBeforeUntilOneHasNone(): void
     {
         $fakeHttpClient = (new FakeHttpClient())
@@ -83,6 +85,10 @@ final class CursorPagerTest extends TestCase
             self::fail('Expected InvalidResponseException');
         } catch (InvalidResponseException $invalidResponseException) {
             self::assertSame('invalid_response', $invalidResponseException->errorCode);
+            self::assertSame(
+                \sprintf('Slen answered a page of %s with the cursor it was asked for; reading on would read the same page forever.', self::ENTRIES),
+                $invalidResponseException->getMessage(),
+            );
         }
 
         self::assertCount(2, $read);
