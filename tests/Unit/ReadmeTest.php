@@ -112,7 +112,7 @@ final class ReadmeTest extends TestCase
 
         self::assertCount(1, $compatibility);
 
-        foreach (['8.3, 8.4, 8.5', 'Laravel | 11 and 12', 'PSR-18', 'bin/floor.php'] as $said) {
+        foreach (['8.3, 8.4, 8.5', 'Laravel | 11, 12 and 13', 'Symfony HttpClient 6.2 to 8', 'PSR-18', 'bin/floor.php'] as $said) {
             self::assertStringContainsString($said, $compatibility[0]);
         }
     }

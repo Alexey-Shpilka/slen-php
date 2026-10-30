@@ -3,7 +3,7 @@
 `slen/sdk` runs your flows and reads how they ended, keeps your end customers and their credits, and checks the webhooks Slen sends you.
 
 - PHP ≥ 8.3. HTTP goes through PSR-18 / PSR-17 (`php-http/discovery`): Guzzle, Symfony HttpClient or any client you already have — the package requires none. The journal is PSR-3.
-- Laravel 11 and 12: an auto-discovered service provider, the `Slen` facade and `config/slen-sdk.php`.
+- Laravel 11, 12 and 13: an auto-discovered service provider, the `Slen` facade and `config/slen-sdk.php`.
 - Money and credits are decimal strings, never floats; ids are strings; times are `DateTimeImmutable`; statuses are enums.
 
 ## Install
@@ -19,8 +19,8 @@ Any PSR-18 client does. With Guzzle, or with Symfony HttpClient and `nyholm/psr7
 | | Versions | Held by |
 |---|---|---|
 | PHP | 8.3, 8.4, 8.5 | the suite on 8.4 and 8.5; the package run on 8.3 (`bin/floor.php`) |
-| Laravel | 11 and 12 | the provider's tests on `illuminate/*` 11–12; `conflict` refuses an older `illuminate/support` |
-| HTTP clients | any PSR-18 client with PSR-17 factories | Guzzle 7.9+ and 8 (the suite runs on both) and Symfony HttpClient 6.2+ take the timeout of a single call; any other client keeps its own timeouts |
+| Laravel | 11, 12 and 13 | the provider's tests on `illuminate/*`, the newest of 11–13 the suite installs; `conflict` refuses an older `illuminate/support` |
+| HTTP clients | any PSR-18 client with PSR-17 factories | Guzzle 7.9+ and 8 (the suite runs on both) and Symfony HttpClient 6.2 to 8 take the timeout of a single call; any other client keeps its own timeouts |
 
 ## The SDK
 
