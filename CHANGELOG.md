@@ -4,15 +4,33 @@ All notable changes to `slen/sdk` are written here. The format follows [Keep a C
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-10-31
+
 ### Breaking
-- The types of answers are named as in TypeScript and the API's spec, without `DTO`: `Health`, `Customer`, `CustomerAccount`, `CreditEntry`, `CreditPrice`, `ExecutionResult`, `ExecutionCost`, `ExecutionCache`, `WaitingOn`, `ExecutionError`, `ExecutionStatusView`, `ExecutionTrace`, `FlowExecutionNode`, `FlowExecutionEvent`, `AttemptSummary`, `WebhookEvent`, `ExecutionFinishedEvent`, `CustomerBalanceLowEvent`, `ApprovalRequestedEvent`, `ApprovalDecidedEvent`, `UnknownWebhookEvent`, `Observability\SlenSpan`. No old name is aliased.
-- A page is one `final` `Slen\Sdk\Data\Page` (`Page<Customer>`, `Page<CreditEntry>`) instead of `PageDTO`, `CustomerPageDTO` and `CreditEntryPageDTO`; `hasMore()` is gone — a full last page carries a cursor to an empty one, so the end is a page whose `nextCursor` is null.
-- `customers()->prices()` answers a `CreditPriceList` (its `data` is the list) instead of an array.
+- The types of answers are named as in TypeScript and the API's spec, without `DTO`. No old name is aliased:
+
+  | 0.3 | 0.4.0 |
+  |---|---|
+  | `Slen\Sdk\Data\HealthDTO` | `Slen\Sdk\Data\Health` |
+  | `Slen\Sdk\Data\PageDTO`, `Customers\Data\CustomerPageDTO`, `Customers\Data\CreditEntryPageDTO` | `Slen\Sdk\Data\Page` (`Page<Customer>`, `Page<CreditEntry>`) |
+  | `Customers\Data\CustomerDTO`, `CustomerAccountDTO`, `CreditEntryDTO`, `CreditPriceDTO` | `Customer`, `CustomerAccount`, `CreditEntry`, `CreditPrice` |
+  | `Operations\Data\ExecutionDTO` | `ExecutionResult` |
+  | `ExecutionCostDTO`, `ExecutionCacheDTO`, `WaitingOnDTO`, `ExecutionErrorDTO` | `ExecutionCost`, `ExecutionCache`, `WaitingOn`, `ExecutionError` |
+  | `Executions\Data\ExecutionStatusDTO` | `ExecutionStatusView` |
+  | `ExecutionTraceDTO`, `TraceNodeDTO`, `TraceEventDTO`, `TraceAttemptDTO` | `ExecutionTrace`, `FlowExecutionNode`, `FlowExecutionEvent`, `AttemptSummary` |
+  | `Webhooks\Data\WebhookEventDTO` | `WebhookEvent` |
+  | `ExecutionFinishedEventDTO`, `CustomerBalanceLowEventDTO`, `ApprovalRequestedEventDTO`, `ApprovalDecidedEventDTO` | `ExecutionFinishedEvent`, `CustomerBalanceLowEvent`, `ApprovalRequestedEvent`, `ApprovalDecidedEvent` |
+  | `Webhooks\Data\UnknownEventDTO` | `UnknownWebhookEvent` |
+  | `Observability\SpanDTO` | `Observability\SlenSpan` |
+
+  The namespaces are those of 0.3 (`Customers\Data\…` is `Slen\Sdk\Modules\Customers\Data\…`).
+- A page is one `final` `Page` and has no `hasMore()`: a full last page carries a cursor to an empty one, so the end is a page whose `nextCursor` is null — or read every page with `listAll()` / `entriesAll()`.
+- `customers()->prices()` answers a `CreditPriceList` (its `data` is the list, `requestId` beside it) instead of an array.
 
 ### Added
-- `requestId` on every result read from an answer — `Health`, `ExecutionResult`, `ExecutionStatusView`, `ExecutionTrace`, `Customer`, `CustomerAccount`, `Page`, `CreditPriceList` — from the answer's `X-Request-Id`.
-- `requestId` in the options of every call that goes over the network: the caller's own id, sent as `X-Request-Id` on every attempt (8 to 128 of `A-Z a-z 0-9 . _ : -`, refused before the wire otherwise).
-- `customers()->listAll()` and `customers()->entriesAll()`: every customer, every entry of a statement, read page by page as a `foreach` goes on (generators; the options' `cursor` is where they start, `limit` the size of a page).
+- `customers()->listAll()` and `customers()->entriesAll()`: every customer, every entry of a statement, read page by page as a `foreach` goes on. They are generators: nothing is sent before the loop starts; the options' `cursor` is where they start, `limit` the size of a page, `timeout` and `retries` hold for each.
+- `requestId` on every result read from an answer — `Health`, `ExecutionResult`, `ExecutionStatusView`, `ExecutionTrace`, `Customer`, `CustomerAccount`, `Page`, `CreditPriceList` — from the answer's `X-Request-Id`; a row of a page and an account inside a customer carry none.
+- `requestId` in the options of every call that goes over the network: the caller's own id, sent as `X-Request-Id` on every attempt (8 to 128 of `A-Z a-z 0-9 . _ : -`, refused before the wire otherwise; `listAll()` and `entriesAll()` take none).
 
 ### Changed
 - Laravel 13 and Symfony HttpClient 8 are supported; the suite runs on them.
@@ -49,7 +67,8 @@ The same code as 0.3.1, released again because 0.3.1 was withdrawn from Packagis
 
 The first tag; not published.
 
-[Unreleased]: https://github.com/Alexey-Shpilka/slen-php/compare/v0.3.2...HEAD
+[Unreleased]: https://github.com/Alexey-Shpilka/slen-php/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/Alexey-Shpilka/slen-php/compare/v0.3.2...v0.4.0
 [0.3.2]: https://github.com/Alexey-Shpilka/slen-php/compare/v0.3.1...v0.3.2
 [0.3.1]: https://github.com/Alexey-Shpilka/slen-php/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/Alexey-Shpilka/slen-php/releases/tag/v0.3.0

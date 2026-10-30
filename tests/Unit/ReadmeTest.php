@@ -90,6 +90,28 @@ final class ReadmeTest extends TestCase
     }
 
     /**
+     * A reader learns from the README how to read every page and how to come back to one, and what the id of a
+     * request is on an answer and on a call.
+     */
+    public function testTheReadmeTellsHowToReadEveryPageAndWhatARequestIdIs(): void
+    {
+        $sections = preg_split('/^## /m', (string) file_get_contents(self::README));
+        $named = [];
+
+        foreach ($sections === false ? [] : $sections as $section) {
+            $named[strtok($section, "\n")] = $section;
+        }
+
+        foreach (['listAll()', 'entriesAll(', 'nextCursor', 'a `break` sends no more'] as $said) {
+            self::assertStringContainsString($said, $named['End customers'] ?? '');
+        }
+
+        foreach (['X-Request-Id', 'requestId: ', '->requestId', '8 to 128', 'give the id to `list()` or `entries()`'] as $said) {
+            self::assertStringContainsString($said, $named['Request ids'] ?? '');
+        }
+    }
+
+    /**
      * Keys are sl_live_...; one issued earlier as sg_live_... keeps working, and is not what a reader is shown.
      */
     public function testTheReadmeShowsAKeyOfToday(): void
