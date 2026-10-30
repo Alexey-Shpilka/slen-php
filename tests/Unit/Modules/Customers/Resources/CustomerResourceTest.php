@@ -17,11 +17,11 @@ final class CustomerResourceTest extends TestCase
 {
     public function testACustomerWithoutAccountsIsRead(): void
     {
-        $customerDTO = (new CustomerResource(new CustomerAccountResource()))->map(CustomerAnswers::customer(['accounts' => []]));
+        $customer = (new CustomerResource(new CustomerAccountResource()))->map(CustomerAnswers::customer(['accounts' => []]));
 
-        self::assertSame(CustomerStatus::Active, $customerDTO->status);
-        self::assertSame([], $customerDTO->accounts);
-        self::assertNull($customerDTO->blockedAt);
+        self::assertSame(CustomerStatus::Active, $customer->status);
+        self::assertSame([], $customer->accounts);
+        self::assertNull($customer->blockedAt);
     }
 
     /**

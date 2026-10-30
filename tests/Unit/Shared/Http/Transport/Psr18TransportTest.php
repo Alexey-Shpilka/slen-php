@@ -51,9 +51,9 @@ final class Psr18TransportTest extends TestCase
     {
         $fakeHttpClient = (new FakeHttpClient())->pushJson(200, ['data' => CustomerAnswers::customer()]);
 
-        $customerDTO = Answers::sdk($fakeHttpClient, new NullSpanRecorder(), new NullLogger())->customers()->get('user_8421', new RequestOptions(timeout: 3.5));
+        $customer = Answers::sdk($fakeHttpClient, new NullSpanRecorder(), new NullLogger())->customers()->get('user_8421', new RequestOptions(timeout: 3.5));
 
-        self::assertSame('user_8421', $customerDTO->externalUserId);
+        self::assertSame('user_8421', $customer->externalUserId);
         self::assertCount(1, $fakeHttpClient->requests());
     }
 }

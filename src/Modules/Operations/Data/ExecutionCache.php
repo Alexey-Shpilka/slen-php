@@ -7,7 +7,7 @@ namespace Slen\Sdk\Modules\Operations\Data;
 use DateTimeImmutable;
 
 /** Whether the answer of a completed run came from the response cache. */
-final readonly class ExecutionCacheDTO
+final readonly class ExecutionCache
 {
     /** @param DateTimeImmutable|null $cachedAt when the served answer was stored; null unless $hit */
     public function __construct(

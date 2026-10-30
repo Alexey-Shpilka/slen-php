@@ -8,7 +8,7 @@ use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Slen\Sdk\Observability\NullSpanRecorder;
 use Slen\Sdk\Observability\Psr3SpanRecorder;
-use Slen\Sdk\Observability\SpanDTO;
+use Slen\Sdk\Observability\SlenSpan;
 use Slen\Sdk\Tests\Unit\Support\RecordingLogger;
 
 final class Psr3SpanRecorderTest extends TestCase
@@ -17,7 +17,7 @@ final class Psr3SpanRecorderTest extends TestCase
     {
         $logger = new RecordingLogger();
 
-        (new Psr3SpanRecorder($logger))->record(new SpanDTO('operations.execute', 'ok', 'completed', 5, '7', 'support.reply', cacheHit: false));
+        (new Psr3SpanRecorder($logger))->record(new SlenSpan('operations.execute', 'ok', 'completed', 5, '7', 'support.reply', cacheHit: false));
 
         self::assertSame([[
             'level' => 'info',
@@ -38,7 +38,7 @@ final class Psr3SpanRecorderTest extends TestCase
     {
         $logger = new RecordingLogger();
 
-        (new Psr3SpanRecorder($logger, ' Warning '))->record(new SpanDTO('executions.wait', 'error', null, 1));
+        (new Psr3SpanRecorder($logger, ' Warning '))->record(new SlenSpan('executions.wait', 'error', null, 1));
 
         self::assertSame(['warning slen.span'], $logger->events());
     }
@@ -53,7 +53,7 @@ final class Psr3SpanRecorderTest extends TestCase
 
     public function testTheNullRecorderTakesASpanAndDoesNothing(): void
     {
-        (new NullSpanRecorder())->record(new SpanDTO('operations.execute', 'ok', 'completed', 1));
+        (new NullSpanRecorder())->record(new SlenSpan('operations.execute', 'ok', 'completed', 1));
 
         $this->expectNotToPerformAssertions();
     }

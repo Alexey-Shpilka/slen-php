@@ -7,7 +7,7 @@ namespace Slen\Sdk\Modules\Customers\Data;
 use DateTimeImmutable;
 
 /** How many credits of $creditType one run of $operationCode holds from the customer it is for. */
-final readonly class CreditPriceDTO
+final readonly class CreditPrice
 {
     public function __construct(
         public string $creditPriceId,

@@ -84,6 +84,38 @@ final class PublicSurfaceTest extends TestCase
         self::assertSame([], $astray, 'A public class lives at the root, in Exceptions, Data, Observability, Testing, Laravel, or a module.');
     }
 
+    /**
+     * A public type is named as in TypeScript and the spec, so `DTO` ends no public class; an internal class of
+     * `Data` carries the suffix, so that no reader takes it for the surface.
+     */
+    public function testOnlyAnInternalClassOfDataEndsWithDto(): void
+    {
+        $public = [];
+        $unsuffixed = [];
+        $internalData = 0;
+
+        foreach (self::classes() as $class) {
+            $suffixed = str_ends_with($class, 'DTO');
+
+            if (self::isInternal($class) === false) {
+                $public = $suffixed === true ? [...$public, $class] : $public;
+
+                continue;
+            }
+
+            if (str_contains($class, '\\Data\\') === false) {
+                continue;
+            }
+
+            ++$internalData;
+            $unsuffixed = $suffixed === false ? [...$unsuffixed, $class] : $unsuffixed;
+        }
+
+        self::assertGreaterThan(10, $internalData, 'the test has to be reading the internal classes of Data');
+        self::assertSame([], $public, 'A public type is named as its TypeScript type: no DTO suffix.');
+        self::assertSame([], $unsuffixed, 'An internal class of Data ends with DTO.');
+    }
+
     public function testACallNamesItsSubjectAndTakesTheRestAsOneOptionalOptions(): void
     {
         $problems = [];
@@ -167,14 +199,14 @@ final class PublicSurfaceTest extends TestCase
 
     /**
      * As the contract test and the help slice classify them: every method of a facade, and a method of SlenSdk that
-     * answers a DTO; a method that hands out a module, a client or a receiver is not a call.
+     * answers a type of `Data`; a method that hands out a module, a client or a receiver is not a call.
      */
     private static function isCall(ReflectionMethod $method): bool
     {
         $returns = $method->getReturnType();
-        $answersADto = $returns instanceof ReflectionNamedType && str_ends_with($returns->getName(), 'DTO');
+        $answersData = $returns instanceof ReflectionNamedType && str_contains($returns->getName(), '\\Data\\');
 
-        return $method->isStatic() === false && ($method->class !== SlenSdk::class || $answersADto);
+        return $method->isStatic() === false && ($method->class !== SlenSdk::class || $answersData);
     }
 
     private static function isOptionalOptions(?ReflectionType $type): bool

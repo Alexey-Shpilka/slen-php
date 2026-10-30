@@ -8,7 +8,7 @@ use DateTimeImmutable;
 use Slen\Sdk\Modules\Webhooks\Enums\WebhookEventType;
 
 /** A webhook whose signature held. Every delivery of one event carries the same $id: deduplicate by it. */
-abstract readonly class WebhookEventDTO
+abstract readonly class WebhookEvent
 {
     /** @param array<mixed> $data */
     public function __construct(

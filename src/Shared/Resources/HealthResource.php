@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Slen\Sdk\Shared\Resources;
 
-use Slen\Sdk\Data\HealthDTO;
+use Slen\Sdk\Data\Health;
 use Slen\Sdk\Exceptions\InvalidResponseException;
 
 /** @internal */
@@ -15,9 +15,9 @@ final readonly class HealthResource extends BaseResource
      *
      * @throws InvalidResponseException
      */
-    public function map(array $data): HealthDTO
+    public function map(array $data): Health
     {
-        return new HealthDTO(
+        return new Health(
             app: $this->string($data, 'app'),
             release: $this->nullableString($data, 'release'),
             server: $this->string($data, 'server'),

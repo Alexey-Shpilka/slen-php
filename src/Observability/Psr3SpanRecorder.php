@@ -40,7 +40,7 @@ final readonly class Psr3SpanRecorder implements SpanRecorderInterface
         $this->level = $normalised;
     }
 
-    public function record(SpanDTO $span): void
+    public function record(SlenSpan $span): void
     {
         $this->logger->log($this->level, self::MESSAGE, $span->toArray());
     }

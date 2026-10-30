@@ -10,12 +10,12 @@ use PHPUnit\Framework\TestCase;
 use Slen\Sdk\Exceptions\InvalidResponseException;
 use Slen\Sdk\Exceptions\WebhookSignatureException;
 use Slen\Sdk\Modules\Operations\Enums\ExecutionStatus;
-use Slen\Sdk\Modules\Webhooks\Data\ApprovalDecidedEventDTO;
-use Slen\Sdk\Modules\Webhooks\Data\ApprovalRequestedEventDTO;
-use Slen\Sdk\Modules\Webhooks\Data\CustomerBalanceLowEventDTO;
-use Slen\Sdk\Modules\Webhooks\Data\ExecutionFinishedEventDTO;
-use Slen\Sdk\Modules\Webhooks\Data\UnknownEventDTO;
-use Slen\Sdk\Modules\Webhooks\Data\WebhookEventDTO;
+use Slen\Sdk\Modules\Webhooks\Data\ApprovalDecidedEvent;
+use Slen\Sdk\Modules\Webhooks\Data\ApprovalRequestedEvent;
+use Slen\Sdk\Modules\Webhooks\Data\CustomerBalanceLowEvent;
+use Slen\Sdk\Modules\Webhooks\Data\ExecutionFinishedEvent;
+use Slen\Sdk\Modules\Webhooks\Data\UnknownWebhookEvent;
+use Slen\Sdk\Modules\Webhooks\Data\WebhookEvent;
 use Slen\Sdk\Modules\Webhooks\Enums\WebhookEventType;
 use Slen\Sdk\Modules\Webhooks\Factories\WebhooksModuleFactory;
 use Slen\Sdk\Modules\Webhooks\Options\VerifyOptions;
@@ -47,7 +47,7 @@ final class WebhooksFacadeTest extends TestCase
 
         $event = $this->construct('execution.finished', $data);
 
-        self::assertInstanceOf(ExecutionFinishedEventDTO::class, $event);
+        self::assertInstanceOf(ExecutionFinishedEvent::class, $event);
         self::assertSame(['7', '8', 'support.reply', ExecutionStatus::Rejected, 'budget_exceeded'], [
             $event->executionId,
             $event->flowId,
@@ -74,7 +74,7 @@ final class WebhooksFacadeTest extends TestCase
             'threshold' => '5.0000',
         ]);
 
-        self::assertInstanceOf(CustomerBalanceLowEventDTO::class, $event);
+        self::assertInstanceOf(CustomerBalanceLowEvent::class, $event);
         self::assertSame(['ada@example.com', 'default', '4.5000', '0.5000', '4.0000', '5.0000'], [
             $event->externalUserId,
             $event->creditType,
@@ -98,10 +98,10 @@ final class WebhooksFacadeTest extends TestCase
             'decided_at' => null,
         ]);
 
-        self::assertInstanceOf(ApprovalRequestedEventDTO::class, $requested);
+        self::assertInstanceOf(ApprovalRequestedEvent::class, $requested);
         self::assertSame('Повернення — перевірте ✓', $requested->note);
         self::assertEquals(new DateTimeImmutable('2026-10-18T12:00:00+00:00'), $requested->expiresAt);
-        self::assertInstanceOf(ApprovalDecidedEventDTO::class, $decided);
+        self::assertInstanceOf(ApprovalDecidedEvent::class, $decided);
         self::assertSame(['support.refund', 'expired', null, null], [$decided->operationCode, $decided->status, $decided->decidedAt, $decided->decidedBy]);
     }
 
@@ -110,10 +110,10 @@ final class WebhooksFacadeTest extends TestCase
         $published = $this->construct('flow.published', ['flow_id' => '8', 'version' => 7]);
         $newer = $this->construct('invoice.paid', ['invoice' => 'INV-1']);
 
-        self::assertInstanceOf(UnknownEventDTO::class, $published);
+        self::assertInstanceOf(UnknownWebhookEvent::class, $published);
         self::assertSame(WebhookEventType::FlowPublished, $published->eventType());
         self::assertSame(['flow_id' => '8', 'version' => 7], $published->data);
-        self::assertInstanceOf(UnknownEventDTO::class, $newer);
+        self::assertInstanceOf(UnknownWebhookEvent::class, $newer);
         self::assertSame('invoice.paid', $newer->type);
         self::assertNull($newer->eventType());
     }
@@ -273,7 +273,7 @@ final class WebhooksFacadeTest extends TestCase
     /**
      * @param array<string, mixed> $data
      */
-    private function construct(string $type, array $data): WebhookEventDTO
+    private function construct(string $type, array $data): WebhookEvent
     {
         $body = $this->body($type, $data);
 

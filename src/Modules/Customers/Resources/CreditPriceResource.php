@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace Slen\Sdk\Modules\Customers\Resources;
 
 use Slen\Sdk\Exceptions\InvalidResponseException;
-use Slen\Sdk\Modules\Customers\Data\CreditPriceDTO;
+use Slen\Sdk\Modules\Customers\Data\CreditPrice;
+use Slen\Sdk\Modules\Customers\Data\CreditPriceList;
 use Slen\Sdk\Shared\Resources\BaseResource;
 
 /** @internal */
@@ -16,9 +17,9 @@ final readonly class CreditPriceResource extends BaseResource
      *
      * @throws InvalidResponseException
      */
-    public function map(array $data): CreditPriceDTO
+    public function map(array $data): CreditPrice
     {
-        return new CreditPriceDTO(
+        return new CreditPrice(
             creditPriceId: $this->string($data, 'credit_price_id'),
             projectId: $this->string($data, 'project_id'),
             operationCode: $this->string($data, 'operation_code'),
@@ -32,12 +33,10 @@ final readonly class CreditPriceResource extends BaseResource
     /**
      * @param array<mixed> $body
      *
-     * @return list<CreditPriceDTO>
-     *
      * @throws InvalidResponseException
      */
-    public function list(array $body): array
+    public function list(array $body): CreditPriceList
     {
-        return array_map($this->map(...), $this->objects($body, 'data'));
+        return new CreditPriceList(array_map($this->map(...), $this->objects($body, 'data')));
     }
 }

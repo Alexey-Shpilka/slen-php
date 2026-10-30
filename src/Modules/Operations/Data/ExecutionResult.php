@@ -7,7 +7,7 @@ namespace Slen\Sdk\Modules\Operations\Data;
 use Slen\Sdk\Modules\Operations\Enums\ExecutionStatus;
 
 /** The answer of a run: finished (completed, rejected, failed, uncertain) or not yet (queued, waiting, running). */
-final readonly class ExecutionDTO
+final readonly class ExecutionResult
 {
     /**
      * @param array<mixed>|null         $output            what the flow returned; null until it returned something
@@ -20,12 +20,12 @@ final readonly class ExecutionDTO
         public ?array $output,
         public ?string $errorCode,
         public ?string $errorMessage,
-        public ExecutionCostDTO $cost,
-        public ExecutionCacheDTO $cache,
-        public ?WaitingOnDTO $waitingOn,
+        public ExecutionCost $cost,
+        public ExecutionCache $cache,
+        public ?WaitingOn $waitingOn,
         public string $traceUrl,
         public ?int $retryAfterSeconds,
-        public ?ExecutionErrorDTO $error,
+        public ?ExecutionError $error,
         public bool $replayed,
     ) {
     }

@@ -9,7 +9,7 @@ use Slen\Sdk\Modules\Operations\Enums\ExecutionStatus;
 use Slen\Sdk\Modules\Webhooks\Enums\WebhookEventType;
 
 /** `execution.finished`: a run is over. */
-final readonly class ExecutionFinishedEventDTO extends WebhookEventDTO
+final readonly class ExecutionFinishedEvent extends WebhookEvent
 {
     /**
      * @param array<mixed> $data

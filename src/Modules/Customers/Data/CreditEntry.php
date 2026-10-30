@@ -8,7 +8,7 @@ use DateTimeImmutable;
 use Slen\Sdk\Modules\Customers\Enums\CreditEntryType;
 
 /** One movement of a customer's credits, with the balance it left behind. */
-final readonly class CreditEntryDTO
+final readonly class CreditEntry
 {
     /**
      * @param string      $credits        signed: negative took credits, positive gave them back

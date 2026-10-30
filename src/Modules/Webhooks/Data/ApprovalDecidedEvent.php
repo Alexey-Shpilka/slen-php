@@ -8,7 +8,7 @@ use DateTimeImmutable;
 use Slen\Sdk\Modules\Webhooks\Enums\WebhookEventType;
 
 /** `approval.decided`: an approval was approved, rejected or expired. */
-final readonly class ApprovalDecidedEventDTO extends WebhookEventDTO
+final readonly class ApprovalDecidedEvent extends WebhookEvent
 {
     /**
      * @param array<mixed>           $data

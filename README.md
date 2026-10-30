@@ -124,22 +124,22 @@ $account = $slen->customers()->charge('user_8421', '5.0000', new MovementOptions
 
 | Call | What it does |
 |---|---|
-| `list(CustomerListOptions(cursor:, limit:, search:, status:, creditType:, lowBalance:))` | customers with their accounts, a page at a time (`data`, `nextCursor`) |
+| `list(CustomerListOptions(cursor:, limit:, search:, status:, creditType:, lowBalance:))` | customers with their accounts, a `Page` at a time (`data`, `nextCursor`) |
 | `get($id)`, `create($id)` | one customer with every account; `create()` is idempotent and moves no credits |
 | `updateAccount($id, $creditType, AccountOptions(allowNegative:, lowBalanceThreshold:))` | the settings of one account; what is left out goes back to `false` and `'0'` |
 | `block($id, BlockOptions(reason:))`, `unblock($id)` | a blocked customer's new runs are refused (`CustomerBlockedException`); their balance can still be settled |
 | `delete($id)` | a customer with no history; one with history is refused (409) — block them instead |
 | `topUp($id, $credits, MovementOptions)`, `charge($id, $credits, MovementOptions)` | add credits; take them for a service of your own application. Above zero |
 | `adjust($id, $credits, MovementOptions)` | an operator's correction, with a sign; not zero |
-| `entries($id, EntryListOptions(cursor:, limit:, creditType:, entryType:))` | the statement of the customer's accounts |
-| `prices(PriceListOptions(operationCode:, creditType:))` | what an operation costs in credits |
+| `entries($id, EntryListOptions(cursor:, limit:, creditType:, entryType:))` | the statement of the customer's accounts, a `Page` at a time |
+| `prices(PriceListOptions(operationCode:, creditType:))` | what an operation costs in credits: a `CreditPriceList` (`data`) |
 
 Credits are a decimal string of at most four places (`'5'`, `'5.25'`, `'-3.0000'`); anything else is refused before the wire. `MovementOptions` carries `creditType` (default `'default'`), `note` and `idempotencyKey`; under the same key the server moves the credits once.
 
 ## Webhooks
 
 ```php
-use Slen\Sdk\Modules\Webhooks\Data\ExecutionFinishedEventDTO;
+use Slen\Sdk\Modules\Webhooks\Data\ExecutionFinishedEvent;
 use Slen\Sdk\Modules\Webhooks\Options\WebhooksOptions;
 use Slen\Sdk\Modules\Webhooks\WebhooksFacade;
 
@@ -147,14 +147,14 @@ $webhooks = WebhooksFacade::standalone(new WebhooksOptions(secret: (string) gete
 
 $event = $webhooks->constructEvent($request->getContent(), $request->headers->get('Slen-Signature'));
 
-if ($event instanceof ExecutionFinishedEventDTO) {
+if ($event instanceof ExecutionFinishedEvent) {
     echo $event->executionId, ' ', $event->status->value, PHP_EOL;
 }
 ```
 
 `constructEvent()` checks the `Slen-Signature` header against the raw body — exactly the bytes that arrived — and reads the event. A signature that does not hold is a `WebhookSignatureException` whose `reason` says which check refused it (`missing_header`, `malformed_header`, `outside_tolerance`, `no_matching_signature`): answer 400 and do nothing with the body. A signed body that is not an event is an `InvalidResponseException` (`webhook_payload_invalid`). `verify()` answers `true` or `false` and reads nothing.
 
-`execution.finished`, `customer.balance_low`, `approval.requested` and `approval.decided` are DTOs of their own; every other event is an `UnknownEventDTO` with its `data` as it was sent. A receiver needs the endpoint's signing secret, not an API key: `WebhooksOptions` of `WebhooksFacade::standalone()` carries it, and `$slen->webhooks()` uses the `webhookSecret` of the config. A signature further from now than `webhookToleranceSeconds` (300) is refused. `VerifyOptions` of one call — `secret`, `toleranceSeconds`, `now` — win over both.
+`execution.finished`, `customer.balance_low`, `approval.requested` and `approval.decided` are classes of their own; every other event is an `UnknownWebhookEvent` with its `data` as it was sent. A receiver needs the endpoint's signing secret, not an API key: `WebhooksOptions` of `WebhooksFacade::standalone()` carries it, and `$slen->webhooks()` uses the `webhookSecret` of the config. A signature further from now than `webhookToleranceSeconds` (300) is refused. `VerifyOptions` of one call — `secret`, `toleranceSeconds`, `now` — win over both.
 
 ## The journal
 
@@ -182,7 +182,7 @@ A request is written by its route — `POST /v1/customers/{externalUserId}/charg
 
 ## Spans
 
-A run leaves one span: `operations.execute`, `operations.execute_async`, or `executions.wait` for a wait. `SpanDTO` has ten fields — the call, `outcome` (`ok`, `refused`, `error`), the run's `status`, `durationMs`, `executionId`, `operationCode`, `estimated`, `actual`, `errorCode`, `cacheHit` — ids, money and a verdict, never a prompt or an answer. Credit movements and webhooks leave none.
+A run leaves one span: `operations.execute`, `operations.execute_async`, or `executions.wait` for a wait. `SlenSpan` has ten fields — the call, `outcome` (`ok`, `refused`, `error`), the run's `status`, `durationMs`, `executionId`, `operationCode`, `estimated`, `actual`, `errorCode`, `cacheHit` — ids, money and a verdict, never a prompt or an answer. Credit movements and webhooks leave none.
 
 ```php
 use Slen\Sdk\Observability\Psr3SpanRecorder;

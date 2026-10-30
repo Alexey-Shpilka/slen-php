@@ -7,7 +7,7 @@ namespace Slen\Sdk\Modules\Customers\Data;
 use DateTimeImmutable;
 
 /** The credits of one type a customer holds. Credits are decimal strings, never floats. */
-final readonly class CustomerAccountDTO
+final readonly class CustomerAccount
 {
     /**
      * @param string $available           `balance - reserved`: what a new hold may take

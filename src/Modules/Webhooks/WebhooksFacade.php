@@ -9,7 +9,7 @@ use Psr\Log\NullLogger;
 use Slen\Sdk\Exceptions\InvalidResponseException;
 use Slen\Sdk\Exceptions\WebhookSignatureException;
 use Slen\Sdk\LogMessages;
-use Slen\Sdk\Modules\Webhooks\Data\WebhookEventDTO;
+use Slen\Sdk\Modules\Webhooks\Data\WebhookEvent;
 use Slen\Sdk\Modules\Webhooks\Factories\WebhooksModuleFactory;
 use Slen\Sdk\Modules\Webhooks\Options\VerifyOptions;
 use Slen\Sdk\Modules\Webhooks\Options\WebhooksOptions;
@@ -65,13 +65,13 @@ final readonly class WebhooksFacade
     }
 
     /**
-     * Checks the signature and reads the event: a typed DTO for the events the SDK knows, UnknownEventDTO for the rest.
+     * Checks the signature and reads the event: a typed DTO for the events the SDK knows, UnknownWebhookEvent for the rest.
      *
      * @throws WebhookSignatureException the signature does not hold; its $reason says why
      * @throws InvalidResponseException  `webhook_payload_invalid`: signed, but not an event
      * @throws InvalidArgumentException  a blank secret passed, none passed and none configured, a tolerance below 1
      */
-    public function constructEvent(string $payload, ?string $signatureHeader, ?VerifyOptions $options = null): WebhookEventDTO
+    public function constructEvent(string $payload, ?string $signatureHeader, ?VerifyOptions $options = null): WebhookEvent
     {
         $options ??= new VerifyOptions();
         $signatureCheck = $this->webhooksModuleFactory->signatureVerifier($options)

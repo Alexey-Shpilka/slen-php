@@ -9,11 +9,11 @@ use PHPUnit\Framework\TestCase;
 use Slen\Sdk\Exceptions\CustomerNotFoundException;
 use Slen\Sdk\Exceptions\InvalidRequestException;
 use Slen\Sdk\Exceptions\InvalidResponseException;
-use Slen\Sdk\Modules\Executions\Data\TraceAttemptDTO;
-use Slen\Sdk\Modules\Executions\Data\TraceEventDTO;
-use Slen\Sdk\Modules\Executions\Data\TraceNodeDTO;
+use Slen\Sdk\Modules\Executions\Data\AttemptSummary;
+use Slen\Sdk\Modules\Executions\Data\FlowExecutionEvent;
+use Slen\Sdk\Modules\Executions\Data\FlowExecutionNode;
 use Slen\Sdk\Modules\Operations\Enums\ExecutionStatus;
-use Slen\Sdk\Observability\SpanDTO;
+use Slen\Sdk\Observability\SlenSpan;
 use Slen\Sdk\SlenSdk;
 use Slen\Sdk\Testing\FakeHttpClient;
 use Slen\Sdk\Testing\RecordingSpanRecorder;
@@ -26,12 +26,12 @@ final class ExecutionsFacadeTest extends TestCase
         $fakeHttpClient = (new FakeHttpClient())->pushJson(200, ['data' => Answers::pending('running', 1)]);
         $recordingSpanRecorder = new RecordingSpanRecorder();
 
-        $executionStatusDTO = Answers::sdk($fakeHttpClient, $recordingSpanRecorder)->executions()->get('74438200973594700');
+        $executionStatusView = Answers::sdk($fakeHttpClient, $recordingSpanRecorder)->executions()->get('74438200973594700');
 
         self::assertSame('GET', $fakeHttpClient->lastRequest()->getMethod());
         self::assertSame('https://api.slen.ai/api/v1/executions/74438200973594700/status', (string) $fakeHttpClient->lastRequest()->getUri());
-        self::assertSame(ExecutionStatus::Running, $executionStatusDTO->status);
-        self::assertSame(1, $executionStatusDTO->retryAfterSeconds);
+        self::assertSame(ExecutionStatus::Running, $executionStatusView->status);
+        self::assertSame(1, $executionStatusView->retryAfterSeconds);
         self::assertSame([], $recordingSpanRecorder->spans());
     }
 
@@ -56,11 +56,11 @@ final class ExecutionsFacadeTest extends TestCase
         $fakeHttpClient = (new FakeHttpClient())->pushJson(200, ['data' => $answer]);
         $recordingSpanRecorder = new RecordingSpanRecorder();
 
-        $executionStatusDTO = Answers::sdk($fakeHttpClient, $recordingSpanRecorder)->executions()->wait('74438200973594700');
+        $executionStatusView = Answers::sdk($fakeHttpClient, $recordingSpanRecorder)->executions()->wait('74438200973594700');
 
-        self::assertTrue($executionStatusDTO->isCompleted());
+        self::assertTrue($executionStatusView->isCompleted());
         self::assertCount(1, $fakeHttpClient->requests());
-        self::assertEquals([new SpanDTO(
+        self::assertEquals([new SlenSpan(
             operation: 'executions.wait',
             outcome: 'ok',
             status: 'completed',
@@ -101,7 +101,7 @@ final class ExecutionsFacadeTest extends TestCase
         }
 
         self::assertEquals(
-            new SpanDTO('executions.wait', 'error', null, $recordingSpanRecorder->last()->durationMs, '7', errorCode: 'customer_not_found'),
+            new SlenSpan('executions.wait', 'error', null, $recordingSpanRecorder->last()->durationMs, '7', errorCode: 'customer_not_found'),
             $recordingSpanRecorder->last(),
         );
     }
@@ -110,23 +110,23 @@ final class ExecutionsFacadeTest extends TestCase
     {
         $fakeHttpClient = (new FakeHttpClient())->pushJson(200, ['data' => self::trace()]);
 
-        $executionTraceDTO = Answers::sdk($fakeHttpClient)->executions()->trace('74438200973594700');
+        $executionTrace = Answers::sdk($fakeHttpClient)->executions()->trace('74438200973594700');
 
         self::assertSame('https://api.slen.ai/api/v1/executions/74438200973594700', (string) $fakeHttpClient->lastRequest()->getUri());
-        self::assertSame('Support replies', $executionTraceDTO->flowName);
-        self::assertSame(ExecutionStatus::Completed, $executionTraceDTO->status);
-        self::assertEquals(new DateTimeImmutable('2026-10-17T12:00:00.120+00:00'), $executionTraceDTO->startedAt);
-        self::assertSame(['ai_model', 'return_response'], array_map(static function (TraceNodeDTO $node): string {
+        self::assertSame('Support replies', $executionTrace->flowName);
+        self::assertSame(ExecutionStatus::Completed, $executionTrace->status);
+        self::assertEquals(new DateTimeImmutable('2026-10-17T12:00:00.120+00:00'), $executionTrace->startedAt);
+        self::assertSame(['ai_model', 'return_response'], array_map(static function (FlowExecutionNode $node): string {
             return $node->nodeType;
-        }, $executionTraceDTO->nodes));
-        self::assertNull($executionTraceDTO->nodes[1]->outputPort);
+        }, $executionTrace->nodes));
+        self::assertNull($executionTrace->nodes[1]->outputPort);
         self::assertEquals(
-            [new TraceAttemptDTO('74438200973596001', 1, '74438200973597001', null, 'succeeded', null, 840, '0.00390000', 'req_abc', 'gpt-4o')],
-            $executionTraceDTO->nodes[0]->attempts,
+            [new AttemptSummary('74438200973596001', 1, '74438200973597001', null, 'succeeded', null, 840, '0.00390000', 'req_abc', 'gpt-4o')],
+            $executionTrace->nodes[0]->attempts,
         );
         self::assertEquals(
-            new TraceEventDTO(2, 'reserved', 'reply', new DateTimeImmutable('2026-10-17T12:00:00.150+00:00'), ['amount' => '0.00412500']),
-            $executionTraceDTO->events[1],
+            new FlowExecutionEvent(2, 'reserved', 'reply', new DateTimeImmutable('2026-10-17T12:00:00.150+00:00'), ['amount' => '0.00412500']),
+            $executionTrace->events[1],
         );
     }
 

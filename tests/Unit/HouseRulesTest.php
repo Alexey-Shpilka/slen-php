@@ -9,6 +9,7 @@ use PHPUnit\Framework\TestCase;
 use ReflectionIntersectionType;
 use ReflectionMethod;
 use ReflectionUnionType;
+use Slen\Sdk\Observability\SlenSpan;
 use Slen\Sdk\SlenConfig;
 use Slen\Sdk\Tests\Unit\Support\SourceTree;
 use Throwable;
@@ -38,7 +39,7 @@ final class HouseRulesTest extends TestCase
             }
         }
 
-        self::assertSame([], $offences, 'More than three travel in a DTO; only constructors of DTOs, options, exceptions and SlenConfig take more.');
+        self::assertSame([], $offences, 'More than three travel in a DTO; only constructors of data classes, options, exceptions and SlenConfig take more.');
     }
 
     public function testEveryMethodAnswersOneTypeOrNull(): void
@@ -95,6 +96,8 @@ final class HouseRulesTest extends TestCase
         return $reflectionMethod->isConstructor()
             && (
                 str_ends_with($class->getName(), 'DTO')
+                || str_contains($class->getName(), '\\Data\\')
+                || $class->getName() === SlenSpan::class
                 || str_ends_with($class->getName(), 'Options')
                 || $class->implementsInterface(Throwable::class)
                 || $class->getName() === SlenConfig::class

@@ -8,11 +8,11 @@ use DateTimeImmutable;
 use Slen\Sdk\Modules\Customers\Enums\CustomerStatus;
 
 /** An end customer of the project with every credit account it holds, one per credit type. */
-final readonly class CustomerDTO
+final readonly class Customer
 {
     /**
      * @param DateTimeImmutable|null   $blockedAt      when it was first blocked; null while it is active
-     * @param list<CustomerAccountDTO> $accounts
+     * @param list<CustomerAccount> $accounts
      */
     public function __construct(
         public string $customerId,
@@ -32,7 +32,7 @@ final readonly class CustomerDTO
     }
 
     /** The account of $creditType, or null when the customer holds none of that type. */
-    public function account(string $creditType = 'default'): ?CustomerAccountDTO
+    public function account(string $creditType = 'default'): ?CustomerAccount
     {
         foreach ($this->accounts as $account) {
             if ($account->creditType === $creditType) {

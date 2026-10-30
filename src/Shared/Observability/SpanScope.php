@@ -7,7 +7,7 @@ namespace Slen\Sdk\Shared\Observability;
 use Slen\Sdk\Exceptions\PolicyDeniedException;
 use Slen\Sdk\Exceptions\SlenException;
 use Slen\Sdk\Exceptions\SpendRefusedException;
-use Slen\Sdk\Observability\SpanDTO;
+use Slen\Sdk\Observability\SlenSpan;
 use Slen\Sdk\Observability\SpanRecorderInterface;
 use Slen\Sdk\Shared\Observability\Data\SpanResultDTO;
 use Slen\Sdk\Shared\Observability\Data\SpanSubjectDTO;
@@ -37,7 +37,7 @@ final readonly class SpanScope
             default => 'ok',
         };
 
-        $this->emit(new SpanDTO(
+        $this->emit(new SlenSpan(
             operation: $this->spanSubjectDTO->operation,
             outcome: $outcome,
             status: $spanResultDTO->status,
@@ -55,7 +55,7 @@ final readonly class SpanScope
     {
         $refused = $throwable instanceof SpendRefusedException || $throwable instanceof PolicyDeniedException;
 
-        $this->emit(new SpanDTO(
+        $this->emit(new SlenSpan(
             operation: $this->spanSubjectDTO->operation,
             outcome: $refused === true ? 'refused' : 'error',
             status: null,
@@ -66,10 +66,10 @@ final readonly class SpanScope
         ));
     }
 
-    private function emit(SpanDTO $spanDTO): void
+    private function emit(SlenSpan $slenSpan): void
     {
         try {
-            $this->spanRecorder->record($spanDTO);
+            $this->spanRecorder->record($slenSpan);
         } catch (Throwable) {
             // Telemetry never fails the call it describes, nor replaces the error the caller has to see.
         }

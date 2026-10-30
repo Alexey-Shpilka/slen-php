@@ -9,17 +9,12 @@ namespace Slen\Sdk\Data;
  *
  * @template T
  */
-readonly class PageDTO
+final readonly class Page
 {
     /** @param list<T> $data */
     public function __construct(
         public array $data,
         public ?string $nextCursor,
     ) {
-    }
-
-    public function hasMore(): bool
-    {
-        return $this->nextCursor !== null;
     }
 }

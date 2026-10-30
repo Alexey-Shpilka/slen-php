@@ -9,8 +9,8 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Slen\Sdk\Exceptions\InvalidResponseException;
 use Slen\Sdk\Modules\Operations\Enums\ExecutionStatus;
-use Slen\Sdk\Modules\Webhooks\Data\ExecutionFinishedEventDTO;
-use Slen\Sdk\Modules\Webhooks\Data\UnknownEventDTO;
+use Slen\Sdk\Modules\Webhooks\Data\ExecutionFinishedEvent;
+use Slen\Sdk\Modules\Webhooks\Data\UnknownWebhookEvent;
 use Slen\Sdk\Modules\Webhooks\Services\EventParser;
 
 final class EventParserTest extends TestCase
@@ -23,7 +23,7 @@ final class EventParserTest extends TestCase
 
         $event = (new EventParser())->parse(self::json([...self::ENVELOPE, 'type' => 'execution.finished', 'data' => $data]));
 
-        self::assertInstanceOf(ExecutionFinishedEventDTO::class, $event);
+        self::assertInstanceOf(ExecutionFinishedEvent::class, $event);
         self::assertSame('7', $event->executionId);
         self::assertSame('support.reply', $event->operationCode);
         self::assertSame(ExecutionStatus::Completed, $event->status);
@@ -34,7 +34,7 @@ final class EventParserTest extends TestCase
     {
         $event = (new EventParser())->parse(self::json([...self::ENVELOPE, 'type' => 'something.new']));
 
-        self::assertInstanceOf(UnknownEventDTO::class, $event);
+        self::assertInstanceOf(UnknownWebhookEvent::class, $event);
         self::assertSame('something.new', $event->type);
         self::assertSame(['flow_id' => '8'], $event->data);
         self::assertSame('2026-10-17T12:00:00+00:00', $event->createdAt->format(DATE_ATOM));

@@ -6,8 +6,8 @@ namespace Slen\Sdk\Modules\Executions;
 
 use Slen\Sdk\Exceptions\InvalidRequestException;
 use Slen\Sdk\Exceptions\SlenException;
-use Slen\Sdk\Modules\Executions\Data\ExecutionStatusDTO;
-use Slen\Sdk\Modules\Executions\Data\ExecutionTraceDTO;
+use Slen\Sdk\Modules\Executions\Data\ExecutionStatusView;
+use Slen\Sdk\Modules\Executions\Data\ExecutionTrace;
 use Slen\Sdk\Modules\Executions\Factories\ExecutionsModuleFactory;
 use Slen\Sdk\Modules\Executions\Options\WaitOptions;
 use Slen\Sdk\RequestOptions;
@@ -30,7 +30,7 @@ final readonly class ExecutionsFacade
      * @throws InvalidRequestException nothing sent: an empty id, a timeout or retries out of range
      * @throws SlenException
      */
-    public function get(string $executionId, ?RequestOptions $options = null): ExecutionStatusDTO
+    public function get(string $executionId, ?RequestOptions $options = null): ExecutionStatusView
     {
         $getExecutionStatusTask = $this->executionsModuleFactory->getExecutionStatusTask();
 
@@ -43,23 +43,23 @@ final readonly class ExecutionsFacade
      * @throws InvalidRequestException an empty id; nothing sent
      * @throws SlenException            no read succeeded, or one failed for good (a 404, a 401)
      */
-    public function wait(string $executionId, ?WaitOptions $options = null): ExecutionStatusDTO
+    public function wait(string $executionId, ?WaitOptions $options = null): ExecutionStatusView
     {
         $waitForExecutionAction = $this->executionsModuleFactory->waitForExecutionAction();
         $waitStateDTO = $waitForExecutionAction->start($executionId, $options ?? new WaitOptions());
         $spanScope = $this->executionsModuleFactory->spanScope(new SpanSubjectDTO('executions.wait', executionId: $executionId));
 
         try {
-            $executionStatusDTO = $waitForExecutionAction->execute($waitStateDTO);
+            $executionStatusView = $waitForExecutionAction->execute($waitStateDTO);
         } catch (Throwable $throwable) {
             $spanScope->failed($throwable);
 
             throw $throwable;
         }
 
-        $spanScope->answered($this->executionsModuleFactory->executionSpanMapper()->map($executionStatusDTO));
+        $spanScope->answered($this->executionsModuleFactory->executionSpanMapper()->map($executionStatusView));
 
-        return $executionStatusDTO;
+        return $executionStatusView;
     }
 
     /**
@@ -68,7 +68,7 @@ final readonly class ExecutionsFacade
      * @throws InvalidRequestException nothing sent: an empty id, a timeout or retries out of range
      * @throws SlenException
      */
-    public function trace(string $executionId, ?RequestOptions $options = null): ExecutionTraceDTO
+    public function trace(string $executionId, ?RequestOptions $options = null): ExecutionTrace
     {
         $options ??= new RequestOptions();
         $apiRequest = new ApiRequestDTO(Endpoint::GetExecutionTrace, ['id' => $executionId], retries: $options->retries, timeout: $options->timeout);

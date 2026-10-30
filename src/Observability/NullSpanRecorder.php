@@ -7,7 +7,7 @@ namespace Slen\Sdk\Observability;
 /** The default: spans go nowhere. */
 final readonly class NullSpanRecorder implements SpanRecorderInterface
 {
-    public function record(SpanDTO $span): void
+    public function record(SlenSpan $span): void
     {
     }
 }

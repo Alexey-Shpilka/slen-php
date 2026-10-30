@@ -16,8 +16,8 @@ use Slen\Sdk\Exceptions\InsufficientCreditsException;
 use Slen\Sdk\Exceptions\InvalidRequestException;
 use Slen\Sdk\Exceptions\InvalidResponseException;
 use Slen\Sdk\Modules\Customers\CustomersFacade;
-use Slen\Sdk\Modules\Customers\Data\CreditPriceDTO;
-use Slen\Sdk\Modules\Customers\Data\CustomerAccountDTO;
+use Slen\Sdk\Modules\Customers\Data\CreditPrice;
+use Slen\Sdk\Modules\Customers\Data\CustomerAccount;
 use Slen\Sdk\Modules\Customers\Enums\CreditEntryType;
 use Slen\Sdk\Modules\Customers\Enums\CustomerStatus;
 use Slen\Sdk\Modules\Customers\Options\AccountOptions;
@@ -43,7 +43,7 @@ final class CustomersFacadeTest extends TestCase
     {
         $fakeHttpClient = (new FakeHttpClient())->pushJson(200, CustomerAnswers::page([CustomerAnswers::customer()], '74438200973594624', 2));
 
-        $customerPageDTO = Answers::sdk($fakeHttpClient)->customers()->list(new CustomerListOptions(
+        $customerPage = Answers::sdk($fakeHttpClient)->customers()->list(new CustomerListOptions(
             cursor: '74438200973594999',
             limit: 2,
             search: 'user_',
@@ -67,22 +67,20 @@ final class CustomersFacadeTest extends TestCase
             self::query($fakeHttpClient->lastRequest()),
         );
         self::assertSame('', (string) $fakeHttpClient->lastRequest()->getBody());
-        self::assertCount(1, $customerPageDTO->data);
-        self::assertSame('user_8421', $customerPageDTO->data[0]->externalUserId);
-        self::assertSame('74438200973594624', $customerPageDTO->nextCursor);
-        self::assertTrue($customerPageDTO->hasMore());
+        self::assertCount(1, $customerPage->data);
+        self::assertSame('user_8421', $customerPage->data[0]->externalUserId);
+        self::assertSame('74438200973594624', $customerPage->nextCursor);
     }
 
     public function testListWithNothingGivenSendsTheViewAndTheLimitAlone(): void
     {
         $fakeHttpClient = (new FakeHttpClient())->pushJson(200, CustomerAnswers::page([]));
 
-        $customerPageDTO = Answers::sdk($fakeHttpClient)->customers()->list();
+        $customerPage = Answers::sdk($fakeHttpClient)->customers()->list();
 
         self::assertSame(['view' => 'customers', 'limit' => '50'], self::query($fakeHttpClient->lastRequest()));
-        self::assertSame([], $customerPageDTO->data);
-        self::assertNull($customerPageDTO->nextCursor);
-        self::assertFalse($customerPageDTO->hasMore());
+        self::assertSame([], $customerPage->data);
+        self::assertNull($customerPage->nextCursor);
     }
 
     public function testAPageWithoutMetaCannotBeRead(): void
@@ -104,22 +102,22 @@ final class CustomersFacadeTest extends TestCase
         ]);
         $fakeHttpClient = (new FakeHttpClient())->pushJson(200, ['data' => $answer]);
 
-        $customerDTO = Answers::sdk($fakeHttpClient)->customers()->get('user_8421');
+        $customer = Answers::sdk($fakeHttpClient)->customers()->get('user_8421');
 
         self::assertSame('GET', $fakeHttpClient->lastRequest()->getMethod());
         self::assertSame(self::BASE . '/v1/customers/user_8421', (string) $fakeHttpClient->lastRequest()->getUri());
-        self::assertSame('74438200973594624', $customerDTO->customerId);
-        self::assertSame(CustomerStatus::Blocked, $customerDTO->status);
-        self::assertTrue($customerDTO->isBlocked());
-        self::assertEquals(new DateTimeImmutable('2026-10-17T11:00:00+00:00'), $customerDTO->blockedAt);
-        self::assertSame('chargeback', $customerDTO->blockReason);
-        self::assertSame(['default', 'search'], array_map(static function (CustomerAccountDTO $account): string {
+        self::assertSame('74438200973594624', $customer->customerId);
+        self::assertSame(CustomerStatus::Blocked, $customer->status);
+        self::assertTrue($customer->isBlocked());
+        self::assertEquals(new DateTimeImmutable('2026-10-17T11:00:00+00:00'), $customer->blockedAt);
+        self::assertSame('chargeback', $customer->blockReason);
+        self::assertSame(['default', 'search'], array_map(static function (CustomerAccount $account): string {
             return $account->creditType;
-        }, $customerDTO->accounts));
-        self::assertSame('95.0000', $customerDTO->account()?->available);
-        self::assertSame('-2.5000', $customerDTO->account('search')?->balance);
-        self::assertNull($customerDTO->account('enrichment'));
-        self::assertEquals(new DateTimeImmutable('2026-10-17T10:05:00+00:00'), $customerDTO->updatedAt);
+        }, $customer->accounts));
+        self::assertSame('95.0000', $customer->account()?->available);
+        self::assertSame('-2.5000', $customer->account('search')?->balance);
+        self::assertNull($customer->account('enrichment'));
+        self::assertEquals(new DateTimeImmutable('2026-10-17T10:05:00+00:00'), $customer->updatedAt);
     }
 
     public function testTheIdIsOnePathSegmentWhateverItHolds(): void
@@ -144,28 +142,28 @@ final class CustomersFacadeTest extends TestCase
     {
         $fakeHttpClient = (new FakeHttpClient())->pushJson(201, ['data' => CustomerAnswers::customer(['accounts' => []])]);
 
-        $customerDTO = Answers::sdk($fakeHttpClient)->customers()->create('user_8421');
+        $customer = Answers::sdk($fakeHttpClient)->customers()->create('user_8421');
 
         self::assertSame('PUT', $fakeHttpClient->lastRequest()->getMethod());
         self::assertSame(self::BASE . '/v1/customers/user_8421', (string) $fakeHttpClient->lastRequest()->getUri());
         self::assertSame('{}', (string) $fakeHttpClient->lastRequest()->getBody());
         self::assertSame('', $fakeHttpClient->lastRequest()->getHeaderLine('Idempotency-Key'));
-        self::assertSame([], $customerDTO->accounts);
-        self::assertNull($customerDTO->account());
+        self::assertSame([], $customer->accounts);
+        self::assertNull($customer->account());
     }
 
     public function testUpdateAccountPutsBothSettingsOfTheAccountOfTheCreditType(): void
     {
         $fakeHttpClient = (new FakeHttpClient())->pushJson(200, ['data' => CustomerAnswers::account(['credit_type' => 'search', 'allow_negative' => true])]);
 
-        $customerAccountDTO = Answers::sdk($fakeHttpClient)->customers()
+        $customerAccount = Answers::sdk($fakeHttpClient)->customers()
             ->updateAccount('user_8421', 'search', new AccountOptions(allowNegative: true, lowBalanceThreshold: '5.0000'));
 
         self::assertSame('PUT', $fakeHttpClient->lastRequest()->getMethod());
         self::assertSame(self::BASE . '/v1/customers/user_8421/accounts/search', (string) $fakeHttpClient->lastRequest()->getUri());
         self::assertSame(['allow_negative' => true, 'low_balance_threshold' => '5.0000'], self::body($fakeHttpClient->lastRequest()));
-        self::assertTrue($customerAccountDTO->allowNegative);
-        self::assertSame('search', $customerAccountDTO->creditType);
+        self::assertTrue($customerAccount->allowNegative);
+        self::assertSame('search', $customerAccount->creditType);
     }
 
     public function testUpdateAccountSendsTheDefaultsWhenNothingIsGiven(): void
@@ -242,7 +240,7 @@ final class CustomersFacadeTest extends TestCase
     }
 
     /**
-     * @param Closure(CustomersFacade): CustomerAccountDTO $move
+     * @param Closure(CustomersFacade): CustomerAccount $move
      * @param array<string, string>                         $body
      */
     #[DataProvider('movementProvider')]
@@ -250,23 +248,23 @@ final class CustomersFacadeTest extends TestCase
     {
         $fakeHttpClient = (new FakeHttpClient())->pushJson(200, ['data' => CustomerAnswers::account()]);
 
-        $customerAccountDTO = $move(Answers::sdk($fakeHttpClient)->customers());
+        $customerAccount = $move(Answers::sdk($fakeHttpClient)->customers());
         $request = $fakeHttpClient->lastRequest();
 
         self::assertSame('POST', $request->getMethod());
         self::assertSame('/api' . $path, $request->getUri()->getPath());
         self::assertSame($body, self::body($request));
         self::assertSame('invoice-7781:move', $request->getHeaderLine('Idempotency-Key'));
-        self::assertSame('95.0000', $customerAccountDTO->balance);
+        self::assertSame('95.0000', $customerAccount->balance);
     }
 
     /**
-     * @return Iterator<string, array{Closure(CustomersFacade): CustomerAccountDTO, string, array<string, string>}>
+     * @return Iterator<string, array{Closure(CustomersFacade): CustomerAccount, string, array<string, string>}>
      */
     public static function movementProvider(): Iterator
     {
         yield 'a top-up' => [
-            static function (CustomersFacade $c): CustomerAccountDTO {
+            static function (CustomersFacade $c): CustomerAccount {
                 return $c->topUp(
                     'user_8421',
                     '100.0000',
@@ -277,7 +275,7 @@ final class CustomersFacadeTest extends TestCase
             ['credits' => '100.0000', 'credit_type' => 'search', 'note' => 'invoice 7781'],
         ];
         yield 'a charge' => [
-            static function (CustomersFacade $c): CustomerAccountDTO {
+            static function (CustomersFacade $c): CustomerAccount {
                 return $c->charge(
                     'user_8421',
                     '5',
@@ -288,14 +286,14 @@ final class CustomersFacadeTest extends TestCase
             ['credits' => '5', 'credit_type' => 'default', 'note' => 'PDF export'],
         ];
         yield 'a correction that takes credits' => [
-            static function (CustomersFacade $c): CustomerAccountDTO {
+            static function (CustomersFacade $c): CustomerAccount {
                 return $c->adjust('user_8421', '-2.5', new MovementOptions(idempotencyKey: 'invoice-7781:move'));
             },
             '/v1/customers/user_8421/adjust',
             ['credits' => '-2.5', 'credit_type' => 'default'],
         ];
         yield 'a correction that gives credits' => [
-            static function (CustomersFacade $c): CustomerAccountDTO {
+            static function (CustomersFacade $c): CustomerAccount {
                 return $c->adjust(
                     'user_8421',
                     '0.0001',
@@ -452,7 +450,7 @@ final class CustomersFacadeTest extends TestCase
         $answer = CustomerAnswers::page([CustomerAnswers::entry(), $hold], null, 2);
         $fakeHttpClient = (new FakeHttpClient())->pushJson(200, $answer);
 
-        $creditEntryPageDTO = Answers::sdk($fakeHttpClient)->customers()
+        $creditEntryPage = Answers::sdk($fakeHttpClient)->customers()
             ->entries('user_8421', new EntryListOptions('74438200973594999', 2, 'default', CreditEntryType::Charge));
 
         self::assertSame('/api/v1/customers/user_8421/entries', $fakeHttpClient->lastRequest()->getUri()->getPath());
@@ -464,12 +462,12 @@ final class CustomersFacadeTest extends TestCase
             [CreditEntryType::Charge, CreditEntryType::Hold],
             array_map(static function ($entry): CreditEntryType {
                 return $entry->entryType;
-            }, $creditEntryPageDTO->data),
+            }, $creditEntryPage->data),
         );
-        self::assertSame('PDF export', $creditEntryPageDTO->data[0]->note);
-        self::assertSame('-5.0000', $creditEntryPageDTO->data[0]->credits);
-        self::assertSame('74438200973594800', $creditEntryPageDTO->data[1]->reservationId);
-        self::assertNull($creditEntryPageDTO->nextCursor);
+        self::assertSame('PDF export', $creditEntryPage->data[0]->note);
+        self::assertSame('-5.0000', $creditEntryPage->data[0]->credits);
+        self::assertSame('74438200973594800', $creditEntryPage->data[1]->reservationId);
+        self::assertNull($creditEntryPage->nextCursor);
     }
 
     public function testEntriesWithNothingGivenSendsTheLimitAlone(): void
@@ -504,11 +502,11 @@ final class CustomersFacadeTest extends TestCase
         self::assertSame('/api/v1/credit-prices', $fakeHttpClient->requests()[0]->getUri()->getPath());
         self::assertSame(['operation_code' => 'support.reply', 'credit_type' => 'default'], self::query($fakeHttpClient->requests()[0]));
         self::assertSame([], self::query($fakeHttpClient->requests()[1]));
-        self::assertSame(['1.5000', '0.0000'], array_map(static function (CreditPriceDTO $price): string {
+        self::assertSame(['1.5000', '0.0000'], array_map(static function (CreditPrice $price): string {
             return $price->credits;
-        }, $prices));
-        self::assertSame('support.reply', $prices[0]->operationCode);
-        self::assertSame([], $none);
+        }, $prices->data));
+        self::assertSame('support.reply', $prices->data[0]->operationCode);
+        self::assertSame([], $none->data);
     }
 
     public function testAnAccountWithoutOneOfItsFieldsCannotBeRead(): void

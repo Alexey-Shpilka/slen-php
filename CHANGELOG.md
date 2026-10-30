@@ -4,6 +4,11 @@ All notable changes to `slen/sdk` are written here. The format follows [Keep a C
 
 ## [Unreleased]
 
+### Breaking
+- The types of answers are named as in TypeScript and the API's spec, without `DTO`: `Health`, `Customer`, `CustomerAccount`, `CreditEntry`, `CreditPrice`, `ExecutionResult`, `ExecutionCost`, `ExecutionCache`, `WaitingOn`, `ExecutionError`, `ExecutionStatusView`, `ExecutionTrace`, `FlowExecutionNode`, `FlowExecutionEvent`, `AttemptSummary`, `WebhookEvent`, `ExecutionFinishedEvent`, `CustomerBalanceLowEvent`, `ApprovalRequestedEvent`, `ApprovalDecidedEvent`, `UnknownWebhookEvent`, `Observability\SlenSpan`. No old name is aliased.
+- A page is one `final` `Slen\Sdk\Data\Page` (`Page<Customer>`, `Page<CreditEntry>`) instead of `PageDTO`, `CustomerPageDTO` and `CreditEntryPageDTO`; `hasMore()` is gone — a full last page carries a cursor to an empty one, so the end is a page whose `nextCursor` is null.
+- `customers()->prices()` answers a `CreditPriceList` (its `data` is the list) instead of an array.
+
 ## [0.3.1] - 2026-10-30
 
 ### Fixed

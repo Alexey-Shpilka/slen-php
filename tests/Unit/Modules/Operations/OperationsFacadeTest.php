@@ -14,12 +14,12 @@ use Slen\Sdk\Exceptions\InsufficientCreditsException;
 use Slen\Sdk\Exceptions\InvalidRequestException;
 use Slen\Sdk\Exceptions\OperationUncertainException;
 use Slen\Sdk\Exceptions\ServiceUnavailableException;
-use Slen\Sdk\Modules\Operations\Data\ExecutionErrorDTO;
-use Slen\Sdk\Modules\Operations\Data\WaitingOnDTO;
+use Slen\Sdk\Modules\Operations\Data\ExecutionError;
+use Slen\Sdk\Modules\Operations\Data\WaitingOn;
 use Slen\Sdk\Modules\Operations\Enums\ExecutionStatus;
 use Slen\Sdk\Modules\Operations\OperationsFacade;
 use Slen\Sdk\Modules\Operations\Options\ExecuteOptions;
-use Slen\Sdk\Observability\SpanDTO;
+use Slen\Sdk\Observability\SlenSpan;
 use Slen\Sdk\Testing\FakeHttpClient;
 use Slen\Sdk\Testing\RecordingSpanRecorder;
 use Slen\Sdk\Tests\Unit\Support\Answers;
@@ -35,17 +35,17 @@ final class OperationsFacadeTest extends TestCase
     {
         $fakeHttpClient = (new FakeHttpClient())->pushJson(200, ['data' => Answers::execution()]);
 
-        $executionDTO = Answers::sdk($fakeHttpClient)->operations()->execute('support.reply', self::INPUT);
+        $executionResult = Answers::sdk($fakeHttpClient)->operations()->execute('support.reply', self::INPUT);
         $request = $fakeHttpClient->lastRequest();
 
         self::assertSame('POST', $request->getMethod());
         self::assertSame('https://api.slen.ai/api/v1/operations/execute', (string) $request->getUri());
         self::assertSame(['operation' => 'support.reply', 'input' => self::INPUT], self::body($request));
         self::assertMatchesRegularExpression(self::UUID_V4, $request->getHeaderLine('Idempotency-Key'));
-        self::assertSame('74438200973594700', $executionDTO->executionId);
-        self::assertSame(ExecutionStatus::Completed, $executionDTO->status);
-        self::assertTrue($executionDTO->isCompleted());
-        self::assertSame(['content' => 'Your order ships today.'], $executionDTO->output);
+        self::assertSame('74438200973594700', $executionResult->executionId);
+        self::assertSame(ExecutionStatus::Completed, $executionResult->status);
+        self::assertTrue($executionResult->isCompleted());
+        self::assertSame(['content' => 'Your order ships today.'], $executionResult->output);
     }
 
     public function testTheCustomerAndTheCreditTypeTravelInTheContextWithTheCallersOwnValues(): void
@@ -174,14 +174,14 @@ final class OperationsFacadeTest extends TestCase
         $fakeHttpClient = (new FakeHttpClient())->pushJson(202, ['data' => Answers::pending('queued', 2, ['replayed' => false, 'error' => null])]);
         $recordingSpanRecorder = new RecordingSpanRecorder();
 
-        $executionDTO = Answers::sdk($fakeHttpClient, $recordingSpanRecorder)->operations()->executeAsync('support.reply', self::INPUT);
+        $executionResult = Answers::sdk($fakeHttpClient, $recordingSpanRecorder)->operations()->executeAsync('support.reply', self::INPUT);
 
         self::assertSame('async', self::body($fakeHttpClient->lastRequest())['execution_mode']);
-        self::assertTrue($executionDTO->isPending());
-        self::assertFalse($executionDTO->isFinished());
-        self::assertSame(2, $executionDTO->retryAfterSeconds);
+        self::assertTrue($executionResult->isPending());
+        self::assertFalse($executionResult->isFinished());
+        self::assertSame(2, $executionResult->retryAfterSeconds);
         self::assertEquals(
-            new SpanDTO('operations.execute_async', 'ok', 'queued', $recordingSpanRecorder->last()->durationMs, '74438200973594700', 'support.reply'),
+            new SlenSpan('operations.execute_async', 'ok', 'queued', $recordingSpanRecorder->last()->durationMs, '74438200973594700', 'support.reply'),
             $recordingSpanRecorder->last(),
         );
     }
@@ -195,10 +195,10 @@ final class OperationsFacadeTest extends TestCase
         $fakeHttpClient = (new FakeHttpClient())->pushJson(200, ['data' => $answer]);
         $recordingSpanRecorder = new RecordingSpanRecorder();
 
-        $executionDTO = Answers::sdk($fakeHttpClient, $recordingSpanRecorder)->operations()->execute('support.reply', self::INPUT);
+        $executionResult = Answers::sdk($fakeHttpClient, $recordingSpanRecorder)->operations()->execute('support.reply', self::INPUT);
 
-        self::assertEquals(new DateTimeImmutable('2026-10-17T11:00:00+00:00'), $executionDTO->cache->cachedAt);
-        self::assertEquals(new SpanDTO(
+        self::assertEquals(new DateTimeImmutable('2026-10-17T11:00:00+00:00'), $executionResult->cache->cachedAt);
+        self::assertEquals(new SlenSpan(
             operation: 'operations.execute',
             outcome: 'ok',
             status: 'completed',
@@ -224,11 +224,11 @@ final class OperationsFacadeTest extends TestCase
         $fakeHttpClient = (new FakeHttpClient())->pushJson(200, ['data' => $answer]);
         $recordingSpanRecorder = new RecordingSpanRecorder();
 
-        $executionDTO = Answers::sdk($fakeHttpClient, $recordingSpanRecorder)->operations()->execute('support.reply', self::INPUT);
+        $executionResult = Answers::sdk($fakeHttpClient, $recordingSpanRecorder)->operations()->execute('support.reply', self::INPUT);
 
-        self::assertTrue($executionDTO->isRejected());
-        self::assertTrue($executionDTO->replayed);
-        self::assertEquals(new ExecutionErrorDTO('out_of_hours', 'We answer between 9 and 18.'), $executionDTO->error);
+        self::assertTrue($executionResult->isRejected());
+        self::assertTrue($executionResult->replayed);
+        self::assertEquals(new ExecutionError('out_of_hours', 'We answer between 9 and 18.'), $executionResult->error);
         self::assertSame('refused', $recordingSpanRecorder->last()->outcome);
         self::assertSame('out_of_hours', $recordingSpanRecorder->last()->errorCode);
         self::assertFalse($recordingSpanRecorder->last()->cacheHit);
@@ -243,10 +243,10 @@ final class OperationsFacadeTest extends TestCase
         ]);
         $fakeHttpClient = (new FakeHttpClient())->pushJson(202, ['data' => $answer]);
 
-        $executionDTO = Answers::sdk($fakeHttpClient)->operations()->execute('support.refund', self::INPUT);
+        $executionResult = Answers::sdk($fakeHttpClient)->operations()->execute('support.refund', self::INPUT);
 
-        self::assertEquals(new WaitingOnDTO('approve_refund', 'approval', null), $executionDTO->waitingOn);
-        self::assertSame(ExecutionStatus::Waiting, $executionDTO->status);
+        self::assertEquals(new WaitingOn('approve_refund', 'approval', null), $executionResult->waitingOn);
+        self::assertSame(ExecutionStatus::Waiting, $executionResult->status);
     }
 
     public function testAPlatformRefusalIsThrownAndItsSpanIsARefusalWithTheCode(): void
@@ -263,7 +263,7 @@ final class OperationsFacadeTest extends TestCase
         }
 
         self::assertEquals(
-            new SpanDTO(
+            new SlenSpan(
                 'operations.execute',
                 'refused',
                 null,

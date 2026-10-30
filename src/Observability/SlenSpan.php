@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Slen\Sdk\Observability;
 
 /** One call as an APM sees it: ids, money and the verdict, never a prompt or an answer. */
-final readonly class SpanDTO
+final readonly class SlenSpan
 {
     /**
      * @param string      $operation     the call: operations.execute, operations.execute_async or executions.wait

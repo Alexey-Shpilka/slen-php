@@ -10,7 +10,7 @@ use ReflectionNamedType;
 use ReflectionProperty;
 use Slen\Sdk\Exceptions\InsufficientCreditsException;
 use Slen\Sdk\Modules\Operations\Options\ExecuteOptions;
-use Slen\Sdk\Observability\SpanDTO;
+use Slen\Sdk\Observability\SlenSpan;
 use Slen\Sdk\Testing\FakeHttpClient;
 use Slen\Sdk\Testing\RecordingSpanRecorder;
 use Slen\Sdk\Tests\Paths;
@@ -19,7 +19,7 @@ use Slen\Sdk\Tests\Unit\Support\Answers;
 /**
  * The span is contract/span-attributes.json, the file the TypeScript suite builds its span tests from too.
  */
-final class SpanDTOTest extends TestCase
+final class SlenSpanTest extends TestCase
 {
     private const string CONTRACT = Paths::CONTRACT . '/span-attributes.json';
 
@@ -27,7 +27,7 @@ final class SpanDTOTest extends TestCase
 
     public function testASpanHasTheFieldsOfTheContractInItsOrderAndNoPlaceForAPrompt(): void
     {
-        $properties = (new ReflectionClass(SpanDTO::class))->getProperties();
+        $properties = (new ReflectionClass(SlenSpan::class))->getProperties();
 
         self::assertSame(
             array_column(self::contract()['fields'], 'field'),
@@ -48,7 +48,7 @@ final class SpanDTOTest extends TestCase
 
     public function testTheAttributesAreTheNamesOfTheContractInTheOrderOfTheFields(): void
     {
-        $span = new SpanDTO(
+        $span = new SlenSpan(
             operation: 'operations.execute',
             outcome: 'ok',
             status: 'completed',
@@ -68,7 +68,7 @@ final class SpanDTOTest extends TestCase
 
     public function testANullIsLeftOutAndFalseIsKept(): void
     {
-        $span = new SpanDTO('executions.wait', 'error', null, 3, cacheHit: false);
+        $span = new SlenSpan('executions.wait', 'error', null, 3, cacheHit: false);
 
         self::assertSame(
             ['operation' => 'executions.wait', 'outcome' => 'error', 'duration_ms' => 3, 'cache_hit' => false],
@@ -98,8 +98,8 @@ final class SpanDTOTest extends TestCase
         } catch (InsufficientCreditsException) {
         }
 
-        $written = array_map(static function (SpanDTO $spanDTO): string {
-            return $spanDTO->operation;
+        $written = array_map(static function (SlenSpan $slenSpan): string {
+            return $slenSpan->operation;
         }, $recordingSpanRecorder->spans());
         $named = array_keys(array_filter(
             self::contract()['operations'],
@@ -112,8 +112,8 @@ final class SpanDTOTest extends TestCase
         sort($unique);
 
         self::assertSame($named, $unique);
-        self::assertSame(['ok', 'ok', 'ok', 'refused'], array_map(static function (SpanDTO $spanDTO): string {
-            return $spanDTO->outcome;
+        self::assertSame(['ok', 'ok', 'ok', 'refused'], array_map(static function (SlenSpan $slenSpan): string {
+            return $slenSpan->outcome;
         }, $recordingSpanRecorder->spans()));
         self::assertSame([], array_diff(['ok', 'refused', 'error'], array_keys(self::contract()['outcomes'])));
     }

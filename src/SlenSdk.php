@@ -6,7 +6,7 @@ namespace Slen\Sdk;
 
 use LogicException;
 use Psr\Log\LoggerInterface;
-use Slen\Sdk\Data\HealthDTO;
+use Slen\Sdk\Data\Health;
 use Slen\Sdk\Exceptions\InvalidRequestException;
 use Slen\Sdk\Exceptions\SlenException;
 use Slen\Sdk\Modules\Customers\CustomersFacade;
@@ -82,7 +82,7 @@ final readonly class SlenSdk
      * @throws InvalidRequestException a timeout or retries out of range; nothing sent
      * @throws SlenException
      */
-    public function health(?RequestOptions $options = null): HealthDTO
+    public function health(?RequestOptions $options = null): Health
     {
         $options ??= new RequestOptions();
         $apiRequest = new ApiRequestDTO(Endpoint::Health, envelope: false, retries: $options->retries, timeout: $options->timeout);

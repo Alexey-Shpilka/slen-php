@@ -48,7 +48,7 @@ final class WebhookVectorsTest extends TestCase
     public function testConstructEventReadsTheEventOrRefusesForTheReasonOfTheVector(array $case): void
     {
         try {
-            $webhookEventDTO = self::facade($case['now'])->constructEvent($case['payload'], $case['header']);
+            $webhookEvent = self::facade($case['now'])->constructEvent($case['payload'], $case['header']);
         } catch (WebhookSignatureException $webhookSignatureException) {
             self::assertFalse($case['valid']);
             self::assertSame($case['reason'], $webhookSignatureException->reason);
@@ -64,7 +64,7 @@ final class WebhookVectorsTest extends TestCase
         }
 
         self::assertTrue($case['valid']);
-        self::assertSame($case['event'], ['id' => $webhookEventDTO->id, 'type' => $webhookEventDTO->type]);
+        self::assertSame($case['event'], ['id' => $webhookEvent->id, 'type' => $webhookEvent->type]);
     }
 
     /**

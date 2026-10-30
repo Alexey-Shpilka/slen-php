@@ -12,7 +12,7 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Slen\Sdk\Observability\NullSpanRecorder;
 use Slen\Sdk\Observability\Psr3SpanRecorder;
-use Slen\Sdk\Observability\SpanDTO;
+use Slen\Sdk\Observability\SlenSpan;
 use Slen\Sdk\Observability\SpanRecorderInterface;
 use Slen\Sdk\SlenConfig;
 use Slen\Sdk\SlenSdk;
@@ -154,7 +154,7 @@ final class SlenServiceProviderTest extends TestCase
         $application->instance(LoggerInterface::class, $recordingLogger);
 
         $spanRecorder = self::make($application, SlenConfig::class)->spanRecorder;
-        $spanRecorder->record(new SpanDTO('operations.execute', 'ok', 'completed', 3));
+        $spanRecorder->record(new SlenSpan('operations.execute', 'ok', 'completed', 3));
 
         self::assertInstanceOf(Psr3SpanRecorder::class, $spanRecorder);
         self::assertSame($spanRecorder, self::make($application, SpanRecorderInterface::class));

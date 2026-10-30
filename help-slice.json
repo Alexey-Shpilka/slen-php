@@ -328,7 +328,7 @@
       "member": "adjust",
       "deprecated": false,
       "internal": false,
-      "signature": "adjust(string $externalUserId, string $credits, ?Slen\\Sdk\\Modules\\Customers\\Options\\MovementOptions $options = null): Slen\\Sdk\\Modules\\Customers\\Data\\CustomerAccountDTO",
+      "signature": "adjust(string $externalUserId, string $credits, ?Slen\\Sdk\\Modules\\Customers\\Options\\MovementOptions $options = null): Slen\\Sdk\\Modules\\Customers\\Data\\CustomerAccount",
       "operation": "POST /v1/customers/{externalUserId}/adjust"
     },
     {
@@ -337,7 +337,7 @@
       "member": "block",
       "deprecated": false,
       "internal": false,
-      "signature": "block(string $externalUserId, ?Slen\\Sdk\\Modules\\Customers\\Options\\BlockOptions $options = null): Slen\\Sdk\\Modules\\Customers\\Data\\CustomerDTO",
+      "signature": "block(string $externalUserId, ?Slen\\Sdk\\Modules\\Customers\\Options\\BlockOptions $options = null): Slen\\Sdk\\Modules\\Customers\\Data\\Customer",
       "operation": "POST /v1/customers/{externalUserId}/block"
     },
     {
@@ -346,7 +346,7 @@
       "member": "charge",
       "deprecated": false,
       "internal": false,
-      "signature": "charge(string $externalUserId, string $credits, ?Slen\\Sdk\\Modules\\Customers\\Options\\MovementOptions $options = null): Slen\\Sdk\\Modules\\Customers\\Data\\CustomerAccountDTO",
+      "signature": "charge(string $externalUserId, string $credits, ?Slen\\Sdk\\Modules\\Customers\\Options\\MovementOptions $options = null): Slen\\Sdk\\Modules\\Customers\\Data\\CustomerAccount",
       "operation": "POST /v1/customers/{externalUserId}/charge"
     },
     {
@@ -355,7 +355,7 @@
       "member": "create",
       "deprecated": false,
       "internal": false,
-      "signature": "create(string $externalUserId, ?Slen\\Sdk\\RequestOptions $options = null): Slen\\Sdk\\Modules\\Customers\\Data\\CustomerDTO",
+      "signature": "create(string $externalUserId, ?Slen\\Sdk\\RequestOptions $options = null): Slen\\Sdk\\Modules\\Customers\\Data\\Customer",
       "operation": "PUT /v1/customers/{externalUserId}"
     },
     {
@@ -373,7 +373,7 @@
       "member": "entries",
       "deprecated": false,
       "internal": false,
-      "signature": "entries(string $externalUserId, ?Slen\\Sdk\\Modules\\Customers\\Options\\EntryListOptions $options = null): Slen\\Sdk\\Modules\\Customers\\Data\\CreditEntryPageDTO",
+      "signature": "entries(string $externalUserId, ?Slen\\Sdk\\Modules\\Customers\\Options\\EntryListOptions $options = null): Slen\\Sdk\\Data\\Page",
       "operation": "GET /v1/customers/{externalUserId}/entries"
     },
     {
@@ -382,7 +382,7 @@
       "member": "get",
       "deprecated": false,
       "internal": false,
-      "signature": "get(string $externalUserId, ?Slen\\Sdk\\RequestOptions $options = null): Slen\\Sdk\\Modules\\Customers\\Data\\CustomerDTO",
+      "signature": "get(string $externalUserId, ?Slen\\Sdk\\RequestOptions $options = null): Slen\\Sdk\\Modules\\Customers\\Data\\Customer",
       "operation": "GET /v1/customers/{externalUserId}"
     },
     {
@@ -391,7 +391,7 @@
       "member": "list",
       "deprecated": false,
       "internal": false,
-      "signature": "list(?Slen\\Sdk\\Modules\\Customers\\Options\\CustomerListOptions $options = null): Slen\\Sdk\\Modules\\Customers\\Data\\CustomerPageDTO",
+      "signature": "list(?Slen\\Sdk\\Modules\\Customers\\Options\\CustomerListOptions $options = null): Slen\\Sdk\\Data\\Page",
       "operation": "GET /v1/customers"
     },
     {
@@ -400,7 +400,7 @@
       "member": "prices",
       "deprecated": false,
       "internal": false,
-      "signature": "prices(?Slen\\Sdk\\Modules\\Customers\\Options\\PriceListOptions $options = null): array",
+      "signature": "prices(?Slen\\Sdk\\Modules\\Customers\\Options\\PriceListOptions $options = null): Slen\\Sdk\\Modules\\Customers\\Data\\CreditPriceList",
       "operation": "GET /v1/credit-prices"
     },
     {
@@ -409,7 +409,7 @@
       "member": "topUp",
       "deprecated": false,
       "internal": false,
-      "signature": "topUp(string $externalUserId, string $credits, ?Slen\\Sdk\\Modules\\Customers\\Options\\MovementOptions $options = null): Slen\\Sdk\\Modules\\Customers\\Data\\CustomerAccountDTO",
+      "signature": "topUp(string $externalUserId, string $credits, ?Slen\\Sdk\\Modules\\Customers\\Options\\MovementOptions $options = null): Slen\\Sdk\\Modules\\Customers\\Data\\CustomerAccount",
       "operation": "POST /v1/customers/{externalUserId}/topup"
     },
     {
@@ -418,7 +418,7 @@
       "member": "unblock",
       "deprecated": false,
       "internal": false,
-      "signature": "unblock(string $externalUserId, ?Slen\\Sdk\\RequestOptions $options = null): Slen\\Sdk\\Modules\\Customers\\Data\\CustomerDTO",
+      "signature": "unblock(string $externalUserId, ?Slen\\Sdk\\RequestOptions $options = null): Slen\\Sdk\\Modules\\Customers\\Data\\Customer",
       "operation": "POST /v1/customers/{externalUserId}/unblock"
     },
     {
@@ -427,7 +427,7 @@
       "member": "updateAccount",
       "deprecated": false,
       "internal": false,
-      "signature": "updateAccount(string $externalUserId, string $creditType, ?Slen\\Sdk\\Modules\\Customers\\Options\\AccountOptions $options = null): Slen\\Sdk\\Modules\\Customers\\Data\\CustomerAccountDTO",
+      "signature": "updateAccount(string $externalUserId, string $creditType, ?Slen\\Sdk\\Modules\\Customers\\Options\\AccountOptions $options = null): Slen\\Sdk\\Modules\\Customers\\Data\\CustomerAccount",
       "operation": "PUT /v1/customers/{externalUserId}/accounts/{creditType}"
     },
     {
@@ -436,7 +436,7 @@
       "member": "get",
       "deprecated": false,
       "internal": false,
-      "signature": "get(string $executionId, ?Slen\\Sdk\\RequestOptions $options = null): Slen\\Sdk\\Modules\\Executions\\Data\\ExecutionStatusDTO",
+      "signature": "get(string $executionId, ?Slen\\Sdk\\RequestOptions $options = null): Slen\\Sdk\\Modules\\Executions\\Data\\ExecutionStatusView",
       "operation": "GET /v1/executions/{id}/status"
     },
     {
@@ -445,7 +445,7 @@
       "member": "trace",
       "deprecated": false,
       "internal": false,
-      "signature": "trace(string $executionId, ?Slen\\Sdk\\RequestOptions $options = null): Slen\\Sdk\\Modules\\Executions\\Data\\ExecutionTraceDTO",
+      "signature": "trace(string $executionId, ?Slen\\Sdk\\RequestOptions $options = null): Slen\\Sdk\\Modules\\Executions\\Data\\ExecutionTrace",
       "operation": "GET /v1/executions/{id}"
     },
     {
@@ -454,7 +454,7 @@
       "member": "wait",
       "deprecated": false,
       "internal": false,
-      "signature": "wait(string $executionId, ?Slen\\Sdk\\Modules\\Executions\\Options\\WaitOptions $options = null): Slen\\Sdk\\Modules\\Executions\\Data\\ExecutionStatusDTO",
+      "signature": "wait(string $executionId, ?Slen\\Sdk\\Modules\\Executions\\Options\\WaitOptions $options = null): Slen\\Sdk\\Modules\\Executions\\Data\\ExecutionStatusView",
       "operation": "GET /v1/executions/{id}/status"
     },
     {
@@ -463,7 +463,7 @@
       "member": "health",
       "deprecated": false,
       "internal": false,
-      "signature": "health(?Slen\\Sdk\\RequestOptions $options = null): Slen\\Sdk\\Data\\HealthDTO",
+      "signature": "health(?Slen\\Sdk\\RequestOptions $options = null): Slen\\Sdk\\Data\\Health",
       "operation": "GET /health"
     },
     {
@@ -472,7 +472,7 @@
       "member": "execute",
       "deprecated": false,
       "internal": false,
-      "signature": "execute(string $operation, array $input, ?Slen\\Sdk\\Modules\\Operations\\Options\\ExecuteOptions $options = null): Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionDTO",
+      "signature": "execute(string $operation, array $input, ?Slen\\Sdk\\Modules\\Operations\\Options\\ExecuteOptions $options = null): Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionResult",
       "operation": "POST /v1/operations/execute"
     },
     {
@@ -481,7 +481,7 @@
       "member": "executeAsync",
       "deprecated": false,
       "internal": false,
-      "signature": "executeAsync(string $operation, array $input, ?Slen\\Sdk\\Modules\\Operations\\Options\\ExecuteOptions $options = null): Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionDTO",
+      "signature": "executeAsync(string $operation, array $input, ?Slen\\Sdk\\Modules\\Operations\\Options\\ExecuteOptions $options = null): Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionResult",
       "operation": "POST /v1/operations/execute"
     },
     {
@@ -490,7 +490,7 @@
       "member": "constructEvent",
       "deprecated": false,
       "internal": false,
-      "signature": "constructEvent(string $payload, ?string $signatureHeader, ?Slen\\Sdk\\Modules\\Webhooks\\Options\\VerifyOptions $options = null): Slen\\Sdk\\Modules\\Webhooks\\Data\\WebhookEventDTO",
+      "signature": "constructEvent(string $payload, ?string $signatureHeader, ?Slen\\Sdk\\Modules\\Webhooks\\Options\\VerifyOptions $options = null): Slen\\Sdk\\Modules\\Webhooks\\Data\\WebhookEvent",
       "operation": null
     },
     {
@@ -505,9 +505,9 @@
   ],
   "symbols": [
     {
-      "name": "Slen\\Sdk\\Data\\HealthDTO",
+      "name": "Slen\\Sdk\\Data\\Health",
       "kind": "class",
-      "source": "src/Data/HealthDTO.php",
+      "source": "src/Data/Health.php",
       "deprecated": false,
       "internal": false,
       "alias_of": null,
@@ -613,13 +613,14 @@
       ]
     },
     {
-      "name": "Slen\\Sdk\\Data\\PageDTO",
+      "name": "Slen\\Sdk\\Data\\Page",
       "kind": "class",
-      "source": "src/Data/PageDTO.php",
+      "source": "src/Data/Page.php",
       "deprecated": false,
       "internal": false,
       "alias_of": null,
       "modifiers": [
+        "final",
         "readonly"
       ],
       "type_parameters": [],
@@ -653,15 +654,6 @@
           "deprecated": false,
           "internal": false,
           "signature": "__construct(array $data, ?string $nextCursor)"
-        },
-        {
-          "name": "hasMore",
-          "kind": "method",
-          "static": false,
-          "optional": false,
-          "deprecated": false,
-          "internal": false,
-          "signature": "hasMore(): bool"
         }
       ]
     },
@@ -1408,7 +1400,7 @@
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "list(?Slen\\Sdk\\Modules\\Customers\\Options\\CustomerListOptions $options = null): Slen\\Sdk\\Modules\\Customers\\Data\\CustomerPageDTO"
+          "signature": "list(?Slen\\Sdk\\Modules\\Customers\\Options\\CustomerListOptions $options = null): Slen\\Sdk\\Data\\Page"
         },
         {
           "name": "get",
@@ -1417,7 +1409,7 @@
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "get(string $externalUserId, ?Slen\\Sdk\\RequestOptions $options = null): Slen\\Sdk\\Modules\\Customers\\Data\\CustomerDTO"
+          "signature": "get(string $externalUserId, ?Slen\\Sdk\\RequestOptions $options = null): Slen\\Sdk\\Modules\\Customers\\Data\\Customer"
         },
         {
           "name": "create",
@@ -1426,7 +1418,7 @@
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "create(string $externalUserId, ?Slen\\Sdk\\RequestOptions $options = null): Slen\\Sdk\\Modules\\Customers\\Data\\CustomerDTO"
+          "signature": "create(string $externalUserId, ?Slen\\Sdk\\RequestOptions $options = null): Slen\\Sdk\\Modules\\Customers\\Data\\Customer"
         },
         {
           "name": "updateAccount",
@@ -1435,7 +1427,7 @@
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "updateAccount(string $externalUserId, string $creditType, ?Slen\\Sdk\\Modules\\Customers\\Options\\AccountOptions $options = null): Slen\\Sdk\\Modules\\Customers\\Data\\CustomerAccountDTO"
+          "signature": "updateAccount(string $externalUserId, string $creditType, ?Slen\\Sdk\\Modules\\Customers\\Options\\AccountOptions $options = null): Slen\\Sdk\\Modules\\Customers\\Data\\CustomerAccount"
         },
         {
           "name": "block",
@@ -1444,7 +1436,7 @@
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "block(string $externalUserId, ?Slen\\Sdk\\Modules\\Customers\\Options\\BlockOptions $options = null): Slen\\Sdk\\Modules\\Customers\\Data\\CustomerDTO"
+          "signature": "block(string $externalUserId, ?Slen\\Sdk\\Modules\\Customers\\Options\\BlockOptions $options = null): Slen\\Sdk\\Modules\\Customers\\Data\\Customer"
         },
         {
           "name": "unblock",
@@ -1453,7 +1445,7 @@
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "unblock(string $externalUserId, ?Slen\\Sdk\\RequestOptions $options = null): Slen\\Sdk\\Modules\\Customers\\Data\\CustomerDTO"
+          "signature": "unblock(string $externalUserId, ?Slen\\Sdk\\RequestOptions $options = null): Slen\\Sdk\\Modules\\Customers\\Data\\Customer"
         },
         {
           "name": "delete",
@@ -1471,7 +1463,7 @@
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "topUp(string $externalUserId, string $credits, ?Slen\\Sdk\\Modules\\Customers\\Options\\MovementOptions $options = null): Slen\\Sdk\\Modules\\Customers\\Data\\CustomerAccountDTO"
+          "signature": "topUp(string $externalUserId, string $credits, ?Slen\\Sdk\\Modules\\Customers\\Options\\MovementOptions $options = null): Slen\\Sdk\\Modules\\Customers\\Data\\CustomerAccount"
         },
         {
           "name": "charge",
@@ -1480,7 +1472,7 @@
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "charge(string $externalUserId, string $credits, ?Slen\\Sdk\\Modules\\Customers\\Options\\MovementOptions $options = null): Slen\\Sdk\\Modules\\Customers\\Data\\CustomerAccountDTO"
+          "signature": "charge(string $externalUserId, string $credits, ?Slen\\Sdk\\Modules\\Customers\\Options\\MovementOptions $options = null): Slen\\Sdk\\Modules\\Customers\\Data\\CustomerAccount"
         },
         {
           "name": "adjust",
@@ -1489,7 +1481,7 @@
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "adjust(string $externalUserId, string $credits, ?Slen\\Sdk\\Modules\\Customers\\Options\\MovementOptions $options = null): Slen\\Sdk\\Modules\\Customers\\Data\\CustomerAccountDTO"
+          "signature": "adjust(string $externalUserId, string $credits, ?Slen\\Sdk\\Modules\\Customers\\Options\\MovementOptions $options = null): Slen\\Sdk\\Modules\\Customers\\Data\\CustomerAccount"
         },
         {
           "name": "entries",
@@ -1498,7 +1490,7 @@
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "entries(string $externalUserId, ?Slen\\Sdk\\Modules\\Customers\\Options\\EntryListOptions $options = null): Slen\\Sdk\\Modules\\Customers\\Data\\CreditEntryPageDTO"
+          "signature": "entries(string $externalUserId, ?Slen\\Sdk\\Modules\\Customers\\Options\\EntryListOptions $options = null): Slen\\Sdk\\Data\\Page"
         },
         {
           "name": "prices",
@@ -1507,14 +1499,14 @@
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "prices(?Slen\\Sdk\\Modules\\Customers\\Options\\PriceListOptions $options = null): array"
+          "signature": "prices(?Slen\\Sdk\\Modules\\Customers\\Options\\PriceListOptions $options = null): Slen\\Sdk\\Modules\\Customers\\Data\\CreditPriceList"
         }
       ]
     },
     {
-      "name": "Slen\\Sdk\\Modules\\Customers\\Data\\CreditEntryDTO",
+      "name": "Slen\\Sdk\\Modules\\Customers\\Data\\CreditEntry",
       "kind": "class",
-      "source": "src/Modules/Customers/Data/CreditEntryDTO.php",
+      "source": "src/Modules/Customers/Data/CreditEntry.php",
       "deprecated": false,
       "internal": false,
       "alias_of": null,
@@ -1638,25 +1630,6 @@
       ]
     },
     {
-      "name": "Slen\\Sdk\\Modules\\Customers\\Data\\CreditEntryPageDTO",
-      "kind": "class",
-      "source": "src/Modules/Customers/Data/CreditEntryPageDTO.php",
-      "deprecated": false,
-      "internal": false,
-      "alias_of": null,
-      "modifiers": [
-        "final",
-        "readonly"
-      ],
-      "type_parameters": [],
-      "extends": [
-        "Slen\\Sdk\\Data\\PageDTO"
-      ],
-      "implements": [],
-      "signature": null,
-      "members": []
-    },
-    {
       "name": "Slen\\Sdk\\Modules\\Customers\\Data\\CreditMovementDTO",
       "kind": "class",
       "source": "src/Modules/Customers/Data/CreditMovementDTO.php",
@@ -1720,9 +1693,9 @@
       ]
     },
     {
-      "name": "Slen\\Sdk\\Modules\\Customers\\Data\\CreditPriceDTO",
+      "name": "Slen\\Sdk\\Modules\\Customers\\Data\\CreditPrice",
       "kind": "class",
-      "source": "src/Modules/Customers/Data/CreditPriceDTO.php",
+      "source": "src/Modules/Customers/Data/CreditPrice.php",
       "deprecated": false,
       "internal": false,
       "alias_of": null,
@@ -1810,9 +1783,162 @@
       ]
     },
     {
-      "name": "Slen\\Sdk\\Modules\\Customers\\Data\\CustomerAccountDTO",
+      "name": "Slen\\Sdk\\Modules\\Customers\\Data\\CreditPriceList",
       "kind": "class",
-      "source": "src/Modules/Customers/Data/CustomerAccountDTO.php",
+      "source": "src/Modules/Customers/Data/CreditPriceList.php",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [
+        "final",
+        "readonly"
+      ],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": null,
+      "members": [
+        {
+          "name": "data",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly array $data"
+        },
+        {
+          "name": "__construct",
+          "kind": "constructor",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "__construct(array $data)"
+        }
+      ]
+    },
+    {
+      "name": "Slen\\Sdk\\Modules\\Customers\\Data\\Customer",
+      "kind": "class",
+      "source": "src/Modules/Customers/Data/Customer.php",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [
+        "final",
+        "readonly"
+      ],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": null,
+      "members": [
+        {
+          "name": "customerId",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly string $customerId"
+        },
+        {
+          "name": "externalUserId",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly string $externalUserId"
+        },
+        {
+          "name": "status",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly Slen\\Sdk\\Modules\\Customers\\Enums\\CustomerStatus $status"
+        },
+        {
+          "name": "blockedAt",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly ?DateTimeImmutable $blockedAt"
+        },
+        {
+          "name": "blockReason",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly ?string $blockReason"
+        },
+        {
+          "name": "accounts",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly array $accounts"
+        },
+        {
+          "name": "createdAt",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly DateTimeImmutable $createdAt"
+        },
+        {
+          "name": "updatedAt",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly DateTimeImmutable $updatedAt"
+        },
+        {
+          "name": "__construct",
+          "kind": "constructor",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "__construct(string $customerId, string $externalUserId, Slen\\Sdk\\Modules\\Customers\\Enums\\CustomerStatus $status, ?DateTimeImmutable $blockedAt, ?string $blockReason, array $accounts, DateTimeImmutable $createdAt, DateTimeImmutable $updatedAt)"
+        },
+        {
+          "name": "isBlocked",
+          "kind": "method",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "isBlocked(): bool"
+        },
+        {
+          "name": "account",
+          "kind": "method",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "account(string $creditType = 'default'): ?Slen\\Sdk\\Modules\\Customers\\Data\\CustomerAccount"
+        }
+      ]
+    },
+    {
+      "name": "Slen\\Sdk\\Modules\\Customers\\Data\\CustomerAccount",
+      "kind": "class",
+      "source": "src/Modules/Customers/Data/CustomerAccount.php",
       "deprecated": false,
       "internal": false,
       "alias_of": null,
@@ -1943,142 +2069,6 @@
           "signature": "__construct(string $customerAccountId, string $customerId, string $projectId, string $externalUserId, string $creditType, string $balance, string $reserved, string $available, bool $allowNegative, string $lowBalanceThreshold, DateTimeImmutable $createdAt, DateTimeImmutable $updatedAt)"
         }
       ]
-    },
-    {
-      "name": "Slen\\Sdk\\Modules\\Customers\\Data\\CustomerDTO",
-      "kind": "class",
-      "source": "src/Modules/Customers/Data/CustomerDTO.php",
-      "deprecated": false,
-      "internal": false,
-      "alias_of": null,
-      "modifiers": [
-        "final",
-        "readonly"
-      ],
-      "type_parameters": [],
-      "extends": [],
-      "implements": [],
-      "signature": null,
-      "members": [
-        {
-          "name": "customerId",
-          "kind": "property",
-          "static": false,
-          "optional": false,
-          "deprecated": false,
-          "internal": false,
-          "signature": "readonly string $customerId"
-        },
-        {
-          "name": "externalUserId",
-          "kind": "property",
-          "static": false,
-          "optional": false,
-          "deprecated": false,
-          "internal": false,
-          "signature": "readonly string $externalUserId"
-        },
-        {
-          "name": "status",
-          "kind": "property",
-          "static": false,
-          "optional": false,
-          "deprecated": false,
-          "internal": false,
-          "signature": "readonly Slen\\Sdk\\Modules\\Customers\\Enums\\CustomerStatus $status"
-        },
-        {
-          "name": "blockedAt",
-          "kind": "property",
-          "static": false,
-          "optional": false,
-          "deprecated": false,
-          "internal": false,
-          "signature": "readonly ?DateTimeImmutable $blockedAt"
-        },
-        {
-          "name": "blockReason",
-          "kind": "property",
-          "static": false,
-          "optional": false,
-          "deprecated": false,
-          "internal": false,
-          "signature": "readonly ?string $blockReason"
-        },
-        {
-          "name": "accounts",
-          "kind": "property",
-          "static": false,
-          "optional": false,
-          "deprecated": false,
-          "internal": false,
-          "signature": "readonly array $accounts"
-        },
-        {
-          "name": "createdAt",
-          "kind": "property",
-          "static": false,
-          "optional": false,
-          "deprecated": false,
-          "internal": false,
-          "signature": "readonly DateTimeImmutable $createdAt"
-        },
-        {
-          "name": "updatedAt",
-          "kind": "property",
-          "static": false,
-          "optional": false,
-          "deprecated": false,
-          "internal": false,
-          "signature": "readonly DateTimeImmutable $updatedAt"
-        },
-        {
-          "name": "__construct",
-          "kind": "constructor",
-          "static": false,
-          "optional": false,
-          "deprecated": false,
-          "internal": false,
-          "signature": "__construct(string $customerId, string $externalUserId, Slen\\Sdk\\Modules\\Customers\\Enums\\CustomerStatus $status, ?DateTimeImmutable $blockedAt, ?string $blockReason, array $accounts, DateTimeImmutable $createdAt, DateTimeImmutable $updatedAt)"
-        },
-        {
-          "name": "isBlocked",
-          "kind": "method",
-          "static": false,
-          "optional": false,
-          "deprecated": false,
-          "internal": false,
-          "signature": "isBlocked(): bool"
-        },
-        {
-          "name": "account",
-          "kind": "method",
-          "static": false,
-          "optional": false,
-          "deprecated": false,
-          "internal": false,
-          "signature": "account(string $creditType = 'default'): ?Slen\\Sdk\\Modules\\Customers\\Data\\CustomerAccountDTO"
-        }
-      ]
-    },
-    {
-      "name": "Slen\\Sdk\\Modules\\Customers\\Data\\CustomerPageDTO",
-      "kind": "class",
-      "source": "src/Modules/Customers/Data/CustomerPageDTO.php",
-      "deprecated": false,
-      "internal": false,
-      "alias_of": null,
-      "modifiers": [
-        "final",
-        "readonly"
-      ],
-      "type_parameters": [],
-      "extends": [
-        "Slen\\Sdk\\Data\\PageDTO"
-      ],
-      "implements": [],
-      "signature": null,
-      "members": []
     },
     {
       "name": "Slen\\Sdk\\Modules\\Customers\\Enums\\CreditEntryType",
@@ -2936,7 +2926,7 @@
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "map(array $data): Slen\\Sdk\\Modules\\Customers\\Data\\CreditEntryDTO"
+          "signature": "map(array $data): Slen\\Sdk\\Modules\\Customers\\Data\\CreditEntry"
         },
         {
           "name": "page",
@@ -2945,7 +2935,7 @@
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "page(array $body): Slen\\Sdk\\Modules\\Customers\\Data\\CreditEntryPageDTO"
+          "signature": "page(array $body): Slen\\Sdk\\Data\\Page"
         }
       ]
     },
@@ -2974,7 +2964,7 @@
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "map(array $data): Slen\\Sdk\\Modules\\Customers\\Data\\CreditPriceDTO"
+          "signature": "map(array $data): Slen\\Sdk\\Modules\\Customers\\Data\\CreditPrice"
         },
         {
           "name": "list",
@@ -2983,7 +2973,7 @@
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "list(array $body): array"
+          "signature": "list(array $body): Slen\\Sdk\\Modules\\Customers\\Data\\CreditPriceList"
         }
       ]
     },
@@ -3012,7 +3002,7 @@
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "map(array $data): Slen\\Sdk\\Modules\\Customers\\Data\\CustomerAccountDTO"
+          "signature": "map(array $data): Slen\\Sdk\\Modules\\Customers\\Data\\CustomerAccount"
         }
       ]
     },
@@ -3050,7 +3040,7 @@
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "map(array $data): Slen\\Sdk\\Modules\\Customers\\Data\\CustomerDTO"
+          "signature": "map(array $data): Slen\\Sdk\\Modules\\Customers\\Data\\Customer"
         },
         {
           "name": "page",
@@ -3059,7 +3049,7 @@
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "page(array $body): Slen\\Sdk\\Modules\\Customers\\Data\\CustomerPageDTO"
+          "signature": "page(array $body): Slen\\Sdk\\Data\\Page"
         }
       ]
     },
@@ -3131,7 +3121,7 @@
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "execute(Slen\\Sdk\\Modules\\Customers\\Data\\CreditMovementDTO $creditMovementDTO): Slen\\Sdk\\Modules\\Customers\\Data\\CustomerAccountDTO"
+          "signature": "execute(Slen\\Sdk\\Modules\\Customers\\Data\\CreditMovementDTO $creditMovementDTO): Slen\\Sdk\\Modules\\Customers\\Data\\CustomerAccount"
         }
       ]
     },
@@ -3176,347 +3166,14 @@
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "execute(Slen\\Sdk\\Modules\\Executions\\Data\\WaitStateDTO $waitStateDTO): Slen\\Sdk\\Modules\\Executions\\Data\\ExecutionStatusDTO"
+          "signature": "execute(Slen\\Sdk\\Modules\\Executions\\Data\\WaitStateDTO $waitStateDTO): Slen\\Sdk\\Modules\\Executions\\Data\\ExecutionStatusView"
         }
       ]
     },
     {
-      "name": "Slen\\Sdk\\Modules\\Executions\\Data\\ExecutionStatusDTO",
+      "name": "Slen\\Sdk\\Modules\\Executions\\Data\\AttemptSummary",
       "kind": "class",
-      "source": "src/Modules/Executions/Data/ExecutionStatusDTO.php",
-      "deprecated": false,
-      "internal": false,
-      "alias_of": null,
-      "modifiers": [
-        "final",
-        "readonly"
-      ],
-      "type_parameters": [],
-      "extends": [],
-      "implements": [],
-      "signature": null,
-      "members": [
-        {
-          "name": "executionId",
-          "kind": "property",
-          "static": false,
-          "optional": false,
-          "deprecated": false,
-          "internal": false,
-          "signature": "readonly string $executionId"
-        },
-        {
-          "name": "status",
-          "kind": "property",
-          "static": false,
-          "optional": false,
-          "deprecated": false,
-          "internal": false,
-          "signature": "readonly Slen\\Sdk\\Modules\\Operations\\Enums\\ExecutionStatus $status"
-        },
-        {
-          "name": "operationCode",
-          "kind": "property",
-          "static": false,
-          "optional": false,
-          "deprecated": false,
-          "internal": false,
-          "signature": "readonly string $operationCode"
-        },
-        {
-          "name": "output",
-          "kind": "property",
-          "static": false,
-          "optional": false,
-          "deprecated": false,
-          "internal": false,
-          "signature": "readonly ?array $output"
-        },
-        {
-          "name": "errorCode",
-          "kind": "property",
-          "static": false,
-          "optional": false,
-          "deprecated": false,
-          "internal": false,
-          "signature": "readonly ?string $errorCode"
-        },
-        {
-          "name": "errorMessage",
-          "kind": "property",
-          "static": false,
-          "optional": false,
-          "deprecated": false,
-          "internal": false,
-          "signature": "readonly ?string $errorMessage"
-        },
-        {
-          "name": "cost",
-          "kind": "property",
-          "static": false,
-          "optional": false,
-          "deprecated": false,
-          "internal": false,
-          "signature": "readonly Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionCostDTO $cost"
-        },
-        {
-          "name": "cache",
-          "kind": "property",
-          "static": false,
-          "optional": false,
-          "deprecated": false,
-          "internal": false,
-          "signature": "readonly Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionCacheDTO $cache"
-        },
-        {
-          "name": "waitingOn",
-          "kind": "property",
-          "static": false,
-          "optional": false,
-          "deprecated": false,
-          "internal": false,
-          "signature": "readonly ?Slen\\Sdk\\Modules\\Operations\\Data\\WaitingOnDTO $waitingOn"
-        },
-        {
-          "name": "traceUrl",
-          "kind": "property",
-          "static": false,
-          "optional": false,
-          "deprecated": false,
-          "internal": false,
-          "signature": "readonly string $traceUrl"
-        },
-        {
-          "name": "retryAfterSeconds",
-          "kind": "property",
-          "static": false,
-          "optional": false,
-          "deprecated": false,
-          "internal": false,
-          "signature": "readonly ?int $retryAfterSeconds"
-        },
-        {
-          "name": "__construct",
-          "kind": "constructor",
-          "static": false,
-          "optional": false,
-          "deprecated": false,
-          "internal": false,
-          "signature": "__construct(string $executionId, Slen\\Sdk\\Modules\\Operations\\Enums\\ExecutionStatus $status, string $operationCode, ?array $output, ?string $errorCode, ?string $errorMessage, Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionCostDTO $cost, Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionCacheDTO $cache, ?Slen\\Sdk\\Modules\\Operations\\Data\\WaitingOnDTO $waitingOn, string $traceUrl, ?int $retryAfterSeconds)"
-        },
-        {
-          "name": "isCompleted",
-          "kind": "method",
-          "static": false,
-          "optional": false,
-          "deprecated": false,
-          "internal": false,
-          "signature": "isCompleted(): bool"
-        },
-        {
-          "name": "isPending",
-          "kind": "method",
-          "static": false,
-          "optional": false,
-          "deprecated": false,
-          "internal": false,
-          "signature": "isPending(): bool"
-        },
-        {
-          "name": "isFinished",
-          "kind": "method",
-          "static": false,
-          "optional": false,
-          "deprecated": false,
-          "internal": false,
-          "signature": "isFinished(): bool"
-        },
-        {
-          "name": "isRejected",
-          "kind": "method",
-          "static": false,
-          "optional": false,
-          "deprecated": false,
-          "internal": false,
-          "signature": "isRejected(): bool"
-        }
-      ]
-    },
-    {
-      "name": "Slen\\Sdk\\Modules\\Executions\\Data\\ExecutionTraceDTO",
-      "kind": "class",
-      "source": "src/Modules/Executions/Data/ExecutionTraceDTO.php",
-      "deprecated": false,
-      "internal": false,
-      "alias_of": null,
-      "modifiers": [
-        "final",
-        "readonly"
-      ],
-      "type_parameters": [],
-      "extends": [],
-      "implements": [],
-      "signature": null,
-      "members": [
-        {
-          "name": "executionId",
-          "kind": "property",
-          "static": false,
-          "optional": false,
-          "deprecated": false,
-          "internal": false,
-          "signature": "readonly string $executionId"
-        },
-        {
-          "name": "flowId",
-          "kind": "property",
-          "static": false,
-          "optional": false,
-          "deprecated": false,
-          "internal": false,
-          "signature": "readonly string $flowId"
-        },
-        {
-          "name": "flowVersionId",
-          "kind": "property",
-          "static": false,
-          "optional": false,
-          "deprecated": false,
-          "internal": false,
-          "signature": "readonly string $flowVersionId"
-        },
-        {
-          "name": "flowName",
-          "kind": "property",
-          "static": false,
-          "optional": false,
-          "deprecated": false,
-          "internal": false,
-          "signature": "readonly ?string $flowName"
-        },
-        {
-          "name": "operationCode",
-          "kind": "property",
-          "static": false,
-          "optional": false,
-          "deprecated": false,
-          "internal": false,
-          "signature": "readonly ?string $operationCode"
-        },
-        {
-          "name": "operationId",
-          "kind": "property",
-          "static": false,
-          "optional": false,
-          "deprecated": false,
-          "internal": false,
-          "signature": "readonly ?string $operationId"
-        },
-        {
-          "name": "status",
-          "kind": "property",
-          "static": false,
-          "optional": false,
-          "deprecated": false,
-          "internal": false,
-          "signature": "readonly Slen\\Sdk\\Modules\\Operations\\Enums\\ExecutionStatus $status"
-        },
-        {
-          "name": "errorCode",
-          "kind": "property",
-          "static": false,
-          "optional": false,
-          "deprecated": false,
-          "internal": false,
-          "signature": "readonly ?string $errorCode"
-        },
-        {
-          "name": "errorMessage",
-          "kind": "property",
-          "static": false,
-          "optional": false,
-          "deprecated": false,
-          "internal": false,
-          "signature": "readonly ?string $errorMessage"
-        },
-        {
-          "name": "cost",
-          "kind": "property",
-          "static": false,
-          "optional": false,
-          "deprecated": false,
-          "internal": false,
-          "signature": "readonly Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionCostDTO $cost"
-        },
-        {
-          "name": "cache",
-          "kind": "property",
-          "static": false,
-          "optional": false,
-          "deprecated": false,
-          "internal": false,
-          "signature": "readonly Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionCacheDTO $cache"
-        },
-        {
-          "name": "startedAt",
-          "kind": "property",
-          "static": false,
-          "optional": false,
-          "deprecated": false,
-          "internal": false,
-          "signature": "readonly DateTimeImmutable $startedAt"
-        },
-        {
-          "name": "finishedAt",
-          "kind": "property",
-          "static": false,
-          "optional": false,
-          "deprecated": false,
-          "internal": false,
-          "signature": "readonly ?DateTimeImmutable $finishedAt"
-        },
-        {
-          "name": "durationMs",
-          "kind": "property",
-          "static": false,
-          "optional": false,
-          "deprecated": false,
-          "internal": false,
-          "signature": "readonly ?int $durationMs"
-        },
-        {
-          "name": "nodes",
-          "kind": "property",
-          "static": false,
-          "optional": false,
-          "deprecated": false,
-          "internal": false,
-          "signature": "readonly array $nodes"
-        },
-        {
-          "name": "events",
-          "kind": "property",
-          "static": false,
-          "optional": false,
-          "deprecated": false,
-          "internal": false,
-          "signature": "readonly array $events"
-        },
-        {
-          "name": "__construct",
-          "kind": "constructor",
-          "static": false,
-          "optional": false,
-          "deprecated": false,
-          "internal": false,
-          "signature": "__construct(string $executionId, string $flowId, string $flowVersionId, ?string $flowName, ?string $operationCode, ?string $operationId, Slen\\Sdk\\Modules\\Operations\\Enums\\ExecutionStatus $status, ?string $errorCode, ?string $errorMessage, Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionCostDTO $cost, Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionCacheDTO $cache, DateTimeImmutable $startedAt, ?DateTimeImmutable $finishedAt, ?int $durationMs, array $nodes, array $events)"
-        }
-      ]
-    },
-    {
-      "name": "Slen\\Sdk\\Modules\\Executions\\Data\\TraceAttemptDTO",
-      "kind": "class",
-      "source": "src/Modules/Executions/Data/TraceAttemptDTO.php",
+      "source": "src/Modules/Executions/Data/AttemptSummary.php",
       "deprecated": false,
       "internal": false,
       "alias_of": null,
@@ -3631,9 +3288,342 @@
       ]
     },
     {
-      "name": "Slen\\Sdk\\Modules\\Executions\\Data\\TraceEventDTO",
+      "name": "Slen\\Sdk\\Modules\\Executions\\Data\\ExecutionStatusView",
       "kind": "class",
-      "source": "src/Modules/Executions/Data/TraceEventDTO.php",
+      "source": "src/Modules/Executions/Data/ExecutionStatusView.php",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [
+        "final",
+        "readonly"
+      ],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": null,
+      "members": [
+        {
+          "name": "executionId",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly string $executionId"
+        },
+        {
+          "name": "status",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly Slen\\Sdk\\Modules\\Operations\\Enums\\ExecutionStatus $status"
+        },
+        {
+          "name": "operationCode",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly string $operationCode"
+        },
+        {
+          "name": "output",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly ?array $output"
+        },
+        {
+          "name": "errorCode",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly ?string $errorCode"
+        },
+        {
+          "name": "errorMessage",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly ?string $errorMessage"
+        },
+        {
+          "name": "cost",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionCost $cost"
+        },
+        {
+          "name": "cache",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionCache $cache"
+        },
+        {
+          "name": "waitingOn",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly ?Slen\\Sdk\\Modules\\Operations\\Data\\WaitingOn $waitingOn"
+        },
+        {
+          "name": "traceUrl",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly string $traceUrl"
+        },
+        {
+          "name": "retryAfterSeconds",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly ?int $retryAfterSeconds"
+        },
+        {
+          "name": "__construct",
+          "kind": "constructor",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "__construct(string $executionId, Slen\\Sdk\\Modules\\Operations\\Enums\\ExecutionStatus $status, string $operationCode, ?array $output, ?string $errorCode, ?string $errorMessage, Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionCost $cost, Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionCache $cache, ?Slen\\Sdk\\Modules\\Operations\\Data\\WaitingOn $waitingOn, string $traceUrl, ?int $retryAfterSeconds)"
+        },
+        {
+          "name": "isCompleted",
+          "kind": "method",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "isCompleted(): bool"
+        },
+        {
+          "name": "isPending",
+          "kind": "method",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "isPending(): bool"
+        },
+        {
+          "name": "isFinished",
+          "kind": "method",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "isFinished(): bool"
+        },
+        {
+          "name": "isRejected",
+          "kind": "method",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "isRejected(): bool"
+        }
+      ]
+    },
+    {
+      "name": "Slen\\Sdk\\Modules\\Executions\\Data\\ExecutionTrace",
+      "kind": "class",
+      "source": "src/Modules/Executions/Data/ExecutionTrace.php",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [
+        "final",
+        "readonly"
+      ],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": null,
+      "members": [
+        {
+          "name": "executionId",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly string $executionId"
+        },
+        {
+          "name": "flowId",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly string $flowId"
+        },
+        {
+          "name": "flowVersionId",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly string $flowVersionId"
+        },
+        {
+          "name": "flowName",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly ?string $flowName"
+        },
+        {
+          "name": "operationCode",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly ?string $operationCode"
+        },
+        {
+          "name": "operationId",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly ?string $operationId"
+        },
+        {
+          "name": "status",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly Slen\\Sdk\\Modules\\Operations\\Enums\\ExecutionStatus $status"
+        },
+        {
+          "name": "errorCode",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly ?string $errorCode"
+        },
+        {
+          "name": "errorMessage",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly ?string $errorMessage"
+        },
+        {
+          "name": "cost",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionCost $cost"
+        },
+        {
+          "name": "cache",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionCache $cache"
+        },
+        {
+          "name": "startedAt",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly DateTimeImmutable $startedAt"
+        },
+        {
+          "name": "finishedAt",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly ?DateTimeImmutable $finishedAt"
+        },
+        {
+          "name": "durationMs",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly ?int $durationMs"
+        },
+        {
+          "name": "nodes",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly array $nodes"
+        },
+        {
+          "name": "events",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly array $events"
+        },
+        {
+          "name": "__construct",
+          "kind": "constructor",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "__construct(string $executionId, string $flowId, string $flowVersionId, ?string $flowName, ?string $operationCode, ?string $operationId, Slen\\Sdk\\Modules\\Operations\\Enums\\ExecutionStatus $status, ?string $errorCode, ?string $errorMessage, Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionCost $cost, Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionCache $cache, DateTimeImmutable $startedAt, ?DateTimeImmutable $finishedAt, ?int $durationMs, array $nodes, array $events)"
+        }
+      ]
+    },
+    {
+      "name": "Slen\\Sdk\\Modules\\Executions\\Data\\FlowExecutionEvent",
+      "kind": "class",
+      "source": "src/Modules/Executions/Data/FlowExecutionEvent.php",
       "deprecated": false,
       "internal": false,
       "alias_of": null,
@@ -3703,9 +3693,9 @@
       ]
     },
     {
-      "name": "Slen\\Sdk\\Modules\\Executions\\Data\\TraceNodeDTO",
+      "name": "Slen\\Sdk\\Modules\\Executions\\Data\\FlowExecutionNode",
       "kind": "class",
-      "source": "src/Modules/Executions/Data/TraceNodeDTO.php",
+      "source": "src/Modules/Executions/Data/FlowExecutionNode.php",
       "deprecated": false,
       "internal": false,
       "alias_of": null,
@@ -3941,7 +3931,7 @@
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "get(string $executionId, ?Slen\\Sdk\\RequestOptions $options = null): Slen\\Sdk\\Modules\\Executions\\Data\\ExecutionStatusDTO"
+          "signature": "get(string $executionId, ?Slen\\Sdk\\RequestOptions $options = null): Slen\\Sdk\\Modules\\Executions\\Data\\ExecutionStatusView"
         },
         {
           "name": "wait",
@@ -3950,7 +3940,7 @@
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "wait(string $executionId, ?Slen\\Sdk\\Modules\\Executions\\Options\\WaitOptions $options = null): Slen\\Sdk\\Modules\\Executions\\Data\\ExecutionStatusDTO"
+          "signature": "wait(string $executionId, ?Slen\\Sdk\\Modules\\Executions\\Options\\WaitOptions $options = null): Slen\\Sdk\\Modules\\Executions\\Data\\ExecutionStatusView"
         },
         {
           "name": "trace",
@@ -3959,7 +3949,7 @@
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "trace(string $executionId, ?Slen\\Sdk\\RequestOptions $options = null): Slen\\Sdk\\Modules\\Executions\\Data\\ExecutionTraceDTO"
+          "signature": "trace(string $executionId, ?Slen\\Sdk\\RequestOptions $options = null): Slen\\Sdk\\Modules\\Executions\\Data\\ExecutionTrace"
         }
       ]
     },
@@ -4123,7 +4113,7 @@
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "map(array $data): Slen\\Sdk\\Modules\\Executions\\Data\\ExecutionStatusDTO"
+          "signature": "map(array $data): Slen\\Sdk\\Modules\\Executions\\Data\\ExecutionStatusView"
         }
       ]
     },
@@ -4161,7 +4151,7 @@
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "map(array $data): Slen\\Sdk\\Modules\\Executions\\Data\\ExecutionTraceDTO"
+          "signature": "map(array $data): Slen\\Sdk\\Modules\\Executions\\Data\\ExecutionTrace"
         }
       ]
     },
@@ -4206,7 +4196,7 @@
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "execute(Slen\\Sdk\\Shared\\Http\\Data\\ApiRequestDTO $request): Slen\\Sdk\\Modules\\Executions\\Data\\ExecutionStatusDTO"
+          "signature": "execute(Slen\\Sdk\\Shared\\Http\\Data\\ApiRequestDTO $request): Slen\\Sdk\\Modules\\Executions\\Data\\ExecutionStatusView"
         },
         {
           "name": "read",
@@ -4215,7 +4205,7 @@
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "read(Slen\\Sdk\\Shared\\Http\\Data\\ApiRequestDTO $request, float $secondsLeft): Slen\\Sdk\\Modules\\Executions\\Data\\ExecutionStatusDTO"
+          "signature": "read(Slen\\Sdk\\Shared\\Http\\Data\\ApiRequestDTO $request, float $secondsLeft): Slen\\Sdk\\Modules\\Executions\\Data\\ExecutionStatusView"
         }
       ]
     },
@@ -4337,9 +4327,9 @@
       ]
     },
     {
-      "name": "Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionCacheDTO",
+      "name": "Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionCache",
       "kind": "class",
-      "source": "src/Modules/Operations/Data/ExecutionCacheDTO.php",
+      "source": "src/Modules/Operations/Data/ExecutionCache.php",
       "deprecated": false,
       "internal": false,
       "alias_of": null,
@@ -4382,9 +4372,9 @@
       ]
     },
     {
-      "name": "Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionCostDTO",
+      "name": "Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionCost",
       "kind": "class",
-      "source": "src/Modules/Operations/Data/ExecutionCostDTO.php",
+      "source": "src/Modules/Operations/Data/ExecutionCost.php",
       "deprecated": false,
       "internal": false,
       "alias_of": null,
@@ -4427,9 +4417,54 @@
       ]
     },
     {
-      "name": "Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionDTO",
+      "name": "Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionError",
       "kind": "class",
-      "source": "src/Modules/Operations/Data/ExecutionDTO.php",
+      "source": "src/Modules/Operations/Data/ExecutionError.php",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [
+        "final",
+        "readonly"
+      ],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": null,
+      "members": [
+        {
+          "name": "code",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly string $code"
+        },
+        {
+          "name": "message",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly string $message"
+        },
+        {
+          "name": "__construct",
+          "kind": "constructor",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "__construct(string $code, string $message)"
+        }
+      ]
+    },
+    {
+      "name": "Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionResult",
+      "kind": "class",
+      "source": "src/Modules/Operations/Data/ExecutionResult.php",
       "deprecated": false,
       "internal": false,
       "alias_of": null,
@@ -4503,7 +4538,7 @@
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "readonly Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionCostDTO $cost"
+          "signature": "readonly Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionCost $cost"
         },
         {
           "name": "cache",
@@ -4512,7 +4547,7 @@
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "readonly Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionCacheDTO $cache"
+          "signature": "readonly Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionCache $cache"
         },
         {
           "name": "waitingOn",
@@ -4521,7 +4556,7 @@
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "readonly ?Slen\\Sdk\\Modules\\Operations\\Data\\WaitingOnDTO $waitingOn"
+          "signature": "readonly ?Slen\\Sdk\\Modules\\Operations\\Data\\WaitingOn $waitingOn"
         },
         {
           "name": "traceUrl",
@@ -4548,7 +4583,7 @@
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "readonly ?Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionErrorDTO $error"
+          "signature": "readonly ?Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionError $error"
         },
         {
           "name": "replayed",
@@ -4566,7 +4601,7 @@
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "__construct(string $executionId, Slen\\Sdk\\Modules\\Operations\\Enums\\ExecutionStatus $status, string $operationCode, ?array $output, ?string $errorCode, ?string $errorMessage, Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionCostDTO $cost, Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionCacheDTO $cache, ?Slen\\Sdk\\Modules\\Operations\\Data\\WaitingOnDTO $waitingOn, string $traceUrl, ?int $retryAfterSeconds, ?Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionErrorDTO $error, bool $replayed)"
+          "signature": "__construct(string $executionId, Slen\\Sdk\\Modules\\Operations\\Enums\\ExecutionStatus $status, string $operationCode, ?array $output, ?string $errorCode, ?string $errorMessage, Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionCost $cost, Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionCache $cache, ?Slen\\Sdk\\Modules\\Operations\\Data\\WaitingOn $waitingOn, string $traceUrl, ?int $retryAfterSeconds, ?Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionError $error, bool $replayed)"
         },
         {
           "name": "isCompleted",
@@ -4607,54 +4642,9 @@
       ]
     },
     {
-      "name": "Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionErrorDTO",
+      "name": "Slen\\Sdk\\Modules\\Operations\\Data\\WaitingOn",
       "kind": "class",
-      "source": "src/Modules/Operations/Data/ExecutionErrorDTO.php",
-      "deprecated": false,
-      "internal": false,
-      "alias_of": null,
-      "modifiers": [
-        "final",
-        "readonly"
-      ],
-      "type_parameters": [],
-      "extends": [],
-      "implements": [],
-      "signature": null,
-      "members": [
-        {
-          "name": "code",
-          "kind": "property",
-          "static": false,
-          "optional": false,
-          "deprecated": false,
-          "internal": false,
-          "signature": "readonly string $code"
-        },
-        {
-          "name": "message",
-          "kind": "property",
-          "static": false,
-          "optional": false,
-          "deprecated": false,
-          "internal": false,
-          "signature": "readonly string $message"
-        },
-        {
-          "name": "__construct",
-          "kind": "constructor",
-          "static": false,
-          "optional": false,
-          "deprecated": false,
-          "internal": false,
-          "signature": "__construct(string $code, string $message)"
-        }
-      ]
-    },
-    {
-      "name": "Slen\\Sdk\\Modules\\Operations\\Data\\WaitingOnDTO",
-      "kind": "class",
-      "source": "src/Modules/Operations/Data/WaitingOnDTO.php",
+      "source": "src/Modules/Operations/Data/WaitingOn.php",
       "deprecated": false,
       "internal": false,
       "alias_of": null,
@@ -4936,7 +4926,7 @@
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "execute(string $operation, array $input, ?Slen\\Sdk\\Modules\\Operations\\Options\\ExecuteOptions $options = null): Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionDTO"
+          "signature": "execute(string $operation, array $input, ?Slen\\Sdk\\Modules\\Operations\\Options\\ExecuteOptions $options = null): Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionResult"
         },
         {
           "name": "executeAsync",
@@ -4945,7 +4935,7 @@
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "executeAsync(string $operation, array $input, ?Slen\\Sdk\\Modules\\Operations\\Options\\ExecuteOptions $options = null): Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionDTO"
+          "signature": "executeAsync(string $operation, array $input, ?Slen\\Sdk\\Modules\\Operations\\Options\\ExecuteOptions $options = null): Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionResult"
         }
       ]
     },
@@ -5055,7 +5045,7 @@
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "map(array $data): Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionDTO"
+          "signature": "map(array $data): Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionResult"
         },
         {
           "name": "status",
@@ -5073,7 +5063,7 @@
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "cost(array $data): Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionCostDTO"
+          "signature": "cost(array $data): Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionCost"
         },
         {
           "name": "cache",
@@ -5082,7 +5072,7 @@
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "cache(array $data): Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionCacheDTO"
+          "signature": "cache(array $data): Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionCache"
         },
         {
           "name": "waitingOn",
@@ -5091,7 +5081,7 @@
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "waitingOn(array $data): ?Slen\\Sdk\\Modules\\Operations\\Data\\WaitingOnDTO"
+          "signature": "waitingOn(array $data): ?Slen\\Sdk\\Modules\\Operations\\Data\\WaitingOn"
         }
       ]
     },
@@ -5136,14 +5126,14 @@
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "execute(Slen\\Sdk\\Shared\\Http\\Data\\ApiRequestDTO $request): Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionDTO"
+          "signature": "execute(Slen\\Sdk\\Shared\\Http\\Data\\ApiRequestDTO $request): Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionResult"
         }
       ]
     },
     {
-      "name": "Slen\\Sdk\\Modules\\Webhooks\\Data\\ApprovalDecidedEventDTO",
+      "name": "Slen\\Sdk\\Modules\\Webhooks\\Data\\ApprovalDecidedEvent",
       "kind": "class",
-      "source": "src/Modules/Webhooks/Data/ApprovalDecidedEventDTO.php",
+      "source": "src/Modules/Webhooks/Data/ApprovalDecidedEvent.php",
       "deprecated": false,
       "internal": false,
       "alias_of": null,
@@ -5153,7 +5143,7 @@
       ],
       "type_parameters": [],
       "extends": [
-        "Slen\\Sdk\\Modules\\Webhooks\\Data\\WebhookEventDTO"
+        "Slen\\Sdk\\Modules\\Webhooks\\Data\\WebhookEvent"
       ],
       "implements": [],
       "signature": null,
@@ -5260,9 +5250,9 @@
       ]
     },
     {
-      "name": "Slen\\Sdk\\Modules\\Webhooks\\Data\\ApprovalRequestedEventDTO",
+      "name": "Slen\\Sdk\\Modules\\Webhooks\\Data\\ApprovalRequestedEvent",
       "kind": "class",
-      "source": "src/Modules/Webhooks/Data/ApprovalRequestedEventDTO.php",
+      "source": "src/Modules/Webhooks/Data/ApprovalRequestedEvent.php",
       "deprecated": false,
       "internal": false,
       "alias_of": null,
@@ -5272,7 +5262,7 @@
       ],
       "type_parameters": [],
       "extends": [
-        "Slen\\Sdk\\Modules\\Webhooks\\Data\\WebhookEventDTO"
+        "Slen\\Sdk\\Modules\\Webhooks\\Data\\WebhookEvent"
       ],
       "implements": [],
       "signature": null,
@@ -5352,9 +5342,9 @@
       ]
     },
     {
-      "name": "Slen\\Sdk\\Modules\\Webhooks\\Data\\CustomerBalanceLowEventDTO",
+      "name": "Slen\\Sdk\\Modules\\Webhooks\\Data\\CustomerBalanceLowEvent",
       "kind": "class",
-      "source": "src/Modules/Webhooks/Data/CustomerBalanceLowEventDTO.php",
+      "source": "src/Modules/Webhooks/Data/CustomerBalanceLowEvent.php",
       "deprecated": false,
       "internal": false,
       "alias_of": null,
@@ -5364,7 +5354,7 @@
       ],
       "type_parameters": [],
       "extends": [
-        "Slen\\Sdk\\Modules\\Webhooks\\Data\\WebhookEventDTO"
+        "Slen\\Sdk\\Modules\\Webhooks\\Data\\WebhookEvent"
       ],
       "implements": [],
       "signature": null,
@@ -5453,9 +5443,9 @@
       ]
     },
     {
-      "name": "Slen\\Sdk\\Modules\\Webhooks\\Data\\ExecutionFinishedEventDTO",
+      "name": "Slen\\Sdk\\Modules\\Webhooks\\Data\\ExecutionFinishedEvent",
       "kind": "class",
-      "source": "src/Modules/Webhooks/Data/ExecutionFinishedEventDTO.php",
+      "source": "src/Modules/Webhooks/Data/ExecutionFinishedEvent.php",
       "deprecated": false,
       "internal": false,
       "alias_of": null,
@@ -5465,7 +5455,7 @@
       ],
       "type_parameters": [],
       "extends": [
-        "Slen\\Sdk\\Modules\\Webhooks\\Data\\WebhookEventDTO"
+        "Slen\\Sdk\\Modules\\Webhooks\\Data\\WebhookEvent"
       ],
       "implements": [],
       "signature": null,
@@ -5572,9 +5562,9 @@
       ]
     },
     {
-      "name": "Slen\\Sdk\\Modules\\Webhooks\\Data\\UnknownEventDTO",
+      "name": "Slen\\Sdk\\Modules\\Webhooks\\Data\\UnknownWebhookEvent",
       "kind": "class",
-      "source": "src/Modules/Webhooks/Data/UnknownEventDTO.php",
+      "source": "src/Modules/Webhooks/Data/UnknownWebhookEvent.php",
       "deprecated": false,
       "internal": false,
       "alias_of": null,
@@ -5584,16 +5574,16 @@
       ],
       "type_parameters": [],
       "extends": [
-        "Slen\\Sdk\\Modules\\Webhooks\\Data\\WebhookEventDTO"
+        "Slen\\Sdk\\Modules\\Webhooks\\Data\\WebhookEvent"
       ],
       "implements": [],
       "signature": null,
       "members": []
     },
     {
-      "name": "Slen\\Sdk\\Modules\\Webhooks\\Data\\WebhookEventDTO",
+      "name": "Slen\\Sdk\\Modules\\Webhooks\\Data\\WebhookEvent",
       "kind": "class",
-      "source": "src/Modules/Webhooks/Data/WebhookEventDTO.php",
+      "source": "src/Modules/Webhooks/Data/WebhookEvent.php",
       "deprecated": false,
       "internal": false,
       "alias_of": null,
@@ -6183,7 +6173,7 @@
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "parse(string $payload): Slen\\Sdk\\Modules\\Webhooks\\Data\\WebhookEventDTO"
+          "signature": "parse(string $payload): Slen\\Sdk\\Modules\\Webhooks\\Data\\WebhookEvent"
         }
       ]
     },
@@ -6309,7 +6299,7 @@
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "constructEvent(string $payload, ?string $signatureHeader, ?Slen\\Sdk\\Modules\\Webhooks\\Options\\VerifyOptions $options = null): Slen\\Sdk\\Modules\\Webhooks\\Data\\WebhookEventDTO"
+          "signature": "constructEvent(string $payload, ?string $signatureHeader, ?Slen\\Sdk\\Modules\\Webhooks\\Options\\VerifyOptions $options = null): Slen\\Sdk\\Modules\\Webhooks\\Data\\WebhookEvent"
         }
       ]
     },
@@ -6338,7 +6328,7 @@
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "record(Slen\\Sdk\\Observability\\SpanDTO $span): void"
+          "signature": "record(Slen\\Sdk\\Observability\\SlenSpan $span): void"
         }
       ]
     },
@@ -6376,14 +6366,14 @@
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "record(Slen\\Sdk\\Observability\\SpanDTO $span): void"
+          "signature": "record(Slen\\Sdk\\Observability\\SlenSpan $span): void"
         }
       ]
     },
     {
-      "name": "Slen\\Sdk\\Observability\\SpanDTO",
+      "name": "Slen\\Sdk\\Observability\\SlenSpan",
       "kind": "class",
-      "source": "src/Observability/SpanDTO.php",
+      "source": "src/Observability/SlenSpan.php",
       "deprecated": false,
       "internal": false,
       "alias_of": null,
@@ -6526,7 +6516,7 @@
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "record(Slen\\Sdk\\Observability\\SpanDTO $span): void"
+          "signature": "record(Slen\\Sdk\\Observability\\SlenSpan $span): void"
         }
       ]
     },
@@ -8517,7 +8507,7 @@
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "map(Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionDTO|Slen\\Sdk\\Modules\\Executions\\Data\\ExecutionStatusDTO $run): Slen\\Sdk\\Shared\\Observability\\Data\\SpanResultDTO"
+          "signature": "map(Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionResult|Slen\\Sdk\\Modules\\Executions\\Data\\ExecutionStatusView $run): Slen\\Sdk\\Shared\\Observability\\Data\\SpanResultDTO"
         }
       ]
     },
@@ -8653,7 +8643,7 @@
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "map(array $data): Slen\\Sdk\\Data\\HealthDTO"
+          "signature": "map(array $data): Slen\\Sdk\\Data\\Health"
         }
       ]
     },
@@ -9111,7 +9101,7 @@
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "health(?Slen\\Sdk\\RequestOptions $options = null): Slen\\Sdk\\Data\\HealthDTO"
+          "signature": "health(?Slen\\Sdk\\RequestOptions $options = null): Slen\\Sdk\\Data\\Health"
         }
       ]
     },
@@ -9212,7 +9202,7 @@
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "record(Slen\\Sdk\\Observability\\SpanDTO $span): void"
+          "signature": "record(Slen\\Sdk\\Observability\\SlenSpan $span): void"
         },
         {
           "name": "spans",
@@ -9230,7 +9220,7 @@
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "last(): Slen\\Sdk\\Observability\\SpanDTO"
+          "signature": "last(): Slen\\Sdk\\Observability\\SlenSpan"
         }
       ]
     }

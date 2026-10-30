@@ -8,7 +8,7 @@ use Slen\Sdk\Exceptions\InvalidRequestException;
 use Slen\Sdk\Exceptions\SlenException;
 use Slen\Sdk\IdempotencyKeys;
 use Slen\Sdk\Modules\Customers\Data\CreditMovementDTO;
-use Slen\Sdk\Modules\Customers\Data\CustomerAccountDTO;
+use Slen\Sdk\Modules\Customers\Data\CustomerAccount;
 use Slen\Sdk\Modules\Customers\Resources\CustomerAccountResource;
 use Slen\Sdk\Shared\Http\ApiCaller;
 use Slen\Sdk\Shared\Http\Data\ApiRequestDTO;
@@ -29,7 +29,7 @@ final readonly class MoveCreditsTask
      *                                 an empty customer, credit type or key
      * @throws SlenException
      */
-    public function execute(CreditMovementDTO $creditMovementDTO): CustomerAccountDTO
+    public function execute(CreditMovementDTO $creditMovementDTO): CustomerAccount
     {
         $creditMovement = $creditMovementDTO->movement;
         $credits = $creditMovementDTO->credits;

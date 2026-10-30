@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Slen\Sdk\Data;
 
 /** The answer of GET /health. Each dependency reads "ok", or "down: " and the reason. */
-final readonly class HealthDTO
+final readonly class Health
 {
     public function __construct(
         public string $app,

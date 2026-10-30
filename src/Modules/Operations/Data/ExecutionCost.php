@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Slen\Sdk\Modules\Operations\Data;
 
 /** What a run was expected to cost and what it was charged, as decimal strings of money. */
-final readonly class ExecutionCostDTO
+final readonly class ExecutionCost
 {
     /**
      * @param string|null $estimated the sum its model calls were authorized at; null when nothing was estimated

@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Slen\Sdk\Modules\Executions\Data;
 
-use Slen\Sdk\Modules\Operations\Data\ExecutionCacheDTO;
-use Slen\Sdk\Modules\Operations\Data\ExecutionCostDTO;
-use Slen\Sdk\Modules\Operations\Data\WaitingOnDTO;
+use Slen\Sdk\Modules\Operations\Data\ExecutionCache;
+use Slen\Sdk\Modules\Operations\Data\ExecutionCost;
+use Slen\Sdk\Modules\Operations\Data\WaitingOn;
 use Slen\Sdk\Modules\Operations\Enums\ExecutionStatus;
 
 /** One run as a poll reads it: the same fields, with the same meaning, as the answer of execute(). */
-final readonly class ExecutionStatusDTO
+final readonly class ExecutionStatusView
 {
     /**
      * @param array<mixed>|null $output            what the flow returned; null until it returned something
@@ -23,9 +23,9 @@ final readonly class ExecutionStatusDTO
         public ?array $output,
         public ?string $errorCode,
         public ?string $errorMessage,
-        public ExecutionCostDTO $cost,
-        public ExecutionCacheDTO $cache,
-        public ?WaitingOnDTO $waitingOn,
+        public ExecutionCost $cost,
+        public ExecutionCache $cache,
+        public ?WaitingOn $waitingOn,
         public string $traceUrl,
         public ?int $retryAfterSeconds,
     ) {

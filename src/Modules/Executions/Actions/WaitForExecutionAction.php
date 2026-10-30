@@ -10,7 +10,7 @@ use Slen\Sdk\Exceptions\InvalidRequestException;
 use Slen\Sdk\Exceptions\SlenException;
 use Slen\Sdk\Exceptions\TimeoutException;
 use Slen\Sdk\LogMessages;
-use Slen\Sdk\Modules\Executions\Data\ExecutionStatusDTO;
+use Slen\Sdk\Modules\Executions\Data\ExecutionStatusView;
 use Slen\Sdk\Modules\Executions\Data\WaitStateDTO;
 use Slen\Sdk\Modules\Executions\Options\WaitOptions;
 use Slen\Sdk\Modules\Executions\Tasks\GetExecutionStatusTask;
@@ -47,7 +47,7 @@ final readonly class WaitForExecutionAction
     }
 
     /** @throws SlenException */
-    public function execute(WaitStateDTO $waitStateDTO): ExecutionStatusDTO
+    public function execute(WaitStateDTO $waitStateDTO): ExecutionStatusView
     {
         $seen = null;
         $answers = 0;

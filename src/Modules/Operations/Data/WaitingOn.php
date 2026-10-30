@@ -7,7 +7,7 @@ namespace Slen\Sdk\Modules\Operations\Data;
 use DateTimeImmutable;
 
 /** What a `waiting` run waits on: the node it parked at and why. */
-final readonly class WaitingOnDTO
+final readonly class WaitingOn
 {
     /**
      * @param string                 $type     queue_node, approval, rate_limit_queue or provider_background

@@ -13,16 +13,14 @@ use ReflectionClass;
 use ReflectionMethod;
 use ReflectionNamedType;
 use ReflectionProperty;
-use Slen\Sdk\Data\HealthDTO;
-use Slen\Sdk\Data\PageDTO;
+use Slen\Sdk\Data\Health;
+use Slen\Sdk\Data\Page;
 use Slen\Sdk\Exceptions\BudgetExceededException;
 use Slen\Sdk\Exceptions\InvalidRequestException;
 use Slen\Sdk\Exceptions\SlenException;
-use Slen\Sdk\Modules\Customers\Data\CreditEntryPageDTO;
-use Slen\Sdk\Modules\Customers\Data\CreditPriceDTO;
-use Slen\Sdk\Modules\Customers\Data\CustomerAccountDTO;
-use Slen\Sdk\Modules\Customers\Data\CustomerDTO;
-use Slen\Sdk\Modules\Customers\Data\CustomerPageDTO;
+use Slen\Sdk\Modules\Customers\Data\CreditPriceList;
+use Slen\Sdk\Modules\Customers\Data\Customer;
+use Slen\Sdk\Modules\Customers\Data\CustomerAccount;
 use Slen\Sdk\Modules\Customers\Enums\CreditEntryType;
 use Slen\Sdk\Modules\Customers\Enums\CustomerStatus;
 use Slen\Sdk\Modules\Customers\Options\AccountOptions;
@@ -31,10 +29,10 @@ use Slen\Sdk\Modules\Customers\Options\CustomerListOptions;
 use Slen\Sdk\Modules\Customers\Options\EntryListOptions;
 use Slen\Sdk\Modules\Customers\Options\MovementOptions;
 use Slen\Sdk\Modules\Customers\Options\PriceListOptions;
-use Slen\Sdk\Modules\Executions\Data\ExecutionStatusDTO;
-use Slen\Sdk\Modules\Executions\Data\ExecutionTraceDTO;
+use Slen\Sdk\Modules\Executions\Data\ExecutionStatusView;
+use Slen\Sdk\Modules\Executions\Data\ExecutionTrace;
 use Slen\Sdk\Modules\Executions\Options\WaitOptions;
-use Slen\Sdk\Modules\Operations\Data\ExecutionDTO;
+use Slen\Sdk\Modules\Operations\Data\ExecutionResult;
 use Slen\Sdk\Modules\Operations\Options\ExecuteOptions;
 use Slen\Sdk\Modules\Webhooks\Options\VerifyOptions;
 use Slen\Sdk\RequestOptions;
@@ -97,9 +95,6 @@ final class ContractTest extends TestCase
      * is a stale line.
      */
     private const array KNOWN_NULLS = [];
-
-    /** DTOs of the answer directories that answers extend, never read as they are. */
-    private const array ANSWER_BASES = [PageDTO::class];
 
     /**
      * A refusal in the two bodies the API answers one with — the envelope (`Error`) and a field validation of the
@@ -682,84 +677,84 @@ final class ContractTest extends TestCase
             timeout: 20.0,
             retries: 0,
         );
-        $run = static function (SlenSdk $s) use ($input, $everything): ExecutionDTO {
+        $run = static function (SlenSdk $s) use ($input, $everything): ExecutionResult {
             return $s->operations()->execute('support.reply', $input, $everything);
         };
 
         yield 'operations.execute' => [
             'call' => $run,
-            'bare' => static function (SlenSdk $s) use ($input): ExecutionDTO {
+            'bare' => static function (SlenSdk $s) use ($input): ExecutionResult {
                 return $s->operations()->execute('support.reply', $input);
             },
-            'dto' => ExecutionDTO::class,
+            'dto' => ExecutionResult::class,
             'pins' => [],
         ];
         yield 'operations.executeAsync' => [
-            'call' => static function (SlenSdk $s) use ($input, $everything): ExecutionDTO {
+            'call' => static function (SlenSdk $s) use ($input, $everything): ExecutionResult {
                 return $s->operations()->executeAsync('support.reply', $input, $everything);
             },
-            'bare' => static function (SlenSdk $s) use ($input): ExecutionDTO {
+            'bare' => static function (SlenSdk $s) use ($input): ExecutionResult {
                 return $s->operations()->executeAsync('support.reply', $input);
             },
-            'dto' => ExecutionDTO::class,
+            'dto' => ExecutionResult::class,
             'pins' => [],
         ];
         yield 'executions.get' => self::row(
-            static function (SlenSdk $s): ExecutionStatusDTO {
+            static function (SlenSdk $s): ExecutionStatusView {
                 return $s->executions()->get(self::ID, new RequestOptions(timeout: 5.0));
             },
-            ExecutionStatusDTO::class,
+            ExecutionStatusView::class,
         );
         yield 'executions.wait' => self::row(
-            static function (SlenSdk $s): ExecutionStatusDTO {
+            static function (SlenSdk $s): ExecutionStatusView {
                 return $s->executions()->wait(self::ID, new WaitOptions(timeoutSeconds: 5));
             },
-            ExecutionStatusDTO::class,
+            ExecutionStatusView::class,
             ['data.status' => 'completed'],
         );
         yield 'executions.trace' => self::row(
-            static function (SlenSdk $s): ExecutionTraceDTO {
+            static function (SlenSdk $s): ExecutionTrace {
                 return $s->executions()->trace(self::ID, new RequestOptions(timeout: 5.0));
             },
-            ExecutionTraceDTO::class,
+            ExecutionTrace::class,
         );
         yield 'customers.list' => [
-            'call' => static function (SlenSdk $s): CustomerPageDTO {
+            'call' => static function (SlenSdk $s): Page {
                 return $s->customers()->list(
                     new CustomerListOptions(self::ID, 30, 'user', CustomerStatus::Active, 'default', '10', 5.0, 0),
                 );
             },
-            'bare' => static function (SlenSdk $s): CustomerPageDTO {
+            'bare' => static function (SlenSdk $s): Page {
                 return $s->customers()->list();
             },
-            'dto' => CustomerPageDTO::class,
+            'dto' => Page::class,
             'pins' => [],
         ];
-        yield 'customers.get' => self::row(static function (SlenSdk $s): CustomerDTO {
+        yield 'customers.get' => self::row(static function (SlenSdk $s): Customer {
             return $s->customers()->get('user 42');
-        }, CustomerDTO::class);
-        yield 'customers.create' => self::row(static function (SlenSdk $s): CustomerDTO {
+        }, Customer::class);
+        yield 'customers.create' => self::row(static function (SlenSdk $s): Customer {
             return $s->customers()->create('user 42');
-        }, CustomerDTO::class);
+        }, Customer::class);
         yield 'customers.updateAccount' => self::row(
-            static function (SlenSdk $s): CustomerAccountDTO {
+            static function (SlenSdk $s): CustomerAccount {
                 return $s->customers()->updateAccount('user 42', 'search', new AccountOptions(true, '5.0000'));
             },
-            CustomerAccountDTO::class,
+            CustomerAccount::class,
         );
         yield 'customers.block' => [
-            'call' => static function (SlenSdk $s): CustomerDTO {
+            'call' => static function (SlenSdk $s): Customer {
                 return $s->customers()->block('user 42', new BlockOptions('chargeback'));
             },
-            'bare' => static function (SlenSdk $s): CustomerDTO {
+            'bare' => static function (SlenSdk $s): Customer {
                 return $s->customers()->block('user 42');
             },
-            'dto' => CustomerDTO::class,
+            'dto' => Customer::class,
             'pins' => [],
         ];
-        yield 'customers.unblock' => self::row(static function (SlenSdk $s): CustomerDTO {
+        yield 'customers.unblock' => self::row(static function (SlenSdk $s): Customer {
             return $s->customers()->unblock('user 42');
-        }, CustomerDTO::class);
+        }, Customer::class);
         yield 'customers.delete' => self::row(static function (SlenSdk $s): mixed {
             $s->customers()->delete('user 42');
 
@@ -767,63 +762,63 @@ final class ContractTest extends TestCase
         }, null);
 
         yield 'customers.topUp' => [
-            'call' => static function (SlenSdk $s): CustomerAccountDTO {
+            'call' => static function (SlenSdk $s): CustomerAccount {
                 return $s->customers()
                     ->topUp('user 42', '5.0000', new MovementOptions('search', 'invoice 7781', 'invoice-7781:topup'));
             },
-            'bare' => static function (SlenSdk $s): CustomerAccountDTO {
+            'bare' => static function (SlenSdk $s): CustomerAccount {
                 return $s->customers()->topUp('user 42', '5.0000');
             },
-            'dto' => CustomerAccountDTO::class,
+            'dto' => CustomerAccount::class,
             'pins' => [],
         ];
         yield 'customers.charge' => [
-            'call' => static function (SlenSdk $s): CustomerAccountDTO {
+            'call' => static function (SlenSdk $s): CustomerAccount {
                 return $s->customers()
                     ->charge('user 42', '5.0000', new MovementOptions('search', 'PDF export', 'export-991:charge'));
             },
-            'bare' => static function (SlenSdk $s): CustomerAccountDTO {
+            'bare' => static function (SlenSdk $s): CustomerAccount {
                 return $s->customers()->charge('user 42', '5.0000');
             },
-            'dto' => CustomerAccountDTO::class,
+            'dto' => CustomerAccount::class,
             'pins' => [],
         ];
         yield 'customers.adjust' => [
-            'call' => static function (SlenSdk $s): CustomerAccountDTO {
+            'call' => static function (SlenSdk $s): CustomerAccount {
                 return $s->customers()
                     ->adjust('user 42', '-5.0000', new MovementOptions('search', 'goodwill', 'ticket-7:adjust'));
             },
-            'bare' => static function (SlenSdk $s): CustomerAccountDTO {
+            'bare' => static function (SlenSdk $s): CustomerAccount {
                 return $s->customers()->adjust('user 42', '-5.0000');
             },
-            'dto' => CustomerAccountDTO::class,
+            'dto' => CustomerAccount::class,
             'pins' => [],
         ];
 
         yield 'customers.entries' => [
-            'call' => static function (SlenSdk $s): CreditEntryPageDTO {
+            'call' => static function (SlenSdk $s): Page {
                 return $s->customers()
                     ->entries('user 42', new EntryListOptions(self::ID, 30, 'default', CreditEntryType::Charge));
             },
-            'bare' => static function (SlenSdk $s): CreditEntryPageDTO {
+            'bare' => static function (SlenSdk $s): Page {
                 return $s->customers()->entries('user 42');
             },
-            'dto' => CreditEntryPageDTO::class,
+            'dto' => Page::class,
             'pins' => [],
         ];
         yield 'customers.prices' => [
-            'call' => static function (SlenSdk $s): array {
+            'call' => static function (SlenSdk $s): CreditPriceList {
                 return $s->customers()->prices(new PriceListOptions('support.reply', 'default'));
             },
-            'bare' => static function (SlenSdk $s): array {
+            'bare' => static function (SlenSdk $s): CreditPriceList {
                 return $s->customers()->prices();
             },
-            'dto' => CreditPriceDTO::class,
+            'dto' => CreditPriceList::class,
             'pins' => [],
         ];
-        yield 'health' => self::row(static function (SlenSdk $s): HealthDTO {
+        yield 'health' => self::row(static function (SlenSdk $s): Health {
             return $s->health();
-        }, HealthDTO::class);
+        }, Health::class);
     }
 
     /**
@@ -840,7 +835,7 @@ final class ContractTest extends TestCase
 
     /**
      * The calls of the SDK as `module.method`: each public method of the facade a method of SlenSdk hands out,
-     * and each method of SlenSdk that answers a DTO itself. The help slice classifies them the same way.
+     * and each method of SlenSdk that answers a type of `Data` itself. The help slice classifies them the same way.
      *
      * @return array<string, ReflectionMethod>
      */
@@ -860,7 +855,7 @@ final class ContractTest extends TestCase
 
             if (str_ends_with($returned, 'Facade')) {
                 $calls = [...$calls, ...self::callsOfTheFacade($reflectionMethod->getName(), $returned)];
-            } elseif (str_ends_with($returned, 'DTO')) {
+            } elseif (str_contains($returned, '\\Data\\')) {
                 $calls[$reflectionMethod->getName()] = $reflectionMethod;
             }
         }
@@ -898,17 +893,15 @@ final class ContractTest extends TestCase
         foreach (['Modules/Operations/Data', 'Modules/Executions/Data', 'Modules/Customers/Data', 'Data'] as $directory) {
             $namespace = 'Slen\\Sdk\\' . str_replace('/', '\\', $directory) . '\\';
 
-            $files = glob(self::SOURCE . '/' . $directory . '/*DTO.php');
+            $files = glob(self::SOURCE . '/' . $directory . '/*.php');
 
             foreach ($files === false ? [] : $files as $file) {
                 /** @var class-string $name */
                 $name = $namespace . basename($file, '.php');
                 $class = new ReflectionClass($name);
 
-                // A base the answers extend and the SDK's own carriers are not read from an answer.
-                $internal = str_contains((string) $class->getDocComment(), '@internal');
-
-                if ($internal === false && \in_array($class->getName(), self::ANSWER_BASES, true) === false) {
+                // The SDK's own carriers are not read from an answer.
+                if (str_contains((string) $class->getDocComment(), '@internal') === false) {
                     $classes[] = $class->getName();
                 }
             }

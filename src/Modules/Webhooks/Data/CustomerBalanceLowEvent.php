@@ -8,7 +8,7 @@ use DateTimeImmutable;
 use Slen\Sdk\Modules\Webhooks\Enums\WebhookEventType;
 
 /** `customer.balance_low`: a movement took the credits of an account below its threshold. */
-final readonly class CustomerBalanceLowEventDTO extends WebhookEventDTO
+final readonly class CustomerBalanceLowEvent extends WebhookEvent
 {
     /**
      * @param array<mixed> $data

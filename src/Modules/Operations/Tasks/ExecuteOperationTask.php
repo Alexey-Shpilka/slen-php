@@ -9,7 +9,7 @@ use Slen\Sdk\Exceptions\SlenException;
 use Slen\Sdk\IdempotencyKeys;
 use Slen\Sdk\Modules\Operations\Data\ContextClaimDTO;
 use Slen\Sdk\Modules\Operations\Data\ExecuteRequestDTO;
-use Slen\Sdk\Modules\Operations\Data\ExecutionDTO;
+use Slen\Sdk\Modules\Operations\Data\ExecutionResult;
 use Slen\Sdk\Modules\Operations\Resources\ExecutionResource;
 use Slen\Sdk\Shared\Http\ApiCaller;
 use Slen\Sdk\Shared\Http\Data\ApiRequestDTO;
@@ -54,7 +54,7 @@ final readonly class ExecuteOperationTask
     }
 
     /** @throws SlenException */
-    public function execute(ApiRequestDTO $request): ExecutionDTO
+    public function execute(ApiRequestDTO $request): ExecutionResult
     {
         return $this->executionResource->map($this->apiCaller->data($request));
     }

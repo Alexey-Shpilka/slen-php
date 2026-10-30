@@ -17,6 +17,15 @@ final class ReadmeTest extends TestCase
 
     private const string CONTRACT = Paths::CONTRACT . '/error-codes.json';
 
+    /** The names of the types of answers before they were named as in TypeScript. */
+    private const array RETIRED_TYPES = [
+        'HealthDTO', 'PageDTO', 'CustomerPageDTO', 'CreditEntryPageDTO', 'CustomerDTO', 'CustomerAccountDTO',
+        'CreditEntryDTO', 'CreditPriceDTO', 'ExecutionDTO', 'ExecutionCostDTO', 'ExecutionCacheDTO', 'WaitingOnDTO',
+        'ExecutionErrorDTO', 'ExecutionStatusDTO', 'ExecutionTraceDTO', 'TraceNodeDTO', 'TraceEventDTO',
+        'TraceAttemptDTO', 'WebhookEventDTO', 'ExecutionFinishedEventDTO', 'CustomerBalanceLowEventDTO',
+        'ApprovalRequestedEventDTO', 'ApprovalDecidedEventDTO', 'UnknownEventDTO', 'SpanDTO',
+    ];
+
     /**
      * The row a caller trusts with "nothing was spent" for the failed model call lists exactly the codes of the
      * type `Provider`, so a code that joins or leaves the type reaches it. The row beside it, for everything else
@@ -63,6 +72,21 @@ final class ReadmeTest extends TestCase
     public function testTheReadmeNamesNoAddressOfTheApi(): void
     {
         self::assertDoesNotMatchRegularExpression('/base[_ ]?url/i', (string) file_get_contents(self::README));
+    }
+
+    /**
+     * The README shows the types of answers as the code has them, and pages without `hasMore()`.
+     */
+    public function testTheReadmeNamesNoRetiredType(): void
+    {
+        $readme = (string) file_get_contents(self::README);
+
+        $retired = '/\b(?:' . implode('|', self::RETIRED_TYPES) . ')\b|->hasMore\(/';
+
+        self::assertDoesNotMatchRegularExpression($retired, $readme);
+        self::assertMatchesRegularExpression($retired, 'foreach ($page->data as $customer) {} $page->hasMore();');
+        self::assertMatchesRegularExpression($retired, '$run instanceof ExecutionDTO');
+        self::assertDoesNotMatchRegularExpression($retired, '$run instanceof ExecutionResult');
     }
 
     /**

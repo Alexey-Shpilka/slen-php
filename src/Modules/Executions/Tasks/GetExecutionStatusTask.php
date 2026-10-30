@@ -6,7 +6,7 @@ namespace Slen\Sdk\Modules\Executions\Tasks;
 
 use Slen\Sdk\Exceptions\InvalidRequestException;
 use Slen\Sdk\Exceptions\SlenException;
-use Slen\Sdk\Modules\Executions\Data\ExecutionStatusDTO;
+use Slen\Sdk\Modules\Executions\Data\ExecutionStatusView;
 use Slen\Sdk\Modules\Executions\Resources\ExecutionStatusResource;
 use Slen\Sdk\RequestOptions;
 use Slen\Sdk\Shared\Http\ApiCaller;
@@ -37,13 +37,13 @@ final readonly class GetExecutionStatusTask
     }
 
     /** @throws SlenException */
-    public function execute(ApiRequestDTO $request): ExecutionStatusDTO
+    public function execute(ApiRequestDTO $request): ExecutionStatusView
     {
         return $this->executionStatusResource->map($this->apiCaller->data($request));
     }
 
     /** @throws SlenException */
-    public function read(ApiRequestDTO $request, float $secondsLeft): ExecutionStatusDTO
+    public function read(ApiRequestDTO $request, float $secondsLeft): ExecutionStatusView
     {
         if ($this->readTimeout === null) {
             return $this->execute($request);

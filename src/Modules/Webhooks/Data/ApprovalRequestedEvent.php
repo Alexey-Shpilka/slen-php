@@ -8,7 +8,7 @@ use DateTimeImmutable;
 use Slen\Sdk\Modules\Webhooks\Enums\WebhookEventType;
 
 /** `approval.requested`: a run parked at an approval node and waits for a person. */
-final readonly class ApprovalRequestedEventDTO extends WebhookEventDTO
+final readonly class ApprovalRequestedEvent extends WebhookEvent
 {
     /** @param array<mixed> $data */
     public function __construct(

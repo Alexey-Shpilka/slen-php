@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace Slen\Sdk\Modules\Customers;
 
+use Slen\Sdk\Data\Page;
 use Slen\Sdk\Exceptions\CustomerNotFoundException;
 use Slen\Sdk\Exceptions\IdempotencyConflictException;
 use Slen\Sdk\Exceptions\InsufficientCreditsException;
 use Slen\Sdk\Exceptions\InvalidRequestException;
 use Slen\Sdk\Exceptions\SlenException;
-use Slen\Sdk\Modules\Customers\Data\CreditEntryPageDTO;
+use Slen\Sdk\Modules\Customers\Data\CreditEntry;
 use Slen\Sdk\Modules\Customers\Data\CreditMovementDTO;
-use Slen\Sdk\Modules\Customers\Data\CreditPriceDTO;
-use Slen\Sdk\Modules\Customers\Data\CustomerAccountDTO;
-use Slen\Sdk\Modules\Customers\Data\CustomerDTO;
-use Slen\Sdk\Modules\Customers\Data\CustomerPageDTO;
+use Slen\Sdk\Modules\Customers\Data\CreditPriceList;
+use Slen\Sdk\Modules\Customers\Data\Customer;
+use Slen\Sdk\Modules\Customers\Data\CustomerAccount;
 use Slen\Sdk\Modules\Customers\Enums\CreditMovement;
 use Slen\Sdk\Modules\Customers\Factories\CustomersModuleFactory;
 use Slen\Sdk\Modules\Customers\Options\AccountOptions;
@@ -38,10 +38,12 @@ final readonly class CustomersFacade
     /**
      * One page of customers, newest first, each with all its accounts.
      *
+     * @return Page<Customer>
+     *
      * @throws InvalidRequestException a timeout or retries out of range; nothing sent
      * @throws SlenException
      */
-    public function list(?CustomerListOptions $options = null): CustomerPageDTO
+    public function list(?CustomerListOptions $options = null): Page
     {
         $options ??= new CustomerListOptions();
         // Without the view an older API answers the page of accounts.
@@ -66,7 +68,7 @@ final readonly class CustomersFacade
      * @throws CustomerNotFoundException the project has no such customer
      * @throws SlenException
      */
-    public function get(string $externalUserId, ?RequestOptions $options = null): CustomerDTO
+    public function get(string $externalUserId, ?RequestOptions $options = null): Customer
     {
         $options ??= new RequestOptions();
 
@@ -84,7 +86,7 @@ final readonly class CustomersFacade
      * @throws InvalidRequestException nothing sent: an empty id, a timeout or retries out of range
      * @throws SlenException
      */
-    public function create(string $externalUserId, ?RequestOptions $options = null): CustomerDTO
+    public function create(string $externalUserId, ?RequestOptions $options = null): Customer
     {
         $options ??= new RequestOptions();
 
@@ -103,7 +105,7 @@ final readonly class CustomersFacade
      * @throws InvalidRequestException nothing sent: an empty id or credit type, a timeout or retries out of range
      * @throws SlenException
      */
-    public function updateAccount(string $externalUserId, string $creditType, ?AccountOptions $options = null): CustomerAccountDTO
+    public function updateAccount(string $externalUserId, string $creditType, ?AccountOptions $options = null): CustomerAccount
     {
         $options ??= new AccountOptions();
         $apiRequest = new ApiRequestDTO(
@@ -124,7 +126,7 @@ final readonly class CustomersFacade
      * @throws CustomerNotFoundException the project has no such customer
      * @throws SlenException
      */
-    public function block(string $externalUserId, ?BlockOptions $options = null): CustomerDTO
+    public function block(string $externalUserId, ?BlockOptions $options = null): Customer
     {
         $options ??= new BlockOptions();
 
@@ -144,7 +146,7 @@ final readonly class CustomersFacade
      * @throws CustomerNotFoundException the project has no such customer
      * @throws SlenException
      */
-    public function unblock(string $externalUserId, ?RequestOptions $options = null): CustomerDTO
+    public function unblock(string $externalUserId, ?RequestOptions $options = null): Customer
     {
         $options ??= new RequestOptions();
 
@@ -180,7 +182,7 @@ final readonly class CustomersFacade
      * @throws IdempotencyConflictException the key names another movement
      * @throws SlenException
      */
-    public function topUp(string $externalUserId, string $credits, ?MovementOptions $options = null): CustomerAccountDTO
+    public function topUp(string $externalUserId, string $credits, ?MovementOptions $options = null): CustomerAccount
     {
         return $this->move(new CreditMovementDTO(CreditMovement::TopUp, $externalUserId, $credits, $options ?? new MovementOptions()));
     }
@@ -197,7 +199,7 @@ final readonly class CustomersFacade
      * @throws IdempotencyConflictException the key names another movement
      * @throws SlenException
      */
-    public function charge(string $externalUserId, string $credits, ?MovementOptions $options = null): CustomerAccountDTO
+    public function charge(string $externalUserId, string $credits, ?MovementOptions $options = null): CustomerAccount
     {
         return $this->move(new CreditMovementDTO(CreditMovement::Charge, $externalUserId, $credits, $options ?? new MovementOptions()));
     }
@@ -214,7 +216,7 @@ final readonly class CustomersFacade
      * @throws IdempotencyConflictException the key names another movement
      * @throws SlenException
      */
-    public function adjust(string $externalUserId, string $credits, ?MovementOptions $options = null): CustomerAccountDTO
+    public function adjust(string $externalUserId, string $credits, ?MovementOptions $options = null): CustomerAccount
     {
         return $this->move(new CreditMovementDTO(CreditMovement::Adjust, $externalUserId, $credits, $options ?? new MovementOptions()));
     }
@@ -222,11 +224,13 @@ final readonly class CustomersFacade
     /**
      * One page of the customer's statement, newest first: every movement with the balance it left behind.
      *
+     * @return Page<CreditEntry>
+     *
      * @throws InvalidRequestException   nothing sent: an empty id, a timeout or retries out of range
      * @throws CustomerNotFoundException the project has no such customer
      * @throws SlenException
      */
-    public function entries(string $externalUserId, ?EntryListOptions $options = null): CreditEntryPageDTO
+    public function entries(string $externalUserId, ?EntryListOptions $options = null): Page
     {
         $options ??= new EntryListOptions();
         $apiRequest = new ApiRequestDTO(
@@ -248,12 +252,10 @@ final readonly class CustomersFacade
     /**
      * What one run of an operation holds from its customer, by operation code and credit type.
      *
-     * @return list<CreditPriceDTO>
-     *
      * @throws InvalidRequestException a timeout or retries out of range; nothing sent
      * @throws SlenException
      */
-    public function prices(?PriceListOptions $options = null): array
+    public function prices(?PriceListOptions $options = null): CreditPriceList
     {
         $options ??= new PriceListOptions();
         $apiRequest = new ApiRequestDTO(
@@ -267,13 +269,13 @@ final readonly class CustomersFacade
     }
 
     /** @throws SlenException */
-    private function move(CreditMovementDTO $creditMovementDTO): CustomerAccountDTO
+    private function move(CreditMovementDTO $creditMovementDTO): CustomerAccount
     {
         return $this->customersModuleFactory->moveCreditsTask()->execute($creditMovementDTO);
     }
 
     /** @throws SlenException */
-    private function customer(ApiRequestDTO $apiRequest): CustomerDTO
+    private function customer(ApiRequestDTO $apiRequest): Customer
     {
         return $this->customersModuleFactory->customerResource()->map($this->customersModuleFactory->api()->data($apiRequest));
     }
