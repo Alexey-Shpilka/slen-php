@@ -40,7 +40,7 @@ jobs:
   # composer.json allows Guzzle 7.9+ and 8: the job above resolves 8, this one
   # holds 7, what a Laravel 11 or 12 application has.
   php-guzzle7:
-    name: php 8.4, guzzle 7
+    name: php 8.4, guzzle 7, laravel 11
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -48,11 +48,13 @@ jobs:
         with: { persist-credentials: false }
       - uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
         with: { php-version: '8.4', coverage: none }
-      # `--with` holds this update alone to Guzzle 7: composer.json, and the
-      # help slice read from it, stay as committed.
+      # `--with` holds this update alone to Guzzle 7 and Laravel 11, the oldest
+      # of each range: composer.json, and the help slice read from it, stay as
+      # committed. The other jobs install the newest.
       - uses: ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda # 4.0.0
-        with: { composer-options: '--with=guzzlehttp/guzzle:^7.9' }
-      # Should `--with` stop holding, this job would run on Guzzle 8 and stay green.
+        with: { composer-options: '--with=guzzlehttp/guzzle:^7.9 --with=illuminate/support:^11.0 --with=illuminate/container:^11.0' }
+      # Should `--with` stop holding, this job would run on Guzzle 8 or a later
+      # Laravel and stay green.
       - name: guzzle 7 is what got installed
         run: |
           version=$(php -r 'require "vendor/autoload.php"; echo Composer\InstalledVersions::getPrettyVersion("guzzlehttp/guzzle");')
@@ -61,6 +63,16 @@ jobs:
             7.*) ;;
             *) echo "::error::guzzlehttp/guzzle $version is installed, not 7"; exit 1 ;;
           esac
+      - name: laravel 11 is what got installed
+        run: |
+          for package in illuminate/support illuminate/container; do
+            version=$(php -r "require 'vendor/autoload.php'; echo Composer\\InstalledVersions::getPrettyVersion('$package');")
+            echo "$package $version"
+            case "$version" in
+              v11.*|11.*) ;;
+              *) echo "::error::$package $version is installed, not 11"; exit 1 ;;
+            esac
+          done
       - run: vendor/bin/phpunit
       # A real Guzzle 7 request to a closed port, beside the doubles of the suite.
       - run: php bin/floor.php
