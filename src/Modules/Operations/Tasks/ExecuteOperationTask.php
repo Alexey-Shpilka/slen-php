@@ -6,24 +6,23 @@ namespace Slen\Sdk\Modules\Operations\Tasks;
 
 use Slen\Sdk\Exceptions\InvalidRequestException;
 use Slen\Sdk\Exceptions\SlenException;
+use Slen\Sdk\IdempotencyKeys;
 use Slen\Sdk\Modules\Operations\Data\ContextClaimDTO;
 use Slen\Sdk\Modules\Operations\Data\ExecuteRequestDTO;
 use Slen\Sdk\Modules\Operations\Data\ExecutionDTO;
 use Slen\Sdk\Modules\Operations\Resources\ExecutionResource;
-use Slen\Sdk\Shared\Http\ApiTransport;
+use Slen\Sdk\Shared\Http\ApiCaller;
 use Slen\Sdk\Shared\Http\Data\ApiRequestDTO;
 use Slen\Sdk\Shared\Http\Enums\Endpoint;
-use Slen\Sdk\Shared\Tasks\AbstractTask;
 use stdClass;
 
 /** @internal */
-final readonly class ExecuteOperationTask extends AbstractTask
+final readonly class ExecuteOperationTask
 {
     public function __construct(
-        ApiTransport $apiTransport,
+        private ApiCaller $apiCaller,
         private ExecutionResource $executionResource,
     ) {
-        parent::__construct($apiTransport);
     }
 
     /** @throws InvalidRequestException */
@@ -48,7 +47,7 @@ final readonly class ExecuteOperationTask extends AbstractTask
         return new ApiRequestDTO(
             Endpoint::ExecuteOperation,
             body: $body,
-            idempotencyKey: $this->idempotencyKey($options->idempotencyKey),
+            idempotencyKey: $options->idempotencyKey ?? IdempotencyKeys::generate(),
             retries: $options->retries,
             timeout: $options->timeout,
         );
@@ -57,7 +56,7 @@ final readonly class ExecuteOperationTask extends AbstractTask
     /** @throws SlenException */
     public function execute(ApiRequestDTO $request): ExecutionDTO
     {
-        return $this->executionResource->map($this->send($request));
+        return $this->executionResource->map($this->apiCaller->data($request));
     }
 
     /**

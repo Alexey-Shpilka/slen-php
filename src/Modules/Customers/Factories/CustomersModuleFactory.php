@@ -8,16 +8,9 @@ use Slen\Sdk\Modules\Customers\Resources\CreditEntryResource;
 use Slen\Sdk\Modules\Customers\Resources\CreditPriceResource;
 use Slen\Sdk\Modules\Customers\Resources\CustomerAccountResource;
 use Slen\Sdk\Modules\Customers\Resources\CustomerResource;
-use Slen\Sdk\Modules\Customers\Tasks\BlockCustomerTask;
-use Slen\Sdk\Modules\Customers\Tasks\CreateCustomerTask;
 use Slen\Sdk\Modules\Customers\Tasks\DeleteCustomerTask;
-use Slen\Sdk\Modules\Customers\Tasks\GetCustomerTask;
-use Slen\Sdk\Modules\Customers\Tasks\ListCustomersTask;
-use Slen\Sdk\Modules\Customers\Tasks\ListEntriesTask;
-use Slen\Sdk\Modules\Customers\Tasks\ListPricesTask;
 use Slen\Sdk\Modules\Customers\Tasks\MoveCreditsTask;
-use Slen\Sdk\Modules\Customers\Tasks\UnblockCustomerTask;
-use Slen\Sdk\Modules\Customers\Tasks\UpdateAccountTask;
+use Slen\Sdk\Shared\Http\ApiCaller;
 use Slen\Sdk\Shared\Http\ApiTransport;
 
 /** @internal */
@@ -27,34 +20,29 @@ final readonly class CustomersModuleFactory
     {
     }
 
-    public function listCustomersTask(): ListCustomersTask
+    public function api(): ApiCaller
     {
-        return new ListCustomersTask($this->apiTransport, $this->customerResource());
+        return new ApiCaller($this->apiTransport);
     }
 
-    public function getCustomerTask(): GetCustomerTask
+    public function customerResource(): CustomerResource
     {
-        return new GetCustomerTask($this->apiTransport, $this->customerResource());
+        return new CustomerResource($this->customerAccountResource());
     }
 
-    public function createCustomerTask(): CreateCustomerTask
+    public function customerAccountResource(): CustomerAccountResource
     {
-        return new CreateCustomerTask($this->apiTransport, $this->customerResource());
+        return new CustomerAccountResource();
     }
 
-    public function updateAccountTask(): UpdateAccountTask
+    public function creditEntryResource(): CreditEntryResource
     {
-        return new UpdateAccountTask($this->apiTransport, new CustomerAccountResource());
+        return new CreditEntryResource();
     }
 
-    public function blockCustomerTask(): BlockCustomerTask
+    public function creditPriceResource(): CreditPriceResource
     {
-        return new BlockCustomerTask($this->apiTransport, $this->customerResource());
-    }
-
-    public function unblockCustomerTask(): UnblockCustomerTask
-    {
-        return new UnblockCustomerTask($this->apiTransport, $this->customerResource());
+        return new CreditPriceResource();
     }
 
     public function deleteCustomerTask(): DeleteCustomerTask
@@ -64,21 +52,6 @@ final readonly class CustomersModuleFactory
 
     public function moveCreditsTask(): MoveCreditsTask
     {
-        return new MoveCreditsTask($this->apiTransport, new CustomerAccountResource());
-    }
-
-    public function listEntriesTask(): ListEntriesTask
-    {
-        return new ListEntriesTask($this->apiTransport, new CreditEntryResource());
-    }
-
-    public function listPricesTask(): ListPricesTask
-    {
-        return new ListPricesTask($this->apiTransport, new CreditPriceResource());
-    }
-
-    private function customerResource(): CustomerResource
-    {
-        return new CustomerResource(new CustomerAccountResource());
+        return new MoveCreditsTask($this->api(), $this->customerAccountResource());
     }
 }

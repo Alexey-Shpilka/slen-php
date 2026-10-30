@@ -14,6 +14,7 @@ use Slen\Sdk\Modules\Webhooks\Factories\WebhooksModuleFactory;
 use Slen\Sdk\Modules\Webhooks\Options\WebhooksOptions;
 use Slen\Sdk\Modules\Webhooks\WebhooksFacade;
 use Slen\Sdk\Shared\Data\SdkModulesDTO;
+use Slen\Sdk\Shared\Http\ApiCaller;
 use Slen\Sdk\Shared\Http\ApiTransport;
 use Slen\Sdk\Shared\Http\Client\ApiClient;
 use Slen\Sdk\Shared\Http\Client\AuthClientDecorator;
@@ -26,7 +27,6 @@ use Slen\Sdk\Shared\Http\Mappers\ErrorMapper;
 use Slen\Sdk\Shared\Logging\Journal;
 use Slen\Sdk\Shared\Observability\Telemetry;
 use Slen\Sdk\Shared\Resources\HealthResource;
-use Slen\Sdk\Shared\Tasks\GetHealthTask;
 use Slen\Sdk\Shared\Timing\TimingInterface;
 use Slen\Sdk\SlenConfig;
 
@@ -49,7 +49,8 @@ final readonly class SdkFactory
             new ExecutionsFacade(new ExecutionsModuleFactory($apiTransport, $telemetry, $this->timing)),
             new CustomersFacade(new CustomersModuleFactory($apiTransport)),
             new WebhooksFacade(new WebhooksModuleFactory($telemetry->journal, $this->webhooksOptions($config), $this->timing)),
-            new GetHealthTask($apiTransport, new HealthResource()),
+            new ApiCaller($apiTransport),
+            new HealthResource(),
         );
     }
 

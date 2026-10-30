@@ -2415,58 +2415,49 @@
           "signature": "__construct(Slen\\Sdk\\Shared\\Http\\ApiTransport $apiTransport)"
         },
         {
-          "name": "listCustomersTask",
+          "name": "api",
           "kind": "method",
           "static": false,
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "listCustomersTask(): Slen\\Sdk\\Modules\\Customers\\Tasks\\ListCustomersTask"
+          "signature": "api(): Slen\\Sdk\\Shared\\Http\\ApiCaller"
         },
         {
-          "name": "getCustomerTask",
+          "name": "customerResource",
           "kind": "method",
           "static": false,
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "getCustomerTask(): Slen\\Sdk\\Modules\\Customers\\Tasks\\GetCustomerTask"
+          "signature": "customerResource(): Slen\\Sdk\\Modules\\Customers\\Resources\\CustomerResource"
         },
         {
-          "name": "createCustomerTask",
+          "name": "customerAccountResource",
           "kind": "method",
           "static": false,
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "createCustomerTask(): Slen\\Sdk\\Modules\\Customers\\Tasks\\CreateCustomerTask"
+          "signature": "customerAccountResource(): Slen\\Sdk\\Modules\\Customers\\Resources\\CustomerAccountResource"
         },
         {
-          "name": "updateAccountTask",
+          "name": "creditEntryResource",
           "kind": "method",
           "static": false,
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "updateAccountTask(): Slen\\Sdk\\Modules\\Customers\\Tasks\\UpdateAccountTask"
+          "signature": "creditEntryResource(): Slen\\Sdk\\Modules\\Customers\\Resources\\CreditEntryResource"
         },
         {
-          "name": "blockCustomerTask",
+          "name": "creditPriceResource",
           "kind": "method",
           "static": false,
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "blockCustomerTask(): Slen\\Sdk\\Modules\\Customers\\Tasks\\BlockCustomerTask"
-        },
-        {
-          "name": "unblockCustomerTask",
-          "kind": "method",
-          "static": false,
-          "optional": false,
-          "deprecated": false,
-          "internal": false,
-          "signature": "unblockCustomerTask(): Slen\\Sdk\\Modules\\Customers\\Tasks\\UnblockCustomerTask"
+          "signature": "creditPriceResource(): Slen\\Sdk\\Modules\\Customers\\Resources\\CreditPriceResource"
         },
         {
           "name": "deleteCustomerTask",
@@ -2485,24 +2476,6 @@
           "deprecated": false,
           "internal": false,
           "signature": "moveCreditsTask(): Slen\\Sdk\\Modules\\Customers\\Tasks\\MoveCreditsTask"
-        },
-        {
-          "name": "listEntriesTask",
-          "kind": "method",
-          "static": false,
-          "optional": false,
-          "deprecated": false,
-          "internal": false,
-          "signature": "listEntriesTask(): Slen\\Sdk\\Modules\\Customers\\Tasks\\ListEntriesTask"
-        },
-        {
-          "name": "listPricesTask",
-          "kind": "method",
-          "static": false,
-          "optional": false,
-          "deprecated": false,
-          "internal": false,
-          "signature": "listPricesTask(): Slen\\Sdk\\Modules\\Customers\\Tasks\\ListPricesTask"
         }
       ]
     },
@@ -3178,12 +3151,19 @@
         "readonly"
       ],
       "type_parameters": [],
-      "extends": [
-        "Slen\\Sdk\\Shared\\Tasks\\AbstractTask"
-      ],
+      "extends": [],
       "implements": [],
       "signature": null,
       "members": [
+        {
+          "name": "__construct",
+          "kind": "constructor",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "__construct(Slen\\Sdk\\Shared\\Http\\ApiTransport $apiTransport)"
+        },
         {
           "name": "execute",
           "kind": "method",
@@ -3359,9 +3339,7 @@
         "readonly"
       ],
       "type_parameters": [],
-      "extends": [
-        "Slen\\Sdk\\Shared\\Tasks\\AbstractTask"
-      ],
+      "extends": [],
       "implements": [],
       "signature": null,
       "members": [
@@ -3372,7 +3350,7 @@
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "__construct(Slen\\Sdk\\Shared\\Http\\ApiTransport $apiTransport, Slen\\Sdk\\Modules\\Customers\\Resources\\CustomerAccountResource $customerAccountResource)"
+          "signature": "__construct(Slen\\Sdk\\Shared\\Http\\ApiCaller $apiCaller, Slen\\Sdk\\Modules\\Customers\\Resources\\CustomerAccountResource $customerAccountResource)"
         },
         {
           "name": "execute",
@@ -4315,6 +4293,24 @@
           "signature": "__construct(Slen\\Sdk\\Shared\\Http\\ApiTransport $apiTransport, Slen\\Sdk\\Shared\\Observability\\Telemetry $telemetry, Slen\\Sdk\\Shared\\Timing\\TimingInterface $timing)"
         },
         {
+          "name": "api",
+          "kind": "method",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "api(): Slen\\Sdk\\Shared\\Http\\ApiCaller"
+        },
+        {
+          "name": "executionTraceResource",
+          "kind": "method",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "executionTraceResource(): Slen\\Sdk\\Modules\\Executions\\Resources\\ExecutionTraceResource"
+        },
+        {
           "name": "getExecutionStatusTask",
           "kind": "method",
           "static": false,
@@ -4322,15 +4318,6 @@
           "deprecated": false,
           "internal": false,
           "signature": "getExecutionStatusTask(): Slen\\Sdk\\Modules\\Executions\\Tasks\\GetExecutionStatusTask"
-        },
-        {
-          "name": "getExecutionTraceTask",
-          "kind": "method",
-          "static": false,
-          "optional": false,
-          "deprecated": false,
-          "internal": false,
-          "signature": "getExecutionTraceTask(): Slen\\Sdk\\Modules\\Executions\\Tasks\\GetExecutionTraceTask"
         },
         {
           "name": "waitForExecutionAction",
@@ -4494,9 +4481,7 @@
         "readonly"
       ],
       "type_parameters": [],
-      "extends": [
-        "Slen\\Sdk\\Shared\\Tasks\\AbstractTask"
-      ],
+      "extends": [],
       "implements": [],
       "signature": null,
       "members": [
@@ -4507,7 +4492,7 @@
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "__construct(Slen\\Sdk\\Shared\\Http\\ApiTransport $apiTransport, Slen\\Sdk\\Modules\\Executions\\Resources\\ExecutionStatusResource $executionStatusResource)"
+          "signature": "__construct(Slen\\Sdk\\Shared\\Http\\ApiCaller $apiCaller, Slen\\Sdk\\Modules\\Executions\\Resources\\ExecutionStatusResource $executionStatusResource, ?float $readTimeout)"
         },
         {
           "name": "request",
@@ -5464,9 +5449,7 @@
         "readonly"
       ],
       "type_parameters": [],
-      "extends": [
-        "Slen\\Sdk\\Shared\\Tasks\\AbstractTask"
-      ],
+      "extends": [],
       "implements": [],
       "signature": null,
       "members": [
@@ -5477,7 +5460,7 @@
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "__construct(Slen\\Sdk\\Shared\\Http\\ApiTransport $apiTransport, Slen\\Sdk\\Modules\\Operations\\Resources\\ExecutionResource $executionResource)"
+          "signature": "__construct(Slen\\Sdk\\Shared\\Http\\ApiCaller $apiCaller, Slen\\Sdk\\Modules\\Operations\\Resources\\ExecutionResource $executionResource)"
         },
         {
           "name": "request",
@@ -6987,13 +6970,22 @@
           "signature": "readonly Slen\\Sdk\\Modules\\Webhooks\\WebhooksFacade $webhooks"
         },
         {
+          "name": "api",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly Slen\\Sdk\\Shared\\Http\\ApiCaller $api"
+        },
+        {
           "name": "health",
           "kind": "property",
           "static": false,
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "readonly Slen\\Sdk\\Shared\\Tasks\\GetHealthTask $health"
+          "signature": "readonly Slen\\Sdk\\Shared\\Resources\\HealthResource $health"
         },
         {
           "name": "__construct",
@@ -7002,7 +6994,52 @@
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "__construct(Slen\\Sdk\\Modules\\Operations\\OperationsFacade $operations, Slen\\Sdk\\Modules\\Executions\\ExecutionsFacade $executions, Slen\\Sdk\\Modules\\Customers\\CustomersFacade $customers, Slen\\Sdk\\Modules\\Webhooks\\WebhooksFacade $webhooks, Slen\\Sdk\\Shared\\Tasks\\GetHealthTask $health)"
+          "signature": "__construct(Slen\\Sdk\\Modules\\Operations\\OperationsFacade $operations, Slen\\Sdk\\Modules\\Executions\\ExecutionsFacade $executions, Slen\\Sdk\\Modules\\Customers\\CustomersFacade $customers, Slen\\Sdk\\Modules\\Webhooks\\WebhooksFacade $webhooks, Slen\\Sdk\\Shared\\Http\\ApiCaller $api, Slen\\Sdk\\Shared\\Resources\\HealthResource $health)"
+        }
+      ]
+    },
+    {
+      "name": "Slen\\Sdk\\Shared\\Http\\ApiCaller",
+      "kind": "class",
+      "source": "src/Shared/Http/ApiCaller.php",
+      "deprecated": false,
+      "internal": true,
+      "alias_of": null,
+      "modifiers": [
+        "final",
+        "readonly"
+      ],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": null,
+      "members": [
+        {
+          "name": "__construct",
+          "kind": "constructor",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "__construct(Slen\\Sdk\\Shared\\Http\\ApiTransport $apiTransport)"
+        },
+        {
+          "name": "exchange",
+          "kind": "method",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "exchange(Slen\\Sdk\\Shared\\Http\\Data\\ApiRequestDTO $request): Slen\\Sdk\\Shared\\Http\\Data\\ApiResponseDTO"
+        },
+        {
+          "name": "data",
+          "kind": "method",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "data(Slen\\Sdk\\Shared\\Http\\Data\\ApiRequestDTO $request): array"
         }
       ]
     },

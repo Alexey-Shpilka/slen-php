@@ -6,6 +6,7 @@ namespace Slen\Sdk\Modules\Operations\Factories;
 
 use Slen\Sdk\Modules\Operations\Resources\ExecutionResource;
 use Slen\Sdk\Modules\Operations\Tasks\ExecuteOperationTask;
+use Slen\Sdk\Shared\Http\ApiCaller;
 use Slen\Sdk\Shared\Http\ApiTransport;
 use Slen\Sdk\Shared\Observability\Data\SpanSubjectDTO;
 use Slen\Sdk\Shared\Observability\ExecutionSpanMapper;
@@ -23,7 +24,7 @@ final readonly class OperationsModuleFactory
 
     public function executeOperationTask(): ExecuteOperationTask
     {
-        return new ExecuteOperationTask($this->apiTransport, new ExecutionResource());
+        return new ExecuteOperationTask(new ApiCaller($this->apiTransport), new ExecutionResource());
     }
 
     public function spanScope(SpanSubjectDTO $spanSubjectDTO): SpanScope

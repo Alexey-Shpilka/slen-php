@@ -15,6 +15,8 @@ use Slen\Sdk\Modules\Operations\OperationsFacade;
 use Slen\Sdk\Modules\Webhooks\WebhooksFacade;
 use Slen\Sdk\Shared\Data\SdkModulesDTO;
 use Slen\Sdk\Shared\Http\Client\HttpClientFactory;
+use Slen\Sdk\Shared\Http\Data\ApiRequestDTO;
+use Slen\Sdk\Shared\Http\Enums\Endpoint;
 use Slen\Sdk\Shared\Logging\Journal;
 use Slen\Sdk\Shared\SdkFactory;
 use Slen\Sdk\Shared\Timing\SystemTiming;
@@ -82,6 +84,9 @@ final readonly class SlenSdk
      */
     public function health(?RequestOptions $options = null): HealthDTO
     {
-        return $this->sdkModulesDTO->health->execute($options ?? new RequestOptions());
+        $options ??= new RequestOptions();
+        $apiRequest = new ApiRequestDTO(Endpoint::Health, envelope: false, retries: $options->retries, timeout: $options->timeout);
+
+        return $this->sdkModulesDTO->health->map($this->sdkModulesDTO->api->data($apiRequest));
     }
 }

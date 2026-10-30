@@ -8,8 +8,8 @@ use Slen\Sdk\Modules\Executions\Actions\WaitForExecutionAction;
 use Slen\Sdk\Modules\Executions\Resources\ExecutionStatusResource;
 use Slen\Sdk\Modules\Executions\Resources\ExecutionTraceResource;
 use Slen\Sdk\Modules\Executions\Tasks\GetExecutionStatusTask;
-use Slen\Sdk\Modules\Executions\Tasks\GetExecutionTraceTask;
 use Slen\Sdk\Modules\Operations\Resources\ExecutionResource;
+use Slen\Sdk\Shared\Http\ApiCaller;
 use Slen\Sdk\Shared\Http\ApiTransport;
 use Slen\Sdk\Shared\Observability\Data\SpanSubjectDTO;
 use Slen\Sdk\Shared\Observability\ExecutionSpanMapper;
@@ -27,19 +27,22 @@ final readonly class ExecutionsModuleFactory
     ) {
     }
 
+    public function api(): ApiCaller
+    {
+        return new ApiCaller($this->apiTransport);
+    }
+
+    public function executionTraceResource(): ExecutionTraceResource
+    {
+        return new ExecutionTraceResource(new ExecutionResource());
+    }
+
     public function getExecutionStatusTask(): GetExecutionStatusTask
     {
         return new GetExecutionStatusTask(
-            $this->apiTransport,
+            $this->api(),
             new ExecutionStatusResource(new ExecutionResource()),
-        );
-    }
-
-    public function getExecutionTraceTask(): GetExecutionTraceTask
-    {
-        return new GetExecutionTraceTask(
-            $this->apiTransport,
-            new ExecutionTraceResource(new ExecutionResource()),
+            $this->apiTransport->readTimeout,
         );
     }
 

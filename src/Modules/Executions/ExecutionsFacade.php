@@ -11,6 +11,8 @@ use Slen\Sdk\Modules\Executions\Data\ExecutionTraceDTO;
 use Slen\Sdk\Modules\Executions\Factories\ExecutionsModuleFactory;
 use Slen\Sdk\Modules\Executions\Options\WaitOptions;
 use Slen\Sdk\RequestOptions;
+use Slen\Sdk\Shared\Http\Data\ApiRequestDTO;
+use Slen\Sdk\Shared\Http\Enums\Endpoint;
 use Slen\Sdk\Shared\Observability\Data\SpanSubjectDTO;
 use Throwable;
 
@@ -68,6 +70,9 @@ final readonly class ExecutionsFacade
      */
     public function trace(string $executionId, ?RequestOptions $options = null): ExecutionTraceDTO
     {
-        return $this->executionsModuleFactory->getExecutionTraceTask()->execute($executionId, $options ?? new RequestOptions());
+        $options ??= new RequestOptions();
+        $apiRequest = new ApiRequestDTO(Endpoint::GetExecutionTrace, ['id' => $executionId], retries: $options->retries, timeout: $options->timeout);
+
+        return $this->executionsModuleFactory->executionTraceResource()->map($this->executionsModuleFactory->api()->data($apiRequest));
     }
 }

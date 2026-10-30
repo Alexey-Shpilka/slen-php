@@ -24,6 +24,8 @@ use Slen\Sdk\Modules\Customers\Options\EntryListOptions;
 use Slen\Sdk\Modules\Customers\Options\MovementOptions;
 use Slen\Sdk\Modules\Customers\Options\PriceListOptions;
 use Slen\Sdk\RequestOptions;
+use Slen\Sdk\Shared\Http\Data\ApiRequestDTO;
+use Slen\Sdk\Shared\Http\Enums\Endpoint;
 
 /** The end customers of the project, named by your own opaque id: their status, accounts and credits. */
 final readonly class CustomersFacade
@@ -41,7 +43,20 @@ final readonly class CustomersFacade
      */
     public function list(?CustomerListOptions $options = null): CustomerPageDTO
     {
-        return $this->customersModuleFactory->listCustomersTask()->execute($options ?? new CustomerListOptions());
+        $options ??= new CustomerListOptions();
+        // Without the view an older API answers the page of accounts.
+        $query = [
+            'view' => 'customers',
+            'cursor' => $options->cursor,
+            'limit' => $options->limit,
+            'q' => $options->search,
+            'status' => $options->status?->value,
+            'credit_type' => $options->creditType,
+            'low_balance' => $options->lowBalance,
+        ];
+        $apiRequest = new ApiRequestDTO(Endpoint::ListCustomers, query: $query, retries: $options->retries, timeout: $options->timeout);
+
+        return $this->customersModuleFactory->customerResource()->page($this->customersModuleFactory->api()->exchange($apiRequest)->body);
     }
 
     /**
@@ -53,7 +68,14 @@ final readonly class CustomersFacade
      */
     public function get(string $externalUserId, ?RequestOptions $options = null): CustomerDTO
     {
-        return $this->customersModuleFactory->getCustomerTask()->execute($externalUserId, $options ?? new RequestOptions());
+        $options ??= new RequestOptions();
+
+        return $this->customer(new ApiRequestDTO(
+            Endpoint::GetCustomer,
+            ['externalUserId' => $externalUserId],
+            retries: $options->retries,
+            timeout: $options->timeout,
+        ));
     }
 
     /**
@@ -64,7 +86,15 @@ final readonly class CustomersFacade
      */
     public function create(string $externalUserId, ?RequestOptions $options = null): CustomerDTO
     {
-        return $this->customersModuleFactory->createCustomerTask()->execute($externalUserId, $options ?? new RequestOptions());
+        $options ??= new RequestOptions();
+
+        return $this->customer(new ApiRequestDTO(
+            Endpoint::CreateCustomer,
+            ['externalUserId' => $externalUserId],
+            body: [],
+            retries: $options->retries,
+            timeout: $options->timeout,
+        ));
     }
 
     /**
@@ -75,7 +105,16 @@ final readonly class CustomersFacade
      */
     public function updateAccount(string $externalUserId, string $creditType, ?AccountOptions $options = null): CustomerAccountDTO
     {
-        return $this->customersModuleFactory->updateAccountTask()->execute($externalUserId, $creditType, $options ?? new AccountOptions());
+        $options ??= new AccountOptions();
+        $apiRequest = new ApiRequestDTO(
+            Endpoint::UpdateAccount,
+            ['externalUserId' => $externalUserId, 'creditType' => $creditType],
+            body: ['allow_negative' => $options->allowNegative, 'low_balance_threshold' => $options->lowBalanceThreshold],
+            retries: $options->retries,
+            timeout: $options->timeout,
+        );
+
+        return $this->customersModuleFactory->customerAccountResource()->map($this->customersModuleFactory->api()->data($apiRequest));
     }
 
     /**
@@ -87,7 +126,15 @@ final readonly class CustomersFacade
      */
     public function block(string $externalUserId, ?BlockOptions $options = null): CustomerDTO
     {
-        return $this->customersModuleFactory->blockCustomerTask()->execute($externalUserId, $options ?? new BlockOptions());
+        $options ??= new BlockOptions();
+
+        return $this->customer(new ApiRequestDTO(
+            Endpoint::BlockCustomer,
+            ['externalUserId' => $externalUserId],
+            body: $options->reason === null ? [] : ['reason' => $options->reason],
+            retries: $options->retries,
+            timeout: $options->timeout,
+        ));
     }
 
     /**
@@ -99,7 +146,15 @@ final readonly class CustomersFacade
      */
     public function unblock(string $externalUserId, ?RequestOptions $options = null): CustomerDTO
     {
-        return $this->customersModuleFactory->unblockCustomerTask()->execute($externalUserId, $options ?? new RequestOptions());
+        $options ??= new RequestOptions();
+
+        return $this->customer(new ApiRequestDTO(
+            Endpoint::UnblockCustomer,
+            ['externalUserId' => $externalUserId],
+            body: [],
+            retries: $options->retries,
+            timeout: $options->timeout,
+        ));
     }
 
     /**
@@ -173,7 +228,21 @@ final readonly class CustomersFacade
      */
     public function entries(string $externalUserId, ?EntryListOptions $options = null): CreditEntryPageDTO
     {
-        return $this->customersModuleFactory->listEntriesTask()->execute($externalUserId, $options ?? new EntryListOptions());
+        $options ??= new EntryListOptions();
+        $apiRequest = new ApiRequestDTO(
+            Endpoint::ListEntries,
+            ['externalUserId' => $externalUserId],
+            [
+                'cursor' => $options->cursor,
+                'limit' => $options->limit,
+                'credit_type' => $options->creditType,
+                'entry_type' => $options->entryType?->value,
+            ],
+            retries: $options->retries,
+            timeout: $options->timeout,
+        );
+
+        return $this->customersModuleFactory->creditEntryResource()->page($this->customersModuleFactory->api()->exchange($apiRequest)->body);
     }
 
     /**
@@ -186,12 +255,26 @@ final readonly class CustomersFacade
      */
     public function prices(?PriceListOptions $options = null): array
     {
-        return $this->customersModuleFactory->listPricesTask()->execute($options ?? new PriceListOptions());
+        $options ??= new PriceListOptions();
+        $apiRequest = new ApiRequestDTO(
+            Endpoint::ListPrices,
+            query: ['operation_code' => $options->operationCode, 'credit_type' => $options->creditType],
+            retries: $options->retries,
+            timeout: $options->timeout,
+        );
+
+        return $this->customersModuleFactory->creditPriceResource()->list($this->customersModuleFactory->api()->exchange($apiRequest)->body);
     }
 
     /** @throws SlenException */
     private function move(CreditMovementDTO $creditMovementDTO): CustomerAccountDTO
     {
         return $this->customersModuleFactory->moveCreditsTask()->execute($creditMovementDTO);
+    }
+
+    /** @throws SlenException */
+    private function customer(ApiRequestDTO $apiRequest): CustomerDTO
+    {
+        return $this->customersModuleFactory->customerResource()->map($this->customersModuleFactory->api()->data($apiRequest));
     }
 }
