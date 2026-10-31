@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Slen\Sdk\Modules\Executions\Resources;
 
 use Slen\Sdk\Exceptions\InvalidResponseException;
-use Slen\Sdk\Modules\Executions\Data\ExecutionStatusDTO;
+use Slen\Sdk\Modules\Executions\Data\ExecutionStatusView;
 use Slen\Sdk\Modules\Operations\Resources\ExecutionResource;
 use Slen\Sdk\Shared\Resources\BaseResource;
 
@@ -21,9 +21,9 @@ final readonly class ExecutionStatusResource extends BaseResource
      *
      * @throws InvalidResponseException
      */
-    public function map(array $data): ExecutionStatusDTO
+    public function map(array $data, ?string $requestId = null): ExecutionStatusView
     {
-        return new ExecutionStatusDTO(
+        return new ExecutionStatusView(
             executionId: $this->string($data, 'execution_id'),
             status: $this->executionResource->status($data),
             operationCode: $this->string($data, 'operation'),
@@ -35,6 +35,7 @@ final readonly class ExecutionStatusResource extends BaseResource
             waitingOn: $this->executionResource->waitingOn($data),
             traceUrl: $this->string($data, 'trace_url'),
             retryAfterSeconds: $this->nullableInt($data, 'retry_after_seconds'),
+            requestId: $requestId,
         );
     }
 }

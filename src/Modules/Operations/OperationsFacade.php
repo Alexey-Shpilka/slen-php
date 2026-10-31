@@ -7,7 +7,7 @@ namespace Slen\Sdk\Modules\Operations;
 use Slen\Sdk\Exceptions\InvalidRequestException;
 use Slen\Sdk\Exceptions\SlenException;
 use Slen\Sdk\Modules\Operations\Data\ExecuteRequestDTO;
-use Slen\Sdk\Modules\Operations\Data\ExecutionDTO;
+use Slen\Sdk\Modules\Operations\Data\ExecutionResult;
 use Slen\Sdk\Modules\Operations\Factories\OperationsModuleFactory;
 use Slen\Sdk\Modules\Operations\Options\ExecuteOptions;
 use Slen\Sdk\Shared\Observability\Data\SpanSubjectDTO;
@@ -30,7 +30,7 @@ final readonly class OperationsFacade
      *                                 a timeout or retries out of range
      * @throws SlenException
      */
-    public function execute(string $operation, array $input, ?ExecuteOptions $options = null): ExecutionDTO
+    public function execute(string $operation, array $input, ?ExecuteOptions $options = null): ExecutionResult
     {
         return $this->run('operations.execute', new ExecuteRequestDTO($operation, $input, $options ?? new ExecuteOptions(), false));
     }
@@ -44,13 +44,13 @@ final readonly class OperationsFacade
      *                                 a timeout or retries out of range
      * @throws SlenException
      */
-    public function executeAsync(string $operation, array $input, ?ExecuteOptions $options = null): ExecutionDTO
+    public function executeAsync(string $operation, array $input, ?ExecuteOptions $options = null): ExecutionResult
     {
         return $this->run('operations.execute_async', new ExecuteRequestDTO($operation, $input, $options ?? new ExecuteOptions(), true));
     }
 
     /** @throws SlenException */
-    private function run(string $span, ExecuteRequestDTO $executeRequestDTO): ExecutionDTO
+    private function run(string $span, ExecuteRequestDTO $executeRequestDTO): ExecutionResult
     {
         $executeOperationTask = $this->operationsModuleFactory->executeOperationTask();
         $apiRequest = $executeOperationTask->request($executeRequestDTO);
@@ -58,15 +58,15 @@ final readonly class OperationsFacade
         $spanScope = $this->operationsModuleFactory->spanScope(new SpanSubjectDTO($span, $executeRequestDTO->operation));
 
         try {
-            $executionDTO = $executeOperationTask->execute($apiRequest);
+            $executionResult = $executeOperationTask->execute($apiRequest);
         } catch (Throwable $throwable) {
             $spanScope->failed($throwable);
 
             throw $throwable;
         }
 
-        $spanScope->answered($this->operationsModuleFactory->executionSpanMapper()->map($executionDTO));
+        $spanScope->answered($this->operationsModuleFactory->executionSpanMapper()->map($executionResult));
 
-        return $executionDTO;
+        return $executionResult;
     }
 }

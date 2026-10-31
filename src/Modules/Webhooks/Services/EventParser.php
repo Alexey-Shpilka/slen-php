@@ -8,12 +8,12 @@ use DateTimeImmutable;
 use JsonException;
 use Slen\Sdk\Exceptions\InvalidResponseException;
 use Slen\Sdk\Modules\Operations\Enums\ExecutionStatus;
-use Slen\Sdk\Modules\Webhooks\Data\ApprovalDecidedEventDTO;
-use Slen\Sdk\Modules\Webhooks\Data\ApprovalRequestedEventDTO;
-use Slen\Sdk\Modules\Webhooks\Data\CustomerBalanceLowEventDTO;
-use Slen\Sdk\Modules\Webhooks\Data\ExecutionFinishedEventDTO;
-use Slen\Sdk\Modules\Webhooks\Data\UnknownEventDTO;
-use Slen\Sdk\Modules\Webhooks\Data\WebhookEventDTO;
+use Slen\Sdk\Modules\Webhooks\Data\ApprovalDecidedEvent;
+use Slen\Sdk\Modules\Webhooks\Data\ApprovalRequestedEvent;
+use Slen\Sdk\Modules\Webhooks\Data\CustomerBalanceLowEvent;
+use Slen\Sdk\Modules\Webhooks\Data\ExecutionFinishedEvent;
+use Slen\Sdk\Modules\Webhooks\Data\UnknownWebhookEvent;
+use Slen\Sdk\Modules\Webhooks\Data\WebhookEvent;
 use Slen\Sdk\Modules\Webhooks\Enums\WebhookEventType;
 use Slen\Sdk\Shared\Resources\BaseResource;
 use Throwable;
@@ -22,7 +22,7 @@ use Throwable;
 final readonly class EventParser extends BaseResource
 {
     /** @throws InvalidResponseException `webhook_payload_invalid`: not JSON, or not an event the SDK can read */
-    public function parse(string $payload): WebhookEventDTO
+    public function parse(string $payload): WebhookEvent
     {
         try {
             $event = json_decode($payload, true, 512, JSON_THROW_ON_ERROR | JSON_BIGINT_AS_STRING);
@@ -38,7 +38,7 @@ final readonly class EventParser extends BaseResource
      *
      * @throws InvalidResponseException
      */
-    private function event(array $event): WebhookEventDTO
+    private function event(array $event): WebhookEvent
     {
         $id = $this->string($event, 'id');
         $type = $this->string($event, 'type');
@@ -50,14 +50,14 @@ final readonly class EventParser extends BaseResource
             WebhookEventType::CustomerBalanceLow => $this->customerBalanceLow($id, $createdAt, $data),
             WebhookEventType::ApprovalRequested => $this->approvalRequested($id, $createdAt, $data),
             WebhookEventType::ApprovalDecided => $this->approvalDecided($id, $createdAt, $data),
-            default => new UnknownEventDTO($id, $type, $createdAt, $data),
+            default => new UnknownWebhookEvent($id, $type, $createdAt, $data),
         };
     }
 
     /** @param array<mixed> $data */
-    private function executionFinished(string $id, DateTimeImmutable $createdAt, array $data): ExecutionFinishedEventDTO
+    private function executionFinished(string $id, DateTimeImmutable $createdAt, array $data): ExecutionFinishedEvent
     {
-        return new ExecutionFinishedEventDTO(
+        return new ExecutionFinishedEvent(
             $id,
             $createdAt,
             $data,
@@ -70,9 +70,9 @@ final readonly class EventParser extends BaseResource
     }
 
     /** @param array<mixed> $data */
-    private function customerBalanceLow(string $id, DateTimeImmutable $createdAt, array $data): CustomerBalanceLowEventDTO
+    private function customerBalanceLow(string $id, DateTimeImmutable $createdAt, array $data): CustomerBalanceLowEvent
     {
-        return new CustomerBalanceLowEventDTO(
+        return new CustomerBalanceLowEvent(
             $id,
             $createdAt,
             $data,
@@ -88,9 +88,9 @@ final readonly class EventParser extends BaseResource
     }
 
     /** @param array<mixed> $data */
-    private function approvalRequested(string $id, DateTimeImmutable $createdAt, array $data): ApprovalRequestedEventDTO
+    private function approvalRequested(string $id, DateTimeImmutable $createdAt, array $data): ApprovalRequestedEvent
     {
-        return new ApprovalRequestedEventDTO(
+        return new ApprovalRequestedEvent(
             $id,
             $createdAt,
             $data,
@@ -105,9 +105,9 @@ final readonly class EventParser extends BaseResource
     }
 
     /** @param array<mixed> $data */
-    private function approvalDecided(string $id, DateTimeImmutable $createdAt, array $data): ApprovalDecidedEventDTO
+    private function approvalDecided(string $id, DateTimeImmutable $createdAt, array $data): ApprovalDecidedEvent
     {
-        return new ApprovalDecidedEventDTO(
+        return new ApprovalDecidedEvent(
             $id,
             $createdAt,
             $data,

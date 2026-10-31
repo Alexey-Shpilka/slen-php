@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace Slen\Sdk\Modules\Operations\Resources;
 
 use Slen\Sdk\Exceptions\InvalidResponseException;
-use Slen\Sdk\Modules\Operations\Data\ExecutionCacheDTO;
-use Slen\Sdk\Modules\Operations\Data\ExecutionCostDTO;
-use Slen\Sdk\Modules\Operations\Data\ExecutionDTO;
-use Slen\Sdk\Modules\Operations\Data\ExecutionErrorDTO;
-use Slen\Sdk\Modules\Operations\Data\WaitingOnDTO;
+use Slen\Sdk\Modules\Operations\Data\ExecutionCache;
+use Slen\Sdk\Modules\Operations\Data\ExecutionCost;
+use Slen\Sdk\Modules\Operations\Data\ExecutionError;
+use Slen\Sdk\Modules\Operations\Data\ExecutionResult;
+use Slen\Sdk\Modules\Operations\Data\WaitingOn;
 use Slen\Sdk\Modules\Operations\Enums\ExecutionStatus;
 use Slen\Sdk\Shared\Resources\BaseResource;
 
@@ -21,11 +21,11 @@ final readonly class ExecutionResource extends BaseResource
      *
      * @throws InvalidResponseException
      */
-    public function map(array $data): ExecutionDTO
+    public function map(array $data, ?string $requestId = null): ExecutionResult
     {
         $error = $this->nullableArray($data, 'error');
 
-        return new ExecutionDTO(
+        return new ExecutionResult(
             executionId: $this->string($data, 'execution_id'),
             status: $this->status($data),
             operationCode: $this->string($data, 'operation'),
@@ -37,8 +37,9 @@ final readonly class ExecutionResource extends BaseResource
             waitingOn: $this->waitingOn($data),
             traceUrl: $this->string($data, 'trace_url'),
             retryAfterSeconds: $this->nullableInt($data, 'retry_after_seconds'),
-            error: $error === null ? null : new ExecutionErrorDTO($this->string($error, 'code'), $this->string($error, 'message')),
+            error: $error === null ? null : new ExecutionError($this->string($error, 'code'), $this->string($error, 'message')),
             replayed: $this->bool($data, 'replayed'),
+            requestId: $requestId,
         );
     }
 
@@ -57,11 +58,11 @@ final readonly class ExecutionResource extends BaseResource
      *
      * @throws InvalidResponseException
      */
-    public function cost(array $data): ExecutionCostDTO
+    public function cost(array $data): ExecutionCost
     {
         $cost = $this->array($data, 'cost');
 
-        return new ExecutionCostDTO($this->nullableDecimal($cost, 'estimated'), $this->nullableDecimal($cost, 'actual'));
+        return new ExecutionCost($this->nullableDecimal($cost, 'estimated'), $this->nullableDecimal($cost, 'actual'));
     }
 
     /**
@@ -69,11 +70,11 @@ final readonly class ExecutionResource extends BaseResource
      *
      * @throws InvalidResponseException
      */
-    public function cache(array $data): ExecutionCacheDTO
+    public function cache(array $data): ExecutionCache
     {
         $cache = $this->array($data, 'cache');
 
-        return new ExecutionCacheDTO($this->bool($cache, 'hit'), $this->nullableDateTime($cache, 'cached_at'));
+        return new ExecutionCache($this->bool($cache, 'hit'), $this->nullableDateTime($cache, 'cached_at'));
     }
 
     /**
@@ -81,7 +82,7 @@ final readonly class ExecutionResource extends BaseResource
      *
      * @throws InvalidResponseException
      */
-    public function waitingOn(array $data): ?WaitingOnDTO
+    public function waitingOn(array $data): ?WaitingOn
     {
         $waitingOn = $this->nullableArray($data, 'waiting_on');
 
@@ -89,7 +90,7 @@ final readonly class ExecutionResource extends BaseResource
             return null;
         }
 
-        return new WaitingOnDTO(
+        return new WaitingOn(
             $this->string($waitingOn, 'node_key'),
             $this->string($waitingOn, 'type'),
             $this->nullableDateTime($waitingOn, 'resume_at'),

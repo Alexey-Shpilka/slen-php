@@ -8,7 +8,8 @@ use Slen\Sdk\Modules\Customers\CustomersFacade;
 use Slen\Sdk\Modules\Executions\ExecutionsFacade;
 use Slen\Sdk\Modules\Operations\OperationsFacade;
 use Slen\Sdk\Modules\Webhooks\WebhooksFacade;
-use Slen\Sdk\Shared\Tasks\GetHealthTask;
+use Slen\Sdk\Shared\Http\ApiCaller;
+use Slen\Sdk\Shared\Resources\HealthResource;
 
 /** @internal */
 final readonly class SdkModulesDTO
@@ -18,7 +19,8 @@ final readonly class SdkModulesDTO
         public ExecutionsFacade $executions,
         public CustomersFacade $customers,
         public WebhooksFacade $webhooks,
-        public GetHealthTask $health,
+        public ApiCaller $api,
+        public HealthResource $health,
     ) {
     }
 }

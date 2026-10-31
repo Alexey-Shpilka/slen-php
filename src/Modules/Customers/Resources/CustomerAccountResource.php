@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Slen\Sdk\Modules\Customers\Resources;
 
 use Slen\Sdk\Exceptions\InvalidResponseException;
-use Slen\Sdk\Modules\Customers\Data\CustomerAccountDTO;
+use Slen\Sdk\Modules\Customers\Data\CustomerAccount;
 use Slen\Sdk\Shared\Resources\BaseResource;
 
 /** @internal */
@@ -16,9 +16,9 @@ final readonly class CustomerAccountResource extends BaseResource
      *
      * @throws InvalidResponseException
      */
-    public function map(array $data): CustomerAccountDTO
+    public function map(array $data, ?string $requestId = null): CustomerAccount
     {
-        return new CustomerAccountDTO(
+        return new CustomerAccount(
             customerAccountId: $this->string($data, 'customer_account_id'),
             customerId: $this->string($data, 'customer_id'),
             projectId: $this->string($data, 'project_id'),
@@ -31,6 +31,7 @@ final readonly class CustomerAccountResource extends BaseResource
             lowBalanceThreshold: $this->decimal($data, 'low_balance_threshold'),
             createdAt: $this->dateTime($data, 'created_at'),
             updatedAt: $this->dateTime($data, 'updated_at'),
+            requestId: $requestId,
         );
     }
 }

@@ -89,7 +89,7 @@ $checks = [
         $customers->topUp('user_8421', '100.0000', new MovementOptions(note: 'Invoice 7781', idempotencyKey: 'invoice-7781:topup'));
         $customers->charge('user_8421', '5.0000', new MovementOptions(idempotencyKey: 'export-991:charge'));
         $holds(\count($customers->entries('user_8421', new EntryListOptions(limit: 2))->data) === 1, 'the statement was not read');
-        $holds(\count($customers->prices()) === 1, 'the prices were not read');
+        $holds(\count($customers->prices()->data) === 1, 'the prices were not read');
         $holds(\count($http->requests()) === 6, 'the customers did not make one request each');
     },
     'a repeat after a 503' => static function () use ($holds, $sdk): void {

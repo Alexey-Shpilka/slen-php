@@ -67,6 +67,10 @@ final readonly class ApiClient implements ApiClientInterface
             $message = $message->withHeader('Idempotency-Key', $request->idempotencyKey);
         }
 
+        if ($request->requestId !== null) {
+            $message = $message->withHeader('X-Request-Id', $request->requestId);
+        }
+
         if ($request->json === null) {
             return $message;
         }
@@ -139,10 +143,18 @@ final readonly class ApiClient implements ApiClientInterface
     private function noAnswer(ApiRequestDTO $request, Throwable $throwable): SlenException
     {
         if ($this->timedOut($throwable) === true) {
-            return new TimeoutException(\sprintf('Slen did not answer %s in time.', $request->describe()), previous: $throwable);
+            return new TimeoutException(
+                \sprintf('Slen did not answer %s in time.', $request->describe()),
+                requestId: $request->requestId,
+                previous: $throwable,
+            );
         }
 
-        return new ConnectionException(\sprintf('Slen could not be reached for %s.', $request->describe()), previous: $throwable);
+        return new ConnectionException(
+            \sprintf('Slen could not be reached for %s.', $request->describe()),
+            requestId: $request->requestId,
+            previous: $throwable,
+        );
     }
 
     private function timedOut(Throwable $throwable): bool

@@ -8,11 +8,11 @@ use Iterator;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Slen\Sdk\Exceptions\InvalidResponseException;
-use Slen\Sdk\Modules\Webhooks\Data\ApprovalDecidedEventDTO;
-use Slen\Sdk\Modules\Webhooks\Data\ApprovalRequestedEventDTO;
-use Slen\Sdk\Modules\Webhooks\Data\CustomerBalanceLowEventDTO;
-use Slen\Sdk\Modules\Webhooks\Data\ExecutionFinishedEventDTO;
-use Slen\Sdk\Modules\Webhooks\Data\WebhookEventDTO;
+use Slen\Sdk\Modules\Webhooks\Data\ApprovalDecidedEvent;
+use Slen\Sdk\Modules\Webhooks\Data\ApprovalRequestedEvent;
+use Slen\Sdk\Modules\Webhooks\Data\CustomerBalanceLowEvent;
+use Slen\Sdk\Modules\Webhooks\Data\ExecutionFinishedEvent;
+use Slen\Sdk\Modules\Webhooks\Data\WebhookEvent;
 use Slen\Sdk\Modules\Webhooks\Enums\WebhookEventType;
 use Slen\Sdk\Modules\Webhooks\Services\EventParser;
 use Symfony\Component\Yaml\Yaml;
@@ -27,10 +27,10 @@ final class WebhookEventsContractTest extends TestCase
     private const string SPEC_VARIABLE = 'SLEN_OPENAPI_SPEC';
 
     private const array TYPED = [
-        'execution.finished' => ExecutionFinishedEventDTO::class,
-        'customer.balance_low' => CustomerBalanceLowEventDTO::class,
-        'approval.requested' => ApprovalRequestedEventDTO::class,
-        'approval.decided' => ApprovalDecidedEventDTO::class,
+        'execution.finished' => ExecutionFinishedEvent::class,
+        'customer.balance_low' => CustomerBalanceLowEvent::class,
+        'approval.requested' => ApprovalRequestedEvent::class,
+        'approval.decided' => ApprovalDecidedEvent::class,
     ];
 
     /** @var array<string, mixed>|null */
@@ -53,7 +53,7 @@ final class WebhookEventsContractTest extends TestCase
     }
 
     /**
-     * @param class-string<WebhookEventDTO> $class
+     * @param class-string<WebhookEvent> $class
      */
     #[DataProvider('typedProvider')]
     public function testATypedEventReadsAllTheDataItsSchemaDescribesAndNothingElse(string $type, string $class): void
@@ -87,7 +87,7 @@ final class WebhookEventsContractTest extends TestCase
     }
 
     /**
-     * @return Iterator<string, array{string, class-string<WebhookEventDTO>}>
+     * @return Iterator<string, array{string, class-string<WebhookEvent>}>
      */
     public static function typedProvider(): Iterator
     {
@@ -99,7 +99,7 @@ final class WebhookEventsContractTest extends TestCase
     /**
      * @param array<mixed> $data
      */
-    private static function parse(string $type, array $data): WebhookEventDTO
+    private static function parse(string $type, array $data): WebhookEvent
     {
         $envelope = ['id' => '1', 'type' => $type, 'created_at' => '2026-10-17T12:00:00+00:00', 'data' => $data];
 

@@ -13,6 +13,9 @@ final readonly class ApiRequestDTO
 {
     private const int JSON_OUT = JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRESERVE_ZERO_FRACTION;
 
+    // The form the API takes; any other id it swaps for one of its own without a word.
+    private const string REQUEST_ID = '/^[A-Za-z0-9._:-]{8,128}$/D';
+
     public ?string $json;
 
     /**
@@ -22,7 +25,8 @@ final readonly class ApiRequestDTO
      * @param array<string, string>      $headers
      *
      * @throws InvalidRequestException `invalid_request`: a path value or an idempotency key that is missing or empty,
-     *                                 a timeout or retries out of range, a body that is not JSON; nothing is sent
+     *                                 a timeout or retries out of range, a request id not of its form, a body that is
+     *                                 not JSON; nothing is sent
      */
     public function __construct(
         public Endpoint $endpoint,
@@ -35,6 +39,7 @@ final readonly class ApiRequestDTO
         public ?float $timeout = null,
         public array $headers = [],
         public int $attempt = 1,
+        public ?string $requestId = null,
     ) {
         foreach ($this->placeholders() as $name) {
             if (trim($this->pathParams[$name] ?? '') === '') {
@@ -57,6 +62,10 @@ final readonly class ApiRequestDTO
             throw $this->refused(\sprintf('the retries of %s must be zero or more, got %d', $this->endpoint->value, $this->retries));
         }
 
+        if ($this->requestId !== null && preg_match(self::REQUEST_ID, $this->requestId) !== 1) {
+            throw $this->refused(\sprintf('the request id of %s must be 8 to 128 of A-Z, a-z, 0-9, ".", "_", ":" and "-"', $this->endpoint->value));
+        }
+
         $this->json = $this->encode();
     }
 
@@ -73,6 +82,7 @@ final readonly class ApiRequestDTO
             $this->timeout,
             [...$this->headers, $name => $value],
             $this->attempt,
+            $this->requestId,
         );
     }
 
@@ -89,6 +99,7 @@ final readonly class ApiRequestDTO
             $this->timeout,
             $this->headers,
             $attempt,
+            $this->requestId,
         );
     }
 
@@ -106,6 +117,7 @@ final readonly class ApiRequestDTO
             $timeout,
             $this->headers,
             $this->attempt,
+            $this->requestId,
         );
     }
 

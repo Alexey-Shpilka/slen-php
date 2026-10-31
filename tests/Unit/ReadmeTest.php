@@ -17,6 +17,15 @@ final class ReadmeTest extends TestCase
 
     private const string CONTRACT = Paths::CONTRACT . '/error-codes.json';
 
+    /** The names of the types of answers before they were named as in TypeScript. */
+    private const array RETIRED_TYPES = [
+        'HealthDTO', 'PageDTO', 'CustomerPageDTO', 'CreditEntryPageDTO', 'CustomerDTO', 'CustomerAccountDTO',
+        'CreditEntryDTO', 'CreditPriceDTO', 'ExecutionDTO', 'ExecutionCostDTO', 'ExecutionCacheDTO', 'WaitingOnDTO',
+        'ExecutionErrorDTO', 'ExecutionStatusDTO', 'ExecutionTraceDTO', 'TraceNodeDTO', 'TraceEventDTO',
+        'TraceAttemptDTO', 'WebhookEventDTO', 'ExecutionFinishedEventDTO', 'CustomerBalanceLowEventDTO',
+        'ApprovalRequestedEventDTO', 'ApprovalDecidedEventDTO', 'UnknownEventDTO', 'SpanDTO',
+    ];
+
     /**
      * The row a caller trusts with "nothing was spent" for the failed model call lists exactly the codes of the
      * type `Provider`, so a code that joins or leaves the type reaches it. The row beside it, for everything else
@@ -66,6 +75,43 @@ final class ReadmeTest extends TestCase
     }
 
     /**
+     * The README shows the types of answers as the code has them, and pages without `hasMore()`.
+     */
+    public function testTheReadmeNamesNoRetiredType(): void
+    {
+        $readme = (string) file_get_contents(self::README);
+
+        $retired = '/\b(?:' . implode('|', self::RETIRED_TYPES) . ')\b|->hasMore\(/';
+
+        self::assertDoesNotMatchRegularExpression($retired, $readme);
+        self::assertMatchesRegularExpression($retired, 'foreach ($page->data as $customer) {} $page->hasMore();');
+        self::assertMatchesRegularExpression($retired, '$run instanceof ExecutionDTO');
+        self::assertDoesNotMatchRegularExpression($retired, '$run instanceof ExecutionResult');
+    }
+
+    /**
+     * A reader learns from the README how to read every page and how to come back to one, and what the id of a
+     * request is on an answer and on a call.
+     */
+    public function testTheReadmeTellsHowToReadEveryPageAndWhatARequestIdIs(): void
+    {
+        $sections = preg_split('/^## /m', (string) file_get_contents(self::README));
+        $named = [];
+
+        foreach ($sections === false ? [] : $sections as $section) {
+            $named[strtok($section, "\n")] = $section;
+        }
+
+        foreach (['listAll()', 'entriesAll(', 'nextCursor', 'a `break` sends no more'] as $said) {
+            self::assertStringContainsString($said, $named['End customers'] ?? '');
+        }
+
+        foreach (['X-Request-Id', 'requestId: ', '->requestId', '8 to 128', 'give the id to `list()` or `entries()`'] as $said) {
+            self::assertStringContainsString($said, $named['Request ids'] ?? '');
+        }
+    }
+
+    /**
      * Keys are sl_live_...; one issued earlier as sg_live_... keeps working, and is not what a reader is shown.
      */
     public function testTheReadmeShowsAKeyOfToday(): void
@@ -88,7 +134,7 @@ final class ReadmeTest extends TestCase
 
         self::assertCount(1, $compatibility);
 
-        foreach (['8.3, 8.4, 8.5', 'Laravel | 11 and 12', 'PSR-18', 'bin/floor.php'] as $said) {
+        foreach (['8.3, 8.4, 8.5', 'Laravel | 11, 12 and 13', 'Symfony HttpClient 6.2 to 8', 'PSR-18', 'bin/floor.php'] as $said) {
             self::assertStringContainsString($said, $compatibility[0]);
         }
     }

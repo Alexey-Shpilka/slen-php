@@ -14,7 +14,7 @@ use Slen\Sdk\SlenSdk;
  * @method static \Slen\Sdk\Modules\Executions\ExecutionsFacade executions()
  * @method static \Slen\Sdk\Modules\Customers\CustomersFacade customers()
  * @method static \Slen\Sdk\Modules\Webhooks\WebhooksFacade webhooks()
- * @method static \Slen\Sdk\Data\HealthDTO health(?\Slen\Sdk\RequestOptions $options = null)
+ * @method static \Slen\Sdk\Data\Health health(?\Slen\Sdk\RequestOptions $options = null)
  * @method static \Slen\Sdk\SlenSdk withLogger(\Psr\Log\LoggerInterface $logger)
  *
  * @see SlenSdk

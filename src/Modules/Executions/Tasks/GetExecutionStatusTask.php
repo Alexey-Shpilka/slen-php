@@ -6,24 +6,23 @@ namespace Slen\Sdk\Modules\Executions\Tasks;
 
 use Slen\Sdk\Exceptions\InvalidRequestException;
 use Slen\Sdk\Exceptions\SlenException;
-use Slen\Sdk\Modules\Executions\Data\ExecutionStatusDTO;
+use Slen\Sdk\Modules\Executions\Data\ExecutionStatusView;
 use Slen\Sdk\Modules\Executions\Resources\ExecutionStatusResource;
 use Slen\Sdk\RequestOptions;
-use Slen\Sdk\Shared\Http\ApiTransport;
+use Slen\Sdk\Shared\Http\ApiCaller;
 use Slen\Sdk\Shared\Http\Data\ApiRequestDTO;
 use Slen\Sdk\Shared\Http\Enums\Endpoint;
-use Slen\Sdk\Shared\Tasks\AbstractTask;
 
 /** @internal */
-final readonly class GetExecutionStatusTask extends AbstractTask
+final readonly class GetExecutionStatusTask
 {
     private const float SHORTEST_READ_SECONDS = 5.0;
 
     public function __construct(
-        ApiTransport $apiTransport,
+        private ApiCaller $apiCaller,
         private ExecutionStatusResource $executionStatusResource,
+        private ?float $readTimeout,
     ) {
-        parent::__construct($apiTransport);
     }
 
     /** @throws InvalidRequestException */
@@ -34,24 +33,25 @@ final readonly class GetExecutionStatusTask extends AbstractTask
             ['id' => $executionId],
             retries: $options->retries,
             timeout: $options->timeout,
+            requestId: $options->requestId,
         );
     }
 
     /** @throws SlenException */
-    public function execute(ApiRequestDTO $request): ExecutionStatusDTO
+    public function execute(ApiRequestDTO $request): ExecutionStatusView
     {
-        return $this->executionStatusResource->map($this->send($request));
+        $apiResponse = $this->apiCaller->exchange($request);
+
+        return $this->executionStatusResource->map($apiResponse->data(), $apiResponse->requestId());
     }
 
     /** @throws SlenException */
-    public function read(ApiRequestDTO $request, float $secondsLeft): ExecutionStatusDTO
+    public function read(ApiRequestDTO $request, float $secondsLeft): ExecutionStatusView
     {
-        $readTimeout = $this->apiTransport->readTimeout;
-
-        if ($readTimeout === null) {
+        if ($this->readTimeout === null) {
             return $this->execute($request);
         }
 
-        return $this->execute($request->withTimeout(min($readTimeout, max(self::SHORTEST_READ_SECONDS, $secondsLeft))));
+        return $this->execute($request->withTimeout(min($this->readTimeout, max(self::SHORTEST_READ_SECONDS, $secondsLeft))));
     }
 }

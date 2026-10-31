@@ -6,23 +6,22 @@ namespace Slen\Sdk\Modules\Customers\Tasks;
 
 use Slen\Sdk\Exceptions\InvalidRequestException;
 use Slen\Sdk\Exceptions\SlenException;
+use Slen\Sdk\IdempotencyKeys;
 use Slen\Sdk\Modules\Customers\Data\CreditMovementDTO;
-use Slen\Sdk\Modules\Customers\Data\CustomerAccountDTO;
+use Slen\Sdk\Modules\Customers\Data\CustomerAccount;
 use Slen\Sdk\Modules\Customers\Resources\CustomerAccountResource;
-use Slen\Sdk\Shared\Http\ApiTransport;
+use Slen\Sdk\Shared\Http\ApiCaller;
 use Slen\Sdk\Shared\Http\Data\ApiRequestDTO;
-use Slen\Sdk\Shared\Tasks\AbstractTask;
 
 /** @internal */
-final readonly class MoveCreditsTask extends AbstractTask
+final readonly class MoveCreditsTask
 {
     private const string CREDITS = '/^-?\d+(\.\d{1,4})?$/';
 
     public function __construct(
-        ApiTransport $apiTransport,
+        private ApiCaller $apiCaller,
         private CustomerAccountResource $customerAccountResource,
     ) {
-        parent::__construct($apiTransport);
     }
 
     /**
@@ -30,7 +29,7 @@ final readonly class MoveCreditsTask extends AbstractTask
      *                                 an empty customer, credit type or key
      * @throws SlenException
      */
-    public function execute(CreditMovementDTO $creditMovementDTO): CustomerAccountDTO
+    public function execute(CreditMovementDTO $creditMovementDTO): CustomerAccount
     {
         $creditMovement = $creditMovementDTO->movement;
         $credits = $creditMovementDTO->credits;
@@ -66,12 +65,14 @@ final readonly class MoveCreditsTask extends AbstractTask
             $creditMovement->endpoint(),
             ['externalUserId' => $creditMovementDTO->externalUserId],
             body: $body,
-            idempotencyKey: $this->idempotencyKey($options->idempotencyKey),
+            idempotencyKey: $options->idempotencyKey ?? IdempotencyKeys::generate(),
             retries: $options->retries,
             timeout: $options->timeout,
+            requestId: $options->requestId,
         );
+        $apiResponse = $this->apiCaller->exchange($apiRequest);
 
-        return $this->customerAccountResource->map($this->send($apiRequest));
+        return $this->customerAccountResource->map($apiResponse->data(), $apiResponse->requestId());
     }
 
     private function refused(string $what): InvalidRequestException

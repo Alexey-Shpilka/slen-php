@@ -30,7 +30,7 @@ declare(strict_types=1);
 //     with one variable set at a time, and a key belongs to the variable that
 //     moves it;
 //   - the calls — the methods of the facades `SlenSdk` hands out, and its own
-//     methods that answer a DTO, classified as the contract test classifies
+//     methods that answer a type of `Data`, classified as the contract test classifies
 //     them; the HTTP operation of each — its line in `contract/calls.json`,
 //     which the contract test holds, or none;
 //   - runtime and dependencies — `composer.json`.
@@ -912,7 +912,7 @@ namespace Slen\SdkHelpSlice {
             ];
         }
 
-        /** `get(string $externalUserId): Slen\Sdk\Modules\Customers\Data\CustomerDTO` */
+        /** `get(string $externalUserId): Slen\Sdk\Modules\Customers\Data\Customer` */
         private static function signature(ReflectionMethod $method): string
         {
             $scope = $method->getDeclaringClass();
@@ -965,7 +965,7 @@ namespace Slen\SdkHelpSlice {
          * classification is the contract test's (`publicCalls()` in
          * `tests/Unit/ContractTest.php`): a public method of `SlenSdk` that
          * returns a facade hands out a module, and each public method of the
-         * facade is a call; a method of `SlenSdk` that answers a DTO is a call
+         * facade is a call; a method of `SlenSdk` that answers a type of `Data` is a call
          * itself; the rest (`config()`, and `withLogger()`, which answers a
          * client) are not calls.
          *
@@ -984,7 +984,7 @@ namespace Slen\SdkHelpSlice {
                     continue;
                 }
 
-                if (str_ends_with($returns->getName(), 'DTO') === true) {
+                if (str_contains($returns->getName(), '\\Data\\') === true) {
                     $calls[] = self::call($entry->getName(), $entry);
 
                     continue;

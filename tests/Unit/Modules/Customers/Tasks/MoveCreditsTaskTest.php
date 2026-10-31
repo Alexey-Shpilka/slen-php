@@ -13,6 +13,7 @@ use Slen\Sdk\Modules\Customers\Enums\CreditMovement;
 use Slen\Sdk\Modules\Customers\Options\MovementOptions;
 use Slen\Sdk\Modules\Customers\Resources\CustomerAccountResource;
 use Slen\Sdk\Modules\Customers\Tasks\MoveCreditsTask;
+use Slen\Sdk\Shared\Http\ApiCaller;
 use Slen\Sdk\Shared\Http\ApiTransport;
 use Slen\Sdk\Shared\Http\Data\ApiResponseDTO;
 use Slen\Sdk\Shared\Http\Enums\Endpoint;
@@ -97,6 +98,6 @@ final class MoveCreditsTaskTest extends TestCase
 
     private function task(ScriptedApiClient $scriptedApiClient): MoveCreditsTask
     {
-        return new MoveCreditsTask(new ApiTransport($scriptedApiClient, new ErrorMapper(), null), new CustomerAccountResource());
+        return new MoveCreditsTask(new ApiCaller(new ApiTransport($scriptedApiClient, new ErrorMapper(), null)), new CustomerAccountResource());
     }
 }

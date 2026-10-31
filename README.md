@@ -3,7 +3,7 @@
 `slen/sdk` runs your flows and reads how they ended, keeps your end customers and their credits, and checks the webhooks Slen sends you.
 
 - PHP ≥ 8.3. HTTP goes through PSR-18 / PSR-17 (`php-http/discovery`): Guzzle, Symfony HttpClient or any client you already have — the package requires none. The journal is PSR-3.
-- Laravel 11 and 12: an auto-discovered service provider, the `Slen` facade and `config/slen-sdk.php`.
+- Laravel 11, 12 and 13: an auto-discovered service provider, the `Slen` facade and `config/slen-sdk.php`.
 - Money and credits are decimal strings, never floats; ids are strings; times are `DateTimeImmutable`; statuses are enums.
 
 ## Install
@@ -19,8 +19,8 @@ Any PSR-18 client does. With Guzzle, or with Symfony HttpClient and `nyholm/psr7
 | | Versions | Held by |
 |---|---|---|
 | PHP | 8.3, 8.4, 8.5 | the suite on 8.4 and 8.5; the package run on 8.3 (`bin/floor.php`) |
-| Laravel | 11 and 12 | the provider's tests on `illuminate/*` 11–12; `conflict` refuses an older `illuminate/support` |
-| HTTP clients | any PSR-18 client with PSR-17 factories | Guzzle 7.9+ and 8 (the suite runs on both) and Symfony HttpClient 6.2+ take the timeout of a single call; any other client keeps its own timeouts |
+| Laravel | 11, 12 and 13 | the provider's tests on `illuminate/*` 13 and 11, the newest and the oldest; `conflict` refuses an older `illuminate/support` |
+| HTTP clients | any PSR-18 client with PSR-17 factories | Guzzle 7.9+ and 8 (the suite runs on both) and Symfony HttpClient 6.2 to 8 take the timeout of a single call; any other client keeps its own timeouts |
 
 ## The SDK
 
@@ -124,22 +124,35 @@ $account = $slen->customers()->charge('user_8421', '5.0000', new MovementOptions
 
 | Call | What it does |
 |---|---|
-| `list(CustomerListOptions(cursor:, limit:, search:, status:, creditType:, lowBalance:))` | customers with their accounts, a page at a time (`data`, `nextCursor`) |
+| `list(CustomerListOptions(cursor:, limit:, search:, status:, creditType:, lowBalance:))` | customers with their accounts, a `Page` at a time (`data`, `nextCursor`) |
 | `get($id)`, `create($id)` | one customer with every account; `create()` is idempotent and moves no credits |
 | `updateAccount($id, $creditType, AccountOptions(allowNegative:, lowBalanceThreshold:))` | the settings of one account; what is left out goes back to `false` and `'0'` |
 | `block($id, BlockOptions(reason:))`, `unblock($id)` | a blocked customer's new runs are refused (`CustomerBlockedException`); their balance can still be settled |
 | `delete($id)` | a customer with no history; one with history is refused (409) — block them instead |
 | `topUp($id, $credits, MovementOptions)`, `charge($id, $credits, MovementOptions)` | add credits; take them for a service of your own application. Above zero |
 | `adjust($id, $credits, MovementOptions)` | an operator's correction, with a sign; not zero |
-| `entries($id, EntryListOptions(cursor:, limit:, creditType:, entryType:))` | the statement of the customer's accounts |
-| `prices(PriceListOptions(operationCode:, creditType:))` | what an operation costs in credits |
+| `entries($id, EntryListOptions(cursor:, limit:, creditType:, entryType:))` | the statement of the customer's accounts, a `Page` at a time |
+| `listAll(CustomerListOptions)`, `entriesAll($id, EntryListOptions)` | every customer, every entry of the statement: a generator that reads the next page when the loop gets to it |
+| `prices(PriceListOptions(operationCode:, creditType:))` | what an operation costs in credits: a `CreditPriceList` (`data`) |
 
 Credits are a decimal string of at most four places (`'5'`, `'5.25'`, `'-3.0000'`); anything else is refused before the wire. `MovementOptions` carries `creditType` (default `'default'`), `note` and `idempotencyKey`; under the same key the server moves the credits once.
+
+**Every page.** `list()` and `entries()` read one page: its `data` and the `nextCursor` of the next, null on the last. `listAll()` and `entriesAll()` read them all, a request a page as the `foreach` gets there: nothing is sent before the loop starts, and a `break` sends no more. Their options are those of a page: `cursor` is where the read starts, `limit` the size of each page (1 to 100, 50), `timeout` and `retries` hold for every page. A list that ends exactly at the end of a full page takes one request more, answered with an empty page.
+
+```php
+use Slen\Sdk\Modules\Customers\Options\EntryListOptions;
+
+foreach ($slen->customers()->entriesAll('user_8421', new EntryListOptions(limit: 100)) as $entry) {
+    echo $entry->createdAt->format('Y-m-d'), ' ', $entry->entryType->value, ' ', $entry->credits, PHP_EOL;
+}
+```
+
+To come back later to where a read stopped, keep the `nextCursor` of a page and pass it as `cursor` to `list()` or `entries()`.
 
 ## Webhooks
 
 ```php
-use Slen\Sdk\Modules\Webhooks\Data\ExecutionFinishedEventDTO;
+use Slen\Sdk\Modules\Webhooks\Data\ExecutionFinishedEvent;
 use Slen\Sdk\Modules\Webhooks\Options\WebhooksOptions;
 use Slen\Sdk\Modules\Webhooks\WebhooksFacade;
 
@@ -147,14 +160,14 @@ $webhooks = WebhooksFacade::standalone(new WebhooksOptions(secret: (string) gete
 
 $event = $webhooks->constructEvent($request->getContent(), $request->headers->get('Slen-Signature'));
 
-if ($event instanceof ExecutionFinishedEventDTO) {
+if ($event instanceof ExecutionFinishedEvent) {
     echo $event->executionId, ' ', $event->status->value, PHP_EOL;
 }
 ```
 
 `constructEvent()` checks the `Slen-Signature` header against the raw body — exactly the bytes that arrived — and reads the event. A signature that does not hold is a `WebhookSignatureException` whose `reason` says which check refused it (`missing_header`, `malformed_header`, `outside_tolerance`, `no_matching_signature`): answer 400 and do nothing with the body. A signed body that is not an event is an `InvalidResponseException` (`webhook_payload_invalid`). `verify()` answers `true` or `false` and reads nothing.
 
-`execution.finished`, `customer.balance_low`, `approval.requested` and `approval.decided` are DTOs of their own; every other event is an `UnknownEventDTO` with its `data` as it was sent. A receiver needs the endpoint's signing secret, not an API key: `WebhooksOptions` of `WebhooksFacade::standalone()` carries it, and `$slen->webhooks()` uses the `webhookSecret` of the config. A signature further from now than `webhookToleranceSeconds` (300) is refused. `VerifyOptions` of one call — `secret`, `toleranceSeconds`, `now` — win over both.
+`execution.finished`, `customer.balance_low`, `approval.requested` and `approval.decided` are classes of their own; every other event is an `UnknownWebhookEvent` with its `data` as it was sent. A receiver needs the endpoint's signing secret, not an API key: `WebhooksOptions` of `WebhooksFacade::standalone()` carries it, and `$slen->webhooks()` uses the `webhookSecret` of the config. A signature further from now than `webhookToleranceSeconds` (300) is refused. `VerifyOptions` of one call — `secret`, `toleranceSeconds`, `now` — win over both.
 
 ## The journal
 
@@ -182,7 +195,7 @@ A request is written by its route — `POST /v1/customers/{externalUserId}/charg
 
 ## Spans
 
-A run leaves one span: `operations.execute`, `operations.execute_async`, or `executions.wait` for a wait. `SpanDTO` has ten fields — the call, `outcome` (`ok`, `refused`, `error`), the run's `status`, `durationMs`, `executionId`, `operationCode`, `estimated`, `actual`, `errorCode`, `cacheHit` — ids, money and a verdict, never a prompt or an answer. Credit movements and webhooks leave none.
+A run leaves one span: `operations.execute`, `operations.execute_async`, or `executions.wait` for a wait. `SlenSpan` has ten fields — the call, `outcome` (`ok`, `refused`, `error`), the run's `status`, `durationMs`, `executionId`, `operationCode`, `estimated`, `actual`, `errorCode`, `cacheHit` — ids, money and a verdict, never a prompt or an answer. Credit movements and webhooks leave none.
 
 ```php
 use Slen\Sdk\Observability\Psr3SpanRecorder;
@@ -299,6 +312,20 @@ They live in `Slen\Sdk\Exceptions`. The same code is the same type in the TypeSc
 A credit movement (`topUp`, `charge`, `adjust`) moves credits once per key: after a `TimeoutException` or a `ConnectionException`, send it again under the same key.
 
 A success the SDK cannot read — a 2xx whose body is not the API's envelope, such as the page of a proxy — is an `InvalidResponseException` with the status it came with. The call may have gone through; it is not repeated, and the body is never quoted.
+
+## Request ids
+
+Every answer of the API names its request in `X-Request-Id`, and so does what the SDK hands back: the result of a call that reads an answer carries it as `requestId` — `Health`, `ExecutionResult`, `ExecutionStatusView`, `ExecutionTrace`, `Customer`, `CustomerAccount`, `Page`, `CreditPriceList`. A row of a page and an account inside a customer carry none: the id is the one of the page, or of the customer. `executions()->wait()` answers with the id of its last read; an exception carries its own `requestId`, from the header or else from `error.request_id`; one of a call that got no answer at all carries the id the call gave, if it gave one.
+
+```php
+use Slen\Sdk\RequestOptions;
+
+$customer = $slen->customers()->get('user_8421', new RequestOptions(requestId: 'order-42:customer'));
+
+$logger->info('customer read', ['request_id' => $customer->requestId]);
+```
+
+A call may name its request itself: `requestId` of its options — 8 to 128 characters of `A-Z a-z 0-9 . _ : -`, anything else is refused before the wire — goes as `X-Request-Id` on every attempt, and the API answers under it, so your own trace and Slen's meet. `listAll()` and `entriesAll()` make a request a page and take none: give the id to `list()` or `entries()`.
 
 ## Testing your own code
 

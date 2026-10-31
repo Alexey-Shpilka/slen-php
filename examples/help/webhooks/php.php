@@ -13,8 +13,8 @@ $signature = 't=' . $timestamp . ',v1=' . hash_hmac('sha256', $timestamp . '.' .
 // docs:end
 
 // docs:start receive
-use Slen\Sdk\Modules\Webhooks\Data\CustomerBalanceLowEventDTO;
-use Slen\Sdk\Modules\Webhooks\Data\ExecutionFinishedEventDTO;
+use Slen\Sdk\Modules\Webhooks\Data\CustomerBalanceLowEvent;
+use Slen\Sdk\Modules\Webhooks\Data\ExecutionFinishedEvent;
 use Slen\Sdk\Modules\Webhooks\Options\WebhooksOptions;
 use Slen\Sdk\Modules\Webhooks\WebhooksFacade;
 
@@ -23,11 +23,11 @@ $webhooks = WebhooksFacade::standalone(new WebhooksOptions(secret: $secret));
 
 $event = $webhooks->constructEvent($payload, $signature);
 
-if ($event instanceof ExecutionFinishedEventDTO) {
+if ($event instanceof ExecutionFinishedEvent) {
     echo $event->type, ': ', $event->executionId, ' ', $event->status->value, PHP_EOL;
 }
 
-if ($event instanceof CustomerBalanceLowEventDTO) {
+if ($event instanceof CustomerBalanceLowEvent) {
     echo $event->type, ': ', $event->externalUserId, PHP_EOL;
 }
 // docs:end

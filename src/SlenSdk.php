@@ -6,7 +6,7 @@ namespace Slen\Sdk;
 
 use LogicException;
 use Psr\Log\LoggerInterface;
-use Slen\Sdk\Data\HealthDTO;
+use Slen\Sdk\Data\Health;
 use Slen\Sdk\Exceptions\InvalidRequestException;
 use Slen\Sdk\Exceptions\SlenException;
 use Slen\Sdk\Modules\Customers\CustomersFacade;
@@ -15,6 +15,8 @@ use Slen\Sdk\Modules\Operations\OperationsFacade;
 use Slen\Sdk\Modules\Webhooks\WebhooksFacade;
 use Slen\Sdk\Shared\Data\SdkModulesDTO;
 use Slen\Sdk\Shared\Http\Client\HttpClientFactory;
+use Slen\Sdk\Shared\Http\Data\ApiRequestDTO;
+use Slen\Sdk\Shared\Http\Enums\Endpoint;
 use Slen\Sdk\Shared\Logging\Journal;
 use Slen\Sdk\Shared\SdkFactory;
 use Slen\Sdk\Shared\Timing\SystemTiming;
@@ -62,7 +64,7 @@ final readonly class SlenSdk
         return $this->sdkModulesDTO->executions;
     }
 
-    /** End customers: list(), get(), create(), updateAccount(), block(), unblock(), delete(), topUp(), charge(), adjust(), entries(), prices(). */
+    /** End customers and their credits: get(), create(), block(), topUp(), charge(), adjust(), list(), listAll(), entries(), entriesAll(), prices()… */
     public function customers(): CustomersFacade
     {
         return $this->sdkModulesDTO->customers;
@@ -80,8 +82,18 @@ final readonly class SlenSdk
      * @throws InvalidRequestException a timeout or retries out of range; nothing sent
      * @throws SlenException
      */
-    public function health(?RequestOptions $options = null): HealthDTO
+    public function health(?RequestOptions $options = null): Health
     {
-        return $this->sdkModulesDTO->health->execute($options ?? new RequestOptions());
+        $options ??= new RequestOptions();
+        $apiRequest = new ApiRequestDTO(
+            Endpoint::Health,
+            envelope: false,
+            retries: $options->retries,
+            timeout: $options->timeout,
+            requestId: $options->requestId,
+        );
+        $apiResponse = $this->sdkModulesDTO->api->exchange($apiRequest);
+
+        return $this->sdkModulesDTO->health->map($apiResponse->body, $apiResponse->requestId());
     }
 }

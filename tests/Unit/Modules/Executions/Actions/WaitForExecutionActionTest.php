@@ -24,7 +24,7 @@ use Slen\Sdk\Modules\Executions\ExecutionsFacade;
 use Slen\Sdk\Modules\Executions\Factories\ExecutionsModuleFactory;
 use Slen\Sdk\Modules\Executions\Options\WaitOptions;
 use Slen\Sdk\Modules\Operations\Enums\ExecutionStatus;
-use Slen\Sdk\Observability\SpanDTO;
+use Slen\Sdk\Observability\SlenSpan;
 use Slen\Sdk\Shared\Http\Client\HttpClientFactory;
 use Slen\Sdk\Shared\Logging\Journal;
 use Slen\Sdk\Shared\Observability\Telemetry;
@@ -64,9 +64,9 @@ final class WaitForExecutionActionTest extends TestCase
             ->pushJson(202, ['data' => Answers::pending('waiting', 5)])
             ->pushJson(200, ['data' => Answers::status()]);
 
-        $executionStatusDTO = $this->action($fakeHttpClient)->wait(self::ID, new WaitOptions(300));
+        $executionStatusView = $this->action($fakeHttpClient)->wait(self::ID, new WaitOptions(300));
 
-        self::assertTrue($executionStatusDTO->isCompleted());
+        self::assertTrue($executionStatusView->isCompleted());
         self::assertSame([2.0, 5.0], $this->fakeTiming->slept);
         self::assertCount(3, $fakeHttpClient->requests());
     }
@@ -109,13 +109,13 @@ final class WaitForExecutionActionTest extends TestCase
             $fakeHttpClient->pushJson(202, ['data' => Answers::pending('queued', 2)]);
         }
 
-        $executionStatusDTO = $this->action($fakeHttpClient)->wait(self::ID, new WaitOptions(5));
+        $executionStatusView = $this->action($fakeHttpClient)->wait(self::ID, new WaitOptions(5));
 
-        self::assertSame(ExecutionStatus::Queued, $executionStatusDTO->status);
+        self::assertSame(ExecutionStatus::Queued, $executionStatusView->status);
         self::assertSame([2.0, 2.0, 1.0], $this->fakeTiming->slept, 'the last pause is cut to the deadline, and the run is read once more at it');
         self::assertCount(4, $fakeHttpClient->requests());
         self::assertEquals(
-            new SpanDTO('executions.wait', 'ok', 'queued', $this->recordingSpanRecorder->last()->durationMs, self::ID, 'support.reply'),
+            new SlenSpan('executions.wait', 'ok', 'queued', $this->recordingSpanRecorder->last()->durationMs, self::ID, 'support.reply'),
             $this->recordingSpanRecorder->last(),
         );
     }
@@ -126,9 +126,9 @@ final class WaitForExecutionActionTest extends TestCase
             ->pushJson(202, ['data' => Answers::pending('waiting', 30)])
             ->pushJson(200, ['data' => Answers::status(['cache' => ['hit' => true, 'cached_at' => '2026-10-17T11:00:00+00:00']])]);
 
-        $executionStatusDTO = $this->action($fakeHttpClient)->wait(self::ID, new WaitOptions(0));
+        $executionStatusView = $this->action($fakeHttpClient)->wait(self::ID, new WaitOptions(0));
 
-        self::assertTrue($executionStatusDTO->isCompleted());
+        self::assertTrue($executionStatusView->isCompleted());
         self::assertSame([1.0], $this->fakeTiming->slept, 'a timeout below one second is one second');
         self::assertTrue($this->recordingSpanRecorder->last()->cacheHit);
     }
@@ -147,9 +147,9 @@ final class WaitForExecutionActionTest extends TestCase
             $heard[] = [$slenException::class, $inARow];
         };
 
-        $executionStatusDTO = $this->action($fakeHttpClient)->wait(self::ID, new WaitOptions(300, $listener));
+        $executionStatusView = $this->action($fakeHttpClient)->wait(self::ID, new WaitOptions(300, $listener));
 
-        self::assertTrue($executionStatusDTO->isCompleted());
+        self::assertTrue($executionStatusView->isCompleted());
         self::assertSame([[ConnectionException::class, 1], [ServiceUnavailableException::class, 2], [RateLimitException::class, 3]], $heard);
         self::assertSame([2.0, 1.0, 7.0, 4.0], $this->fakeTiming->slept, 'a failure is paused after by its Retry-After, else by the backoff');
         self::assertCount(5, $fakeHttpClient->requests(), 'each read is sent once: the wait is the loop that repeats it');
@@ -182,7 +182,7 @@ final class WaitForExecutionActionTest extends TestCase
 
         self::assertSame(0, $heard);
         self::assertEquals(
-            new SpanDTO('executions.wait', 'error', null, $this->recordingSpanRecorder->last()->durationMs, self::ID, errorCode: 'invalid_api_key'),
+            new SlenSpan('executions.wait', 'error', null, $this->recordingSpanRecorder->last()->durationMs, self::ID, errorCode: 'invalid_api_key'),
             $this->recordingSpanRecorder->last(),
         );
     }
@@ -214,9 +214,9 @@ final class WaitForExecutionActionTest extends TestCase
             ->pushJson(500, [])
             ->pushException(new NetworkFailure());
 
-        $executionStatusDTO = $this->action($fakeHttpClient)->wait(self::ID, new WaitOptions(3));
+        $executionStatusView = $this->action($fakeHttpClient)->wait(self::ID, new WaitOptions(3));
 
-        self::assertSame(ExecutionStatus::Waiting, $executionStatusDTO->status);
+        self::assertSame(ExecutionStatus::Waiting, $executionStatusView->status);
         self::assertSame([1.0, 1.0, 1.0], $this->fakeTiming->slept);
     }
 

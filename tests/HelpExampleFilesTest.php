@@ -71,6 +71,8 @@ class HelpExampleFilesTest extends TestCase
         '~setLogger\(~' => 'a logger of its own is a copy of the client: `withLogger()`',
         '~Slen\\\\Sdk\\\\Shared\\\\~' => 'the public PHP classes are not under `Shared`: `Slen\Sdk\SlenSdk`, `Slen\Sdk\Exceptions\…`',
         '~\b(?:CustomerListFilters|AccountSettings|EntryFilters|PriceFilters)\b~' => 'the options are named as the PHP classes: `CustomerListOptions`, `AccountOptions`, `EntryListOptions`, `PriceListOptions`',
+        '~\b(?:HealthDTO|PageDTO|CustomerPageDTO|CreditEntryPageDTO|CustomerDTO|CustomerAccountDTO|CreditEntryDTO|CreditPriceDTO|ExecutionDTO|ExecutionCostDTO|ExecutionCacheDTO|WaitingOnDTO|ExecutionErrorDTO|ExecutionStatusDTO|ExecutionTraceDTO|TraceNodeDTO|TraceEventDTO|TraceAttemptDTO|WebhookEventDTO|ExecutionFinishedEventDTO|CustomerBalanceLowEventDTO|ApprovalRequestedEventDTO|ApprovalDecidedEventDTO|UnknownEventDTO|SpanDTO)\b~' => 'a type of an answer is named as in TypeScript, without `DTO`: `Customer`, `ExecutionResult`, `Page`',
+        '~->hasMore\(~' => 'a page has no `hasMore()`: the last page is the one whose `nextCursor` is null',
     ];
 
     // What no file of an example names, in a region or out of one: the address of the API is the SDK's
@@ -179,6 +181,9 @@ class HelpExampleFilesTest extends TestCase
             '$slen->setLogger($logger);',
             'use Slen\\Sdk\\Shared\\SlenSdk;',
             '$filters = new CustomerListFilters(limit: 10);',
+            'use Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionDTO;',
+            'function shown(UnknownEventDTO $event): void {}',
+            'while ($page->hasMore()) {',
         ];
 
         foreach ($old as $line) {
@@ -188,6 +193,8 @@ class HelpExampleFilesTest extends TestCase
         self::assertSame([], self::matching(self::RETIRED, '$slen = SlenSdk::create(new SlenConfig(apiKey: $key));'));
         self::assertSame([], self::matching(self::RETIRED, '$sdkOfThisRequest = $slen->withLogger($requestLogger);'));
         self::assertSame([], self::matching(self::RETIRED, 'use Slen\\Sdk\\Modules\\Customers\\Options\\MovementOptions;'));
+        self::assertSame([], self::matching(self::RETIRED, 'use Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionResult;'));
+        self::assertSame([], self::matching(self::RETIRED, 'function shown(UnknownWebhookEvent $event): void {}'));
     }
 
     public function testWhatNoFileOfAnExampleNamesIsKnown(): void

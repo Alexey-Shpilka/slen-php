@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Slen\Sdk\Modules\Executions\Resources;
 
 use Slen\Sdk\Exceptions\InvalidResponseException;
-use Slen\Sdk\Modules\Executions\Data\ExecutionTraceDTO;
-use Slen\Sdk\Modules\Executions\Data\TraceAttemptDTO;
-use Slen\Sdk\Modules\Executions\Data\TraceEventDTO;
-use Slen\Sdk\Modules\Executions\Data\TraceNodeDTO;
+use Slen\Sdk\Modules\Executions\Data\AttemptSummary;
+use Slen\Sdk\Modules\Executions\Data\ExecutionTrace;
+use Slen\Sdk\Modules\Executions\Data\FlowExecutionEvent;
+use Slen\Sdk\Modules\Executions\Data\FlowExecutionNode;
 use Slen\Sdk\Modules\Operations\Resources\ExecutionResource;
 use Slen\Sdk\Shared\Resources\BaseResource;
 
@@ -24,9 +24,9 @@ final readonly class ExecutionTraceResource extends BaseResource
      *
      * @throws InvalidResponseException
      */
-    public function map(array $data): ExecutionTraceDTO
+    public function map(array $data, ?string $requestId = null): ExecutionTrace
     {
-        return new ExecutionTraceDTO(
+        return new ExecutionTrace(
             executionId: $this->string($data, 'execution_id'),
             flowId: $this->string($data, 'flow_id'),
             flowVersionId: $this->string($data, 'flow_version_id'),
@@ -43,13 +43,14 @@ final readonly class ExecutionTraceResource extends BaseResource
             durationMs: $this->nullableInt($data, 'duration_ms'),
             nodes: array_map($this->node(...), $this->objects($data, 'nodes')),
             events: array_map($this->event(...), $this->objects($data, 'events')),
+            requestId: $requestId,
         );
     }
 
     /** @param array<mixed> $node */
-    private function node(array $node): TraceNodeDTO
+    private function node(array $node): FlowExecutionNode
     {
-        return new TraceNodeDTO(
+        return new FlowExecutionNode(
             nodeKey: $this->string($node, 'node_key'),
             nodeType: $this->string($node, 'node_type'),
             status: $this->string($node, 'status'),
@@ -67,9 +68,9 @@ final readonly class ExecutionTraceResource extends BaseResource
     }
 
     /** @param array<mixed> $attempt */
-    private function attempt(array $attempt): TraceAttemptDTO
+    private function attempt(array $attempt): AttemptSummary
     {
-        return new TraceAttemptDTO(
+        return new AttemptSummary(
             attemptId: $this->string($attempt, 'attempt_id'),
             attemptNumber: $this->int($attempt, 'attempt_number'),
             connectionId: $this->string($attempt, 'connection_id'),
@@ -84,9 +85,9 @@ final readonly class ExecutionTraceResource extends BaseResource
     }
 
     /** @param array<mixed> $event */
-    private function event(array $event): TraceEventDTO
+    private function event(array $event): FlowExecutionEvent
     {
-        return new TraceEventDTO(
+        return new FlowExecutionEvent(
             seq: $this->int($event, 'seq'),
             type: $this->string($event, 'type'),
             nodeKey: $this->nullableString($event, 'node_key'),

@@ -12,6 +12,7 @@ use Slen\Sdk\Modules\Operations\Data\ExecuteRequestDTO;
 use Slen\Sdk\Modules\Operations\Options\ExecuteOptions;
 use Slen\Sdk\Modules\Operations\Resources\ExecutionResource;
 use Slen\Sdk\Modules\Operations\Tasks\ExecuteOperationTask;
+use Slen\Sdk\Shared\Http\ApiCaller;
 use Slen\Sdk\Shared\Http\ApiTransport;
 use Slen\Sdk\Shared\Http\Mappers\ErrorMapper;
 use Slen\Sdk\Tests\Unit\Support\ScriptedApiClient;
@@ -74,6 +75,6 @@ final class ExecuteOperationTaskTest extends TestCase
 
     private function task(): ExecuteOperationTask
     {
-        return new ExecuteOperationTask(new ApiTransport(new ScriptedApiClient(), new ErrorMapper(), null), new ExecutionResource());
+        return new ExecuteOperationTask(new ApiCaller(new ApiTransport(new ScriptedApiClient(), new ErrorMapper(), null)), new ExecutionResource());
     }
 }

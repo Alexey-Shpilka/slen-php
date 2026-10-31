@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Slen\Sdk\Modules\Customers\Resources;
 
+use Slen\Sdk\Data\Page;
 use Slen\Sdk\Exceptions\InvalidResponseException;
-use Slen\Sdk\Modules\Customers\Data\CustomerDTO;
-use Slen\Sdk\Modules\Customers\Data\CustomerPageDTO;
+use Slen\Sdk\Modules\Customers\Data\Customer;
 use Slen\Sdk\Modules\Customers\Enums\CustomerStatus;
 use Slen\Sdk\Shared\Resources\BaseResource;
 
@@ -22,9 +22,9 @@ final readonly class CustomerResource extends BaseResource
      *
      * @throws InvalidResponseException
      */
-    public function map(array $data): CustomerDTO
+    public function map(array $data, ?string $requestId = null): Customer
     {
-        return new CustomerDTO(
+        return new Customer(
             customerId: $this->string($data, 'customer_id'),
             externalUserId: $this->string($data, 'external_user_id'),
             status: $this->enum($data, 'status', CustomerStatus::class),
@@ -33,19 +33,23 @@ final readonly class CustomerResource extends BaseResource
             accounts: array_map($this->customerAccountResource->map(...), $this->objects($data, 'accounts')),
             createdAt: $this->dateTime($data, 'created_at'),
             updatedAt: $this->dateTime($data, 'updated_at'),
+            requestId: $requestId,
         );
     }
 
     /**
      * @param array<mixed> $body
      *
+     * @return Page<Customer>
+     *
      * @throws InvalidResponseException
      */
-    public function page(array $body): CustomerPageDTO
+    public function page(array $body, ?string $requestId = null): Page
     {
-        return new CustomerPageDTO(
+        return new Page(
             array_map($this->map(...), $this->objects($body, 'data')),
             $this->nullableString($this->array($body, 'meta'), 'next_cursor'),
+            $requestId,
         );
     }
 }

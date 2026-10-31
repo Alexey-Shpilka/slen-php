@@ -17,7 +17,7 @@ use Slen\Sdk\Exceptions\PolicyDeniedException;
 use Slen\Sdk\Exceptions\ProviderException;
 use Slen\Sdk\Exceptions\RateLimitException;
 use Slen\Sdk\Exceptions\SpendRefusedException;
-use Slen\Sdk\Observability\SpanDTO;
+use Slen\Sdk\Observability\SlenSpan;
 use Slen\Sdk\Observability\SpanRecorderInterface;
 use Slen\Sdk\Shared\Observability\Data\SpanResultDTO;
 use Slen\Sdk\Shared\Observability\Data\SpanSubjectDTO;
@@ -60,7 +60,7 @@ final class SpanScopeTest extends TestCase
         (new SpanScope($recorder, new SpanSubjectDTO('operations.execute', operationCode: 'support.reply')))
             ->answered(new SpanResultDTO('rejected', '74438200973594700', 'support.reply', '0.00412500', '0.00100000', 'budget_exceeded', false));
 
-        self::assertEquals(new SpanDTO(
+        self::assertEquals(new SlenSpan(
             operation: 'operations.execute',
             outcome: 'refused',
             status: 'rejected',
@@ -96,7 +96,7 @@ final class SpanScopeTest extends TestCase
 
         (new SpanScope($recorder, new SpanSubjectDTO('executions.wait', operationCode: 'support.reply', executionId: '7')))->failed($throwable);
 
-        self::assertEquals(new SpanDTO(
+        self::assertEquals(new SlenSpan(
             operation: 'executions.wait',
             outcome: $outcome,
             status: null,
@@ -128,7 +128,7 @@ final class SpanScopeTest extends TestCase
         $recorder = new class implements SpanRecorderInterface {
             public int $calls = 0;
 
-            public function record(SpanDTO $span): void
+            public function record(SlenSpan $span): void
             {
                 ++$this->calls;
 

@@ -595,7 +595,7 @@ class HelpSliceTest extends TestCase
      * The same classification as `ContractTest::publicCalls()`, written out
      * again on purpose: a public method of `SlenSdk` that returns a facade
      * hands out a module whose public methods are the calls, and one that
-     * answers a DTO is a call itself.
+     * answers a type of `Data` is a call itself.
      */
     public function testTheCallsAreThePublicCallsOfTheSdk(): void
     {
@@ -610,7 +610,7 @@ class HelpSliceTest extends TestCase
                 continue;
             }
 
-            if (str_ends_with($returns->getName(), 'DTO') === true) {
+            if (str_contains($returns->getName(), '\\Data\\') === true) {
                 $expected[$entry->getName()] = $entry;
 
                 continue;

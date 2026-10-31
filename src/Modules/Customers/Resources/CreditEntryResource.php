@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Slen\Sdk\Modules\Customers\Resources;
 
+use Slen\Sdk\Data\Page;
 use Slen\Sdk\Exceptions\InvalidResponseException;
-use Slen\Sdk\Modules\Customers\Data\CreditEntryDTO;
-use Slen\Sdk\Modules\Customers\Data\CreditEntryPageDTO;
+use Slen\Sdk\Modules\Customers\Data\CreditEntry;
 use Slen\Sdk\Modules\Customers\Enums\CreditEntryType;
 use Slen\Sdk\Shared\Resources\BaseResource;
 
@@ -18,9 +18,9 @@ final readonly class CreditEntryResource extends BaseResource
      *
      * @throws InvalidResponseException
      */
-    public function map(array $data): CreditEntryDTO
+    public function map(array $data): CreditEntry
     {
-        return new CreditEntryDTO(
+        return new CreditEntry(
             entryId: $this->string($data, 'entry_id'),
             customerAccountId: $this->string($data, 'customer_account_id'),
             externalUserId: $this->string($data, 'external_user_id'),
@@ -38,13 +38,16 @@ final readonly class CreditEntryResource extends BaseResource
     /**
      * @param array<mixed> $body
      *
+     * @return Page<CreditEntry>
+     *
      * @throws InvalidResponseException
      */
-    public function page(array $body): CreditEntryPageDTO
+    public function page(array $body, ?string $requestId = null): Page
     {
-        return new CreditEntryPageDTO(
+        return new Page(
             array_map($this->map(...), $this->objects($body, 'data')),
             $this->nullableString($this->array($body, 'meta'), 'next_cursor'),
+            $requestId,
         );
     }
 }

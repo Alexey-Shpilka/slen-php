@@ -6,13 +6,17 @@ namespace Slen\Sdk\Modules\Customers\Tasks;
 
 use Slen\Sdk\Exceptions\SlenException;
 use Slen\Sdk\RequestOptions;
+use Slen\Sdk\Shared\Http\ApiTransport;
 use Slen\Sdk\Shared\Http\Data\ApiRequestDTO;
 use Slen\Sdk\Shared\Http\Enums\Endpoint;
-use Slen\Sdk\Shared\Tasks\AbstractTask;
 
 /** @internal */
-final readonly class DeleteCustomerTask extends AbstractTask
+final readonly class DeleteCustomerTask
 {
+    public function __construct(private ApiTransport $apiTransport)
+    {
+    }
+
     /** @throws SlenException */
     public function execute(string $externalUserId, RequestOptions $options): void
     {
@@ -22,6 +26,7 @@ final readonly class DeleteCustomerTask extends AbstractTask
             envelope: false,
             retries: $options->retries,
             timeout: $options->timeout,
+            requestId: $options->requestId,
         );
         $apiResponse = $this->apiTransport->client->send($apiRequest);
 
