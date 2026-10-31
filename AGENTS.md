@@ -3,7 +3,7 @@
 ## Purpose
 `slen/sdk` — the PHP/Laravel SDK: runs flows and reads their outcome, keeps end customers and their credits, checks webhooks. An entry point over a config, PSR-18/17 through discovery, PSR-3 for the journal, a facade per module, typed answers, an error mapper, a chain of HTTP decorators.
 
-This repository is the package itself. `contract/` and the JSON of `examples/help/` are copies of the contract both SDKs share; the contract is kept, and both SDKs are held against the API's OpenAPI spec, in the SDK's source repository.
+This repository is the package itself. `contract/` and the JSON of `examples/help/` are copies of the contract the SDKs share (PHP, TypeScript, Python); the contract is kept, and the SDKs are held against the API's OpenAPI spec, in the SDK's source repository.
 
 ## Key Files
 | File | Description |
@@ -56,7 +56,7 @@ This repository is the package itself. `contract/` and the JSON of `examples/hel
 - **Retry** (`RetryPolicy`): no answer, 429 and any 503, with the same key on every attempt. 500, 502, 504 are never repeated — a provider may have been paid. A call's `retries` (`ApiRequestDTO::$retries`) replaces the config's; `0` is one attempt.
 - **The pause**: `Retry-After` (seconds or an HTTP date) up to 30 s is waited out; past 30 s the answer goes back at once as its error; without it 200 ms × 2ⁿ ±25 %, at most 5 s after the jitter.
 - **`ApiResponseDTO::$afterNoAnswer`** says an earlier attempt got no answer: `customers()->delete()` takes a `404 customer_not_found` after it as success.
-- **Errors**: `ErrorMapper::BY_CODE` is `contract/error-codes.json`; `ErrorMapperTest` holds it both ways — every contract type to its class and parent, every class of `Exceptions/` to a contract type. A change starts in the contract both SDKs share; the copy here comes with this table in one commit.
+- **Errors**: `ErrorMapper::BY_CODE` is `contract/error-codes.json`; `ErrorMapperTest` holds it both ways — every contract type to its class and parent, every class of `Exceptions/` to a contract type. A change starts in the contract the SDKs share; the copy here comes with this table in one commit.
 - **A code outside the table falls back by status**; a 5xx without a code is `ProviderException` with a null code — the fallback never invents one, the README sends the caller to the code.
 - **An exception carries** `errorCode`, `statusCode`, `details` (`error.details`, or `errors` of framework validation), `requestId` (`X-Request-Id`, else `error.request_id`), `retryAfterSeconds`; `type()` is the contract's name.
 - **The request id of an answer**: the eight types of a top-level result (`Health`, `Page`, `CreditPriceList`, `Customer`, `CustomerAccount`, `ExecutionResult`, `ExecutionStatusView`, `ExecutionTrace`) end with `public ?string $requestId = null`, read the same way (`ApiResponseDTO::requestId()`); a resource takes it as the second argument of `map()`/`page()`/`list()`, the rows of a page and a nested account get `null`. `wait()` answers with the id of its last read; a webhook event has none.
@@ -69,7 +69,7 @@ This repository is the package itself. `contract/` and the JSON of `examples/hel
 - **The journal** is `SlenConfig::$logger` (silent unless given); `Journal` is `final readonly`, the one holder every link of one SDK shares. Names are `LogMessages`, the same names and fields as TypeScript's `LOG_EVENTS`; levels are PSR-3 (`warning` where TypeScript writes `warn`).
 - **Written by the retry**: `slen.request` (debug, every attempt), `slen.retry` (warning: the attempt that failed, `delay_ms`, `reason` `no_answer` / `rate_limited` / `unavailable`, `status`), `slen.failed` of a call that got no answer at all (`attempts`).
 - **Written by the logging decorator**: `slen.response` (debug: `status`, `duration_ms`, `request_id`), `slen.refused` (info, a 4xx), `slen.unauthorized` (error: 401; 403 under `insufficient_scope`, `invalid_api_key`, `not_a_member` or no code), `slen.failed` (error: 5xx, unreadable 2xx; `error_type`, `attempts`).
-- **`error_type` is the contract's name of the type** (`Provider`, `InvalidResponse`): one word for both languages.
+- **`error_type` is the contract's name of the type** (`Provider`, `InvalidResponse`): one word for every language.
 - **Never written**: the key and `Authorization`, the webhook secret, the idempotency key, bodies, the server's `error.message`, path and query values. `SlenSdkJournalTest` plants values in each and searches every record. A logger that throws is swallowed.
 - **A span is ten fields** (`SlenSpan`), attributes in snake_case, a null left out, `false` kept; none can hold a prompt or an answer. `SlenSpanTest` holds the class to `contract/span-attributes.json` and the names the calls write.
 - **`SpanScope` writes once per call**: an answered run is `refused` when `rejected`, `error` when `failed` or `uncertain`, else `ok`; a thrown 402 or policy refusal is `refused`, anything else `error`. What a recorder throws is swallowed: telemetry never fails a run.
@@ -122,7 +122,7 @@ A release is an annotated tag `vX.Y.Z` on `master`: Packagist lists `slen/sdk` f
 4. A pushed tag is never moved or deleted: Packagist and every `composer.lock` that took it hold its commit, so a fix is a new version.
 
 ## Help examples
-`examples/help/<id>/` is code the console's Help & Docs prints: an article shows a region of `php.php`, never code of its own. `example.json` (`languages`, `regions`, `responses` — the answers in order) and `expect.json` (`calls` — every request, compared whole; `prints` — every line written) are the same files in both SDKs.
+`examples/help/<id>/` is code the console's Help & Docs prints: an article shows a region of `php.php`, never code of its own. `example.json` (`languages`, `regions`, `responses` — the answers in order) and `expect.json` (`calls` — every request, compared whole; `prints` — every line written) are the same files in every SDK whose language the example names.
 - **`php.php` is included as it is**, in a scope of its own; it builds its SDK for real and hands it over on a line outside every region: `$slen = $offline($slen);`. `$offline` answers the same SDK on a `FakeHttpClient` fed from `responses`.
 - **Regions**: the lines between `// docs:start <name>` and `// docs:end`, each marker on a line of its own, name `[a-z][a-z0-9-]*`, no nesting, a name once per file, never empty; exactly the regions `example.json` lists, in that order. What a reader does not see (`$offline`, `$recorded`) stays outside with a `// Harness:` comment, and a region reads only names a region of the same file brings in.
 - **What an example shows**: the SDK as the code has it and without an address (`NAMED_NOWHERE`: no `baseUrl`, `base_url`, "base URL", not even to say it is left out); keys as `sl_live_…`; an idempotency key derived from the unit of work; options in their objects; no `else` (`match (true)` or independent `if`s); nothing the SDK no longer has (`RETIRED`) or never documented (`NOT_SHOWN`). PHP for the floor, 8.3: no `new Foo()->bar()`; no functions or classes at the top level.
