@@ -15,8 +15,9 @@ use RuntimeException;
  * carries the regions the example lists, and has no region that shows what an
  * article must not teach or leans on a line the reader is not shown.
  *
- * The TypeScript suite makes the same checks for its `node.ts` and holds the
- * JSON of every example; the checks across languages (the same regions in
+ * The TypeScript and Python suites make the same checks for their `node.ts` and
+ * `python.py`, and the TypeScript one holds the JSON of every example against
+ * the API's spec; the checks across languages (the same regions in
  * each, `languages` = the files, one `expect.json`) are `check-examples.mjs`
  * of the SDK's source repository. The rules are in `AGENTS.md` ("Help examples").
  */
@@ -29,6 +30,10 @@ class HelpExampleFilesTest extends TestCase
     private const REGION_END = '~^\s*// docs:end$~';
 
     private const REGION_MARKER = '~docs:(?:start|end)~';
+
+    // The languages the help examples are written in. An example of any of them may be copied here; this
+    // package runs the ones that name php.
+    private const LANGUAGES = ['node', 'php', 'python'];
 
     private const HOLDS = 'the holds left the SDK: a flow holds and settles the money of its model calls';
 
@@ -94,6 +99,31 @@ class HelpExampleFilesTest extends TestCase
         $named = in_array('php', self::example($id)['languages'], true);
 
         self::assertSame($named, is_file(self::EXAMPLES.'/'.$id.'/php.php'));
+    }
+
+    #[DataProvider('everyExampleProvider')]
+    public function testAnExampleNamesLanguagesTheExamplesKnowAndAFrameworkOnlyOfItsOneLanguage(string $id): void
+    {
+        /** @var array<array-key, mixed> $example */
+        $example = json_decode((string) file_get_contents(self::EXAMPLES.'/'.$id.'/example.json'), true, 64, JSON_THROW_ON_ERROR);
+
+        self::assertNull(self::languageProblem($example));
+    }
+
+    public function testTheLanguagesOfAnExampleAreKnownEachOnceAndAFrameworkIsOfOneLanguageAlone(): void
+    {
+        $fastapi = ['name' => 'fastapi', 'requests' => [['method' => 'GET', 'path' => '/', 'status' => 200]]];
+
+        self::assertNull(self::languageProblem(['languages' => ['node', 'php', 'python']]));
+        self::assertNull(self::languageProblem(['languages' => ['php'], 'laravel' => true]));
+        self::assertNull(self::languageProblem(['languages' => ['python'], 'framework' => $fastapi]));
+        self::assertNotNull(self::languageProblem(['languages' => []]));
+        self::assertNotNull(self::languageProblem(['languages' => ['php', 'php']]));
+        self::assertNotNull(self::languageProblem(['languages' => ['php', 'ruby']]));
+        self::assertNotNull(self::languageProblem(['languages' => 'php']));
+        self::assertNotNull(self::languageProblem(['languages' => ['node', 'php'], 'laravel' => true]));
+        self::assertNotNull(self::languageProblem(['languages' => ['php'], 'laravel' => false]));
+        self::assertNotNull(self::languageProblem(['languages' => ['php', 'python'], 'framework' => $fastapi]));
     }
 
     #[DataProvider('phpExampleProvider')]
@@ -310,6 +340,37 @@ class HelpExampleFilesTest extends TestCase
     {
         /** @var array{languages: list<string>, regions: list<string>} */
         return json_decode((string) file_get_contents(self::EXAMPLES.'/'.$id.'/example.json'), true, 64, JSON_THROW_ON_ERROR);
+    }
+
+    /**
+     * What is wrong with what an `example.json` says about the languages it is written in, or null: a list of the
+     * languages the examples know, each once; `laravel` is true and only on an example written for PHP alone (a
+     * Laravel application), `framework` only on one written for Python alone (the test client of a Python
+     * framework runs it, in the Python SDK's suite).
+     *
+     * @param array<array-key, mixed> $example
+     */
+    private static function languageProblem(array $example): ?string
+    {
+        $languages = $example['languages'] ?? null;
+        $known = is_array($languages) && array_is_list($languages) && $languages !== []
+            && array_filter($languages, is_string(...)) === $languages
+            && array_unique($languages) === $languages
+            && array_diff($languages, self::LANGUAGES) === [];
+
+        if ($known === false) {
+            return '`languages` is a list of '.implode(', ', self::LANGUAGES).', each once';
+        }
+
+        if (array_key_exists('laravel', $example) === true && ($example['laravel'] !== true || $languages !== ['php'])) {
+            return '`laravel` is true, and only on an example written for PHP alone';
+        }
+
+        if (array_key_exists('framework', $example) === true && $languages !== ['python']) {
+            return '`framework` is only on an example written for Python alone';
+        }
+
+        return null;
     }
 
     /**

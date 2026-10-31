@@ -69,6 +69,9 @@ final class ContractTest extends TestCase
 
     private const string SDK = 'php';
 
+    // The SDKs the contract knows. A line of the call table names some of them, this one among them.
+    private const array SDKS = ['php', 'python', 'typescript'];
+
     private const string KEY = 'sk_live_contract';
 
     private const string IDEMPOTENCY_HEADER = 'Idempotency-Key';
@@ -302,7 +305,7 @@ final class ContractTest extends TestCase
         }
     }
 
-    public function testEveryLineOfTheCallTableIsAnOperationOfBothSdks(): void
+    public function testEveryLineOfTheCallTableIsAnOperationOfSdksTheContractKnows(): void
     {
         $problems = [];
         $table = self::callTable();
@@ -314,12 +317,25 @@ final class ContractTest extends TestCase
                 $problems[] = \sprintf('%s: the operation is not `METHOD /path`: %s', $name, $line['operation']);
             }
 
-            if ($line['sdks'] !== ['php', 'typescript']) {
-                $problems[] = \sprintf('%s: `sdks` is not both SDKs: %s', $name, json_encode($line['sdks']));
+            $problem = self::sdksProblem($line['sdks']);
+
+            if ($problem !== null) {
+                $problems[] = \sprintf('%s: %s: %s', $name, $problem, json_encode($line['sdks']));
             }
         }
 
         self::assertSame([], $problems, implode("\n", $problems));
+    }
+
+    public function testTheSdksOfALineAreKnownSdksEachOnceThisOneAmongThem(): void
+    {
+        self::assertNull(self::sdksProblem(['php', 'python', 'typescript']));
+        self::assertNull(self::sdksProblem(['php', 'typescript']));
+        self::assertNull(self::sdksProblem(['php']));
+        self::assertNotNull(self::sdksProblem([]));
+        self::assertNotNull(self::sdksProblem(['python', 'typescript']));
+        self::assertNotNull(self::sdksProblem(['php', 'php']));
+        self::assertNotNull(self::sdksProblem(['php', 'ruby']));
     }
 
     /**
@@ -1651,6 +1667,23 @@ final class ContractTest extends TestCase
         }
 
         return $codes;
+    }
+
+    /**
+     * What is wrong with the `sdks` of a line of the call table, or null: a list of the SDKs the contract knows,
+     * each once, with this one among them.
+     *
+     * @param list<string> $sdks
+     */
+    private static function sdksProblem(array $sdks): ?string
+    {
+        $known = array_intersect($sdks, self::SDKS) === $sdks && array_unique($sdks) === $sdks;
+
+        if ($known === false || \in_array(self::SDK, $sdks, true) === false) {
+            return \sprintf('`sdks` is not a list of %s, each once, with %s among them', implode(', ', self::SDKS), self::SDK);
+        }
+
+        return null;
     }
 
     /**

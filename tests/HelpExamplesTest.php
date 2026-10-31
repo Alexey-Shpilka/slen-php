@@ -40,7 +40,7 @@ use Slen\Sdk\Testing\RecordingSpanRecorder;
  * put on the wire and what it printed are held against `expect.json`. One call more, one call less, another key, another body — each
  * is red.
  *
- * `expect.json` is the same file for both languages, so the two examples of
+ * `expect.json` is the same file for every language, so the examples of
  * one id send the same requests and print the same lines. The checks that only
  * read the files of this package are `HelpExampleFilesTest`; the JSON of the
  * examples is held against the OpenAPI spec where the contract is kept.
