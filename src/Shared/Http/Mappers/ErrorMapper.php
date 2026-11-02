@@ -17,6 +17,7 @@ use Slen\Sdk\Exceptions\OperationLimitExceededException;
 use Slen\Sdk\Exceptions\OperationUncertainException;
 use Slen\Sdk\Exceptions\OverrunApprovalRequiredException;
 use Slen\Sdk\Exceptions\OverrunStoppedException;
+use Slen\Sdk\Exceptions\PlanLimitException;
 use Slen\Sdk\Exceptions\PolicyDeniedException;
 use Slen\Sdk\Exceptions\ProviderException;
 use Slen\Sdk\Exceptions\RateLimitException;
@@ -41,6 +42,8 @@ final readonly class ErrorMapper
         'overrun_stopped' => OverrunStoppedException::class,
         'overrun_approval_required' => OverrunApprovalRequiredException::class,
         'customer_not_found' => CustomerNotFoundException::class,
+        'plan_limit_reached' => PlanLimitException::class,
+        'plan_feature_unavailable' => PlanLimitException::class,
         'operation_limit_exceeded' => OperationLimitExceededException::class,
         'concurrency_limit_exceeded' => ConcurrencyLimitException::class,
         'rate_limit_exceeded' => RateLimitException::class,

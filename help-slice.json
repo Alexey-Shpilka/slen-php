@@ -934,6 +934,22 @@
       "members": []
     },
     {
+      "name": "Slen\\Sdk\\Exceptions\\PlanLimitException",
+      "kind": "class",
+      "source": "src/Exceptions/PlanLimitException.php",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [],
+      "type_parameters": [],
+      "extends": [
+        "Slen\\Sdk\\Exceptions\\SlenException"
+      ],
+      "implements": [],
+      "signature": null,
+      "members": []
+    },
+    {
       "name": "Slen\\Sdk\\Exceptions\\PolicyDeniedException",
       "kind": "class",
       "source": "src/Exceptions/PolicyDeniedException.php",

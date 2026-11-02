@@ -15,6 +15,7 @@ use Slen\Sdk\Exceptions\IdempotencyConflictException;
 use Slen\Sdk\Exceptions\InsufficientCreditsException;
 use Slen\Sdk\Exceptions\InvalidRequestException;
 use Slen\Sdk\Exceptions\InvalidResponseException;
+use Slen\Sdk\Exceptions\PlanLimitException;
 use Slen\Sdk\Modules\Customers\CustomersFacade;
 use Slen\Sdk\Modules\Customers\Data\CreditPrice;
 use Slen\Sdk\Modules\Customers\Data\CustomerAccount;
@@ -136,6 +137,30 @@ final class CustomersFacadeTest extends TestCase
         $this->expectException(CustomerNotFoundException::class);
 
         Answers::sdk($fakeHttpClient)->customers()->get('user_404');
+    }
+
+    public function testANewCustomerOnAPlanWithoutCustomersIsAPlanLimitThatNamesThePlanToUpgradeTo(): void
+    {
+        $fakeHttpClient = (new FakeHttpClient())->pushJson(403, ['error' => [
+            'code' => 'plan_feature_unavailable',
+            'message' => "This organization's Free plan does not include customers.",
+            'details' => ['feature' => 'customers', 'plan' => 'free', 'required_plan' => 'pro'],
+            'request_id' => 'req_1',
+        ]]);
+
+        try {
+            Answers::sdk($fakeHttpClient, retries: 2)->customers()->create('user_8421');
+            self::fail('the refusal was not thrown');
+        } catch (PlanLimitException $planLimitException) {
+            self::assertSame('plan_feature_unavailable', $planLimitException->errorCode);
+            self::assertSame(403, $planLimitException->statusCode);
+            self::assertSame('pro', $planLimitException->details['required_plan']);
+            self::assertSame(['feature' => 'customers', 'plan' => 'free', 'required_plan' => 'pro'], $planLimitException->details);
+            self::assertSame('PlanLimit', $planLimitException::type());
+            self::assertSame('req_1', $planLimitException->requestId);
+        }
+
+        self::assertCount(1, $fakeHttpClient->requests());
     }
 
     public function testCreatePutsAnEmptyObjectAndReadsTheCustomer(): void

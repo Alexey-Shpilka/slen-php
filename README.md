@@ -283,6 +283,7 @@ Every failure is a `SlenException` with `errorCode`, `statusCode`, `details`, `r
 | `RateLimitException` | `rate_limit_exceeded` | any other 429 |
 | `IdempotencyConflictException` | `idempotency_conflict`, `idempotency_in_progress` | |
 | `CustomerNotFoundException` | `customer_not_found` | |
+| `PlanLimitException` | `plan_limit_reached`, `plan_feature_unavailable` | |
 | `ProviderException` | `provider_error`, `provider_unavailable`, `provider_timeout`, `provider_rate_limit`, `provider_not_configured`, `pool_exhausted` | any other 5xx |
 | `OperationUncertainException` | `operation_uncertain` | |
 | `ServiceUnavailableException` | `ledger_unavailable`, `service_unavailable` | |
@@ -295,13 +296,25 @@ Every failure is a `SlenException` with `errorCode`, `statusCode`, `details`, `r
 
 They live in `Slen\Sdk\Exceptions`. The same code is the same type in the TypeScript SDK: the table is `contract/error-codes.json` at the root of the repository. Every 402 extends `SpendRefusedException`, so "money said no" is one `catch` that still knows which. A 429 is not in it: `RateLimitException` is the key's own request rate.
 
+**The plan of the organization.** `PlanLimitException` is a refusal of the organization's plan — not of the request, not of the key: `plan_limit_reached` (409) when one more would pass what the plan allows (`details`: `limit`, `current`, `max`, `plan`, `required_plan`), `plan_feature_unavailable` (403) when the plan does not include the feature (`details`: `feature`, `plan`, `required_plan`). `details['required_plan']` is the plan to upgrade to. End customers need a paid plan: on Free, `customers()->create()` of a new customer, `updateAccount()`, and a `topUp()` that would open an account are `plan_feature_unavailable` with `feature` `customers`. A plan closes creating, never running: what exists keeps working, and no run is refused by it.
+
+```php
+use Slen\Sdk\Exceptions\PlanLimitException;
+
+try {
+    $slen->customers()->create('user_8421');
+} catch (PlanLimitException $error) {
+    echo 'needs the ', $error->details['required_plan'] ?? 'next', ' plan', PHP_EOL;
+}
+```
+
 **What is retried.** No answer, a 429 and a 503 are sent again, under the same idempotency key, up to `retries` times: a `Retry-After` of up to 30 s is waited out, a longer one comes back to you as `retryAfterSeconds`; otherwise the pause is 200 ms doubling, at most 5 s. A 500, 502 or 504 is never repeated — a provider may have been paid.
 
 **Which of them may have cost money.** The money of a run is the money of the model calls its flow made. The types are drawn along that line, with one exception — the second `ProviderException` row, where the code has to be read as well:
 
 | Exception | Was money spent? | Send it again? |
 |---|---|---|
-| `SpendRefusedException`, `PolicyDeniedException`, `RateLimitException`, `InvalidRequestException`, `AuthenticationException`, `IdempotencyConflictException` — thrown before the run began | no — nothing ran and nothing was held | only once what was refused has changed |
+| `SpendRefusedException`, `PolicyDeniedException`, `RateLimitException`, `InvalidRequestException`, `AuthenticationException`, `IdempotencyConflictException`, `PlanLimitException` — thrown before the run began | no — nothing ran and nothing was held | only once what was refused has changed |
 | `ServiceUnavailableException` | no — Slen did not carry the request out | yes, later, under the same key |
 | `TimeoutException`, `ConnectionException` raised by the SDK (`errorCode === null`) | unknown — the request may have reached the server | under the same key only: the SDK has already repeated it so, and the server runs a key once |
 | `OperationUncertainException` | **unknown — it may have been.** A provider was called and its answer never came; the hold is left in place until it expires | not under a new key: under the same one the server answers with the run as it ended and runs nothing |
