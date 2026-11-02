@@ -4,6 +4,11 @@ All notable changes to `slen/sdk` are written here. The format follows [Keep a C
 
 ## [Unreleased]
 
+## [0.4.1] - 2026-11-02
+
+### Added
+- `PlanLimitException` (`Slen\Sdk\Exceptions`, a `SlenException`): a refusal of the organization's plan. `plan_limit_reached` (409) — one more would pass what the plan allows — and `plan_feature_unavailable` (403) — the plan does not include the feature — become it; until now they fell back by status to `InvalidRequestException` and `AuthenticationException`. Its `details` carry `required_plan`, the plan to upgrade to. On the Free plan `customers()->create()` of a new customer, `updateAccount()` and a `topUp()` that would open an account are refused so: end customers need a paid plan. No run is refused by a plan.
+
 ## [0.4.0] - 2026-10-31
 
 ### Breaking
@@ -67,7 +72,8 @@ The same code as 0.3.1, released again because 0.3.1 was withdrawn from Packagis
 
 The first tag; not published.
 
-[Unreleased]: https://github.com/Alexey-Shpilka/slen-php/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/Alexey-Shpilka/slen-php/compare/v0.4.1...HEAD
+[0.4.1]: https://github.com/Alexey-Shpilka/slen-php/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/Alexey-Shpilka/slen-php/compare/v0.3.2...v0.4.0
 [0.3.2]: https://github.com/Alexey-Shpilka/slen-php/compare/v0.3.1...v0.3.2
 [0.3.1]: https://github.com/Alexey-Shpilka/slen-php/compare/v0.3.0...v0.3.1
