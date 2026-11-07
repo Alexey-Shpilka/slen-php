@@ -4166,13 +4166,40 @@
           "signature": "readonly ?string $code"
         },
         {
+          "name": "output",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly ?array $output"
+        },
+        {
+          "name": "outputTruncated",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly ?bool $outputTruncated"
+        },
+        {
+          "name": "outputStored",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly ?string $outputStored"
+        },
+        {
           "name": "__construct",
           "kind": "constructor",
           "static": false,
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "__construct(string $nodeKey, string $nodeType, string $status, ?string $outputPort, ?string $cost, ?int $durationMs, DateTimeImmutable $startedAt, ?DateTimeImmutable $finishedAt, ?array $metadata, array $attempts, ?string $label, ?string $model, ?string $code)"
+          "signature": "__construct(string $nodeKey, string $nodeType, string $status, ?string $outputPort, ?string $cost, ?int $durationMs, DateTimeImmutable $startedAt, ?DateTimeImmutable $finishedAt, ?array $metadata, array $attempts, ?string $label, ?string $model, ?string $code, ?array $output = null, ?bool $outputTruncated = null, ?string $outputStored = null)"
         }
       ]
     },
