@@ -65,6 +65,9 @@ final readonly class ExecutionTraceResource extends BaseResource
             label: $this->nullableString($node, 'label'),
             model: $this->nullableString($node, 'model'),
             code: $this->nullableString($node, 'code'),
+            output: $this->nullableArray($node, 'output'),
+            outputTruncated: $this->nullableBool($node, 'output_truncated'),
+            outputStored: $this->nullableString($node, 'output_stored'),
         );
     }
 

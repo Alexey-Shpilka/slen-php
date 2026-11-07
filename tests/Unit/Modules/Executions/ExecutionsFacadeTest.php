@@ -240,6 +240,37 @@ final class ExecutionsFacadeTest extends TestCase
         yield 'an incomplete cost as a string' => [['cost_incomplete' => 'no'], 'cost_incomplete'];
     }
 
+    public function testAModelNodeReadsTheAnswerItLeftAndWhetherItWasKept(): void
+    {
+        $refusal = ['class' => 'unavailable', 'code' => 'pool_unavailable', 'http_status' => 503, 'retry_after_seconds' => null];
+        $fakeHttpClient = (new FakeHttpClient())
+            ->pushJson(200, ['data' => self::trace()])
+            ->pushJson(200, ['data' => self::trace([], [], ['output_port' => 'unavailable', 'output' => ['error' => $refusal], 'output_truncated' => true])])
+            ->pushJson(200, ['data' => self::trace([], [], ['output' => null, 'output_stored' => 'disabled_by_project'])]);
+        $executions = Answers::sdk($fakeHttpClient)->executions();
+
+        $answered = $executions->trace('74438200973594700')->nodes;
+        $refused = $executions->trace('74438200973594700')->nodes[0];
+        $unkept = $executions->trace('74438200973594700')->nodes[0];
+
+        self::assertSame('Your order ships on Monday.', $answered[0]->output['content'] ?? null);
+        self::assertSame([false, 'stored'], [$answered[0]->outputTruncated, $answered[0]->outputStored]);
+        self::assertSame([null, null, null], [$answered[1]->output, $answered[1]->outputTruncated, $answered[1]->outputStored]);
+        self::assertSame(['error' => $refusal], $refused->output);
+        self::assertTrue($refused->outputTruncated);
+        self::assertSame([null, 'disabled_by_project'], [$unkept->output, $unkept->outputStored]);
+    }
+
+    public function testAModelNodeWhoseKeptStateIsNotAStringIsUnreadable(): void
+    {
+        $fakeHttpClient = (new FakeHttpClient())->pushJson(200, ['data' => self::trace([], [], ['output_stored' => true])]);
+
+        $this->expectException(InvalidResponseException::class);
+        $this->expectExceptionMessage('"output_stored"');
+
+        Answers::sdk($fakeHttpClient)->executions()->trace('74438200973594700');
+    }
+
     public function testATraceWhoseNodesAreNotObjectsIsUnreadable(): void
     {
         $fakeHttpClient = (new FakeHttpClient())->pushJson(200, ['data' => ['nodes' => ['reply']] + self::trace()]);
@@ -262,10 +293,11 @@ final class ExecutionsFacadeTest extends TestCase
     /**
      * @param array<string, mixed> $attempt  on top of the one attempt of the model node
      * @param list<string>         $leaveOut the keys that attempt goes without
+     * @param array<string, mixed> $node     on top of the model node
      *
      * @return array<string, mixed>
      */
-    private static function trace(array $attempt = [], array $leaveOut = []): array
+    private static function trace(array $attempt = [], array $leaveOut = [], array $node = []): array
     {
         return [
             'execution_id' => '74438200973594700',
@@ -325,6 +357,16 @@ final class ExecutionsFacadeTest extends TestCase
                     'label' => 'Reply',
                     'model' => 'gpt-4o',
                     'code' => null,
+                    'output' => [
+                        'model' => 'gpt-4o',
+                        'content' => 'Your order ships on Monday.',
+                        'finish_reason' => 'stop',
+                        'tool_calls' => [],
+                        'usage' => ['input_tokens' => 1100, 'output_tokens' => 179, 'cached_input_tokens' => 512],
+                    ],
+                    'output_truncated' => false,
+                    'output_stored' => 'stored',
+                    ...$node,
                 ],
                 [
                     'node_key' => 'answer',
