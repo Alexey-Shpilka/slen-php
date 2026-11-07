@@ -6,6 +6,7 @@ namespace Slen\Sdk\Modules\Executions\Data;
 
 use Slen\Sdk\Modules\Operations\Data\ExecutionCache;
 use Slen\Sdk\Modules\Operations\Data\ExecutionCost;
+use Slen\Sdk\Modules\Operations\Data\ExecutionWarning;
 use Slen\Sdk\Modules\Operations\Data\WaitingOn;
 use Slen\Sdk\Modules\Operations\Enums\ExecutionStatus;
 
@@ -13,8 +14,9 @@ use Slen\Sdk\Modules\Operations\Enums\ExecutionStatus;
 final readonly class ExecutionStatusView
 {
     /**
-     * @param array<mixed>|null $output            what the flow returned; null until it returned something
-     * @param int|null          $retryAfterSeconds while the run is not over: when to read it again
+     * @param array<mixed>|null      $output            what the flow returned; null until it returned something
+     * @param int|null               $retryAfterSeconds while the run is not over: when to read it again
+     * @param list<ExecutionWarning> $warnings          what the run said about its request when it started
      */
     public function __construct(
         public string $executionId,
@@ -29,6 +31,7 @@ final readonly class ExecutionStatusView
         public string $traceUrl,
         public ?int $retryAfterSeconds,
         public ?string $requestId = null,
+        public array $warnings = [],
     ) {
     }
 

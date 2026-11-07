@@ -311,6 +311,7 @@ final class RequestIdTest extends TestCase
             'started_at' => '2026-10-17T12:00:00.120+00:00',
             'finished_at' => '2026-10-17T12:00:01.010+00:00',
             'duration_ms' => 890,
+            'warnings' => [],
             'nodes' => [],
             'events' => [],
         ];

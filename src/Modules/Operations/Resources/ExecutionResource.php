@@ -9,6 +9,7 @@ use Slen\Sdk\Modules\Operations\Data\ExecutionCache;
 use Slen\Sdk\Modules\Operations\Data\ExecutionCost;
 use Slen\Sdk\Modules\Operations\Data\ExecutionError;
 use Slen\Sdk\Modules\Operations\Data\ExecutionResult;
+use Slen\Sdk\Modules\Operations\Data\ExecutionWarning;
 use Slen\Sdk\Modules\Operations\Data\WaitingOn;
 use Slen\Sdk\Modules\Operations\Enums\ExecutionStatus;
 use Slen\Sdk\Shared\Resources\BaseResource;
@@ -40,6 +41,7 @@ final readonly class ExecutionResource extends BaseResource
             error: $error === null ? null : new ExecutionError($this->string($error, 'code'), $this->string($error, 'message')),
             replayed: $this->bool($data, 'replayed'),
             requestId: $requestId,
+            warnings: $this->warnings($data),
         );
     }
 
@@ -67,6 +69,29 @@ final readonly class ExecutionResource extends BaseResource
             $this->nullableDecimal($cost, 'actual'),
             $this->bool($cost, 'incomplete'),
         );
+    }
+
+    /**
+     * @param array<mixed> $data
+     *
+     * @return list<ExecutionWarning>
+     */
+    public function warnings(array $data): array
+    {
+        $warnings = [];
+
+        foreach ($this->objects($data, 'warnings') as $warning) {
+            $listed = $this->nullableArray($warning, 'keys');
+            $keys = $listed === null ? null : [];
+
+            foreach ($listed ?? [] as $key) {
+                $keys[] = $this->string(['keys' => $key], 'keys');
+            }
+
+            $warnings[] = new ExecutionWarning($this->string($warning, 'code'), $this->string($warning, 'message'), $keys);
+        }
+
+        return $warnings;
     }
 
     /**

@@ -36,6 +36,7 @@ final readonly class ExecutionStatusResource extends BaseResource
             traceUrl: $this->string($data, 'trace_url'),
             retryAfterSeconds: $this->nullableInt($data, 'retry_after_seconds'),
             requestId: $requestId,
+            warnings: $this->executionResource->warnings($data),
         );
     }
 }

@@ -12,6 +12,7 @@ use Slen\Sdk\Exceptions\InvalidResponseException;
 use Slen\Sdk\Modules\Operations\Data\ExecutionCache;
 use Slen\Sdk\Modules\Operations\Data\ExecutionCost;
 use Slen\Sdk\Modules\Operations\Data\ExecutionResult;
+use Slen\Sdk\Modules\Operations\Data\ExecutionWarning;
 use Slen\Sdk\Modules\Operations\Data\WaitingOn;
 use Slen\Sdk\Modules\Operations\Enums\ExecutionStatus;
 use Slen\Sdk\Modules\Operations\Resources\ExecutionResource;
@@ -71,8 +72,25 @@ final class ExecutionResourceTest extends TestCase
         yield 'a cost as a float' => [Answers::execution(['cost' => ['estimated' => 0.0041, 'actual' => null, 'incomplete' => false]]), 'estimated'];
         yield 'a cost that does not say whether it is complete' => [Answers::execution(['cost' => ['estimated' => '0.0041', 'actual' => null]]), 'incomplete'];
         yield 'no cache' => [Answers::execution(['cache' => null]), 'cache'];
+        yield 'no warnings' => [array_diff_key(Answers::execution(), ['warnings' => true]), 'warnings'];
+        $warning = ['code' => 'input_key_ignored', 'message' => '.', 'keys' => [1]];
+        yield 'warning keys that are not strings' => [Answers::execution(['warnings' => [$warning]]), 'keys'];
         yield 'an error without a message' => [Answers::execution(['error' => ['code' => 'x']]), 'message'];
         yield 'an execution id as a number' => [Answers::execution(['execution_id' => 74438200973594700]), 'execution_id'];
+    }
+
+    public function testTheWarningsOfARunAreReadAsTheApiSendsThem(): void
+    {
+        $said = 'The input carries keys of a model call that the flow does not pass to the model: tools, temperature.';
+        $executionResult = (new ExecutionResource())->map(Answers::execution(['warnings' => [
+            ['code' => 'input_key_ignored', 'keys' => ['tools', 'temperature'], 'message' => $said],
+            ['code' => 'later', 'message' => 'Another.'],
+        ]]));
+
+        self::assertEquals(
+            [new ExecutionWarning('input_key_ignored', $said, ['tools', 'temperature']), new ExecutionWarning('later', 'Another.')],
+            $executionResult->warnings,
+        );
     }
 
     #[DataProvider('statusProvider')]

@@ -261,6 +261,23 @@ final class ExecutionsFacadeTest extends TestCase
         self::assertSame([null, 'disabled_by_project'], [$unkept->output, $unkept->outputStored]);
     }
 
+    public function testANodeReadsItsEstimateAndOnceItsHoldIsCapturedItsFact(): void
+    {
+        $fakeHttpClient = (new FakeHttpClient())
+            ->pushJson(200, ['data' => self::trace()])
+            ->pushJson(200, ['data' => self::trace([], [], ['cost' => '0.00412500', 'cost_status' => 'estimated', 'cost_incomplete' => true])]);
+        $executions = Answers::sdk($fakeHttpClient)->executions();
+
+        $settled = $executions->trace('74438200973594700')->nodes;
+        $held = $executions->trace('74438200973594700')->nodes[0];
+
+        $model = $settled[0];
+
+        self::assertSame(['0.00390000', '0.00412500', 'actual', false], [$model->cost, $model->estimatedCost, $model->costStatus, $model->costIncomplete]);
+        self::assertSame([null, null, null], [$settled[1]->estimatedCost, $settled[1]->costStatus, $settled[1]->costIncomplete]);
+        self::assertSame(['0.00412500', '0.00412500', 'estimated', true], [$held->cost, $held->estimatedCost, $held->costStatus, $held->costIncomplete]);
+    }
+
     public function testAModelNodeWhoseKeptStateIsNotAStringIsUnreadable(): void
     {
         $fakeHttpClient = (new FakeHttpClient())->pushJson(200, ['data' => self::trace([], [], ['output_stored' => true])]);
@@ -314,6 +331,7 @@ final class ExecutionsFacadeTest extends TestCase
             'started_at' => '2026-10-17T12:00:00.120+00:00',
             'finished_at' => '2026-10-17T12:00:01.010+00:00',
             'duration_ms' => 890,
+            'warnings' => [],
             'nodes' => [
                 [
                     'node_key' => 'reply',
@@ -321,6 +339,9 @@ final class ExecutionsFacadeTest extends TestCase
                     'status' => 'completed',
                     'output_port' => 'success',
                     'cost' => '0.00390000',
+                    'estimated_cost' => '0.00412500',
+                    'cost_status' => 'actual',
+                    'cost_incomplete' => false,
                     'duration_ms' => 850,
                     'started_at' => '2026-10-17T12:00:00.130+00:00',
                     'finished_at' => '2026-10-17T12:00:00.980+00:00',
