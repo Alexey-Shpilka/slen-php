@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Slen\Sdk\Modules\Executions\Resources;
 
 use Slen\Sdk\Exceptions\InvalidResponseException;
+use Slen\Sdk\Modules\Executions\Data\AttemptCostBreakdown;
 use Slen\Sdk\Modules\Executions\Data\AttemptSummary;
 use Slen\Sdk\Modules\Executions\Data\ExecutionTrace;
 use Slen\Sdk\Modules\Executions\Data\FlowExecutionEvent;
@@ -81,6 +82,32 @@ final readonly class ExecutionTraceResource extends BaseResource
             cost: $this->nullableDecimal($attempt, 'cost'),
             providerRequestId: $this->nullableString($attempt, 'provider_request_id'),
             modelCode: $this->nullableString($attempt, 'model_code'),
+            inputTokens: $this->nullableInt($attempt, 'input_tokens'),
+            outputTokens: $this->nullableInt($attempt, 'output_tokens'),
+            cachedInputTokens: $this->nullableInt($attempt, 'cached_input_tokens'),
+            cacheWriteTokens: $this->nullableInt($attempt, 'cache_write_tokens'),
+            cacheWriteLongTokens: $this->nullableInt($attempt, 'cache_write_long_tokens'),
+            reasoningTokens: $this->nullableInt($attempt, 'reasoning_tokens'),
+            toolCalls: $this->nullableCounts($attempt, 'tool_calls'),
+            costBreakdown: $this->costBreakdown($this->nullableArray($attempt, 'cost_breakdown')),
+            costIncomplete: $this->nullableBool($attempt, 'cost_incomplete'),
+        );
+    }
+
+    /** @param array<mixed>|null $breakdown */
+    private function costBreakdown(?array $breakdown): ?AttemptCostBreakdown
+    {
+        if ($breakdown === null) {
+            return null;
+        }
+
+        return new AttemptCostBreakdown(
+            input: $this->decimal($breakdown, 'input'),
+            cachedInput: $this->decimal($breakdown, 'cached_input'),
+            cacheWrite: $this->decimal($breakdown, 'cache_write'),
+            output: $this->decimal($breakdown, 'output'),
+            tools: $this->decimals($breakdown, 'tools'),
+            total: $this->decimal($breakdown, 'total'),
         );
     }
 

@@ -189,7 +189,7 @@ final class OperationsFacadeTest extends TestCase
     public function testTheSpanOfARunCarriesItsCostsAndWhetherItsAnswerWasCached(): void
     {
         $answer = Answers::execution([
-            'cost' => ['estimated' => '0.00412500', 'actual' => '0.00390000'],
+            'cost' => ['estimated' => '0.00412500', 'actual' => '0.00390000', 'incomplete' => false],
             'cache' => ['hit' => true, 'cached_at' => '2026-10-17T11:00:00+00:00'],
         ]);
         $fakeHttpClient = (new FakeHttpClient())->pushJson(200, ['data' => $answer]);

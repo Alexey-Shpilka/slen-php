@@ -57,7 +57,7 @@ final class Answers
             'output' => ['content' => 'Your order ships today.'],
             'error_code' => null,
             'error_message' => null,
-            'cost' => ['estimated' => '0.00412500', 'actual' => null],
+            'cost' => ['estimated' => '0.00412500', 'actual' => null, 'incomplete' => false],
             'cache' => ['hit' => false, 'cached_at' => null],
             'waiting_on' => null,
             'trace_url' => '/v1/executions/74438200973594700',
@@ -86,7 +86,7 @@ final class Answers
      */
     public static function pending(string $status = 'queued', ?int $retryAfterSeconds = 2, array $overrides = []): array
     {
-        $pending = ['status' => $status, 'output' => null, 'cost' => ['estimated' => null, 'actual' => null], ...$overrides];
+        $pending = ['status' => $status, 'output' => null, 'cost' => ['estimated' => null, 'actual' => null, 'incomplete' => false], ...$overrides];
 
         if ($retryAfterSeconds !== null) {
             $pending['retry_after_seconds'] = $retryAfterSeconds;

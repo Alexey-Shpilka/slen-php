@@ -62,7 +62,11 @@ final readonly class ExecutionResource extends BaseResource
     {
         $cost = $this->array($data, 'cost');
 
-        return new ExecutionCost($this->nullableDecimal($cost, 'estimated'), $this->nullableDecimal($cost, 'actual'));
+        return new ExecutionCost(
+            $this->nullableDecimal($cost, 'estimated'),
+            $this->nullableDecimal($cost, 'actual'),
+            $this->bool($cost, 'incomplete'),
+        );
     }
 
     /**

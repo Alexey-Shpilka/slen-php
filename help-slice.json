@@ -3331,6 +3331,87 @@
       ]
     },
     {
+      "name": "Slen\\Sdk\\Modules\\Executions\\Data\\AttemptCostBreakdown",
+      "kind": "class",
+      "source": "src/Modules/Executions/Data/AttemptCostBreakdown.php",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [
+        "final",
+        "readonly"
+      ],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": null,
+      "members": [
+        {
+          "name": "input",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly string $input"
+        },
+        {
+          "name": "cachedInput",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly string $cachedInput"
+        },
+        {
+          "name": "cacheWrite",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly string $cacheWrite"
+        },
+        {
+          "name": "output",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly string $output"
+        },
+        {
+          "name": "tools",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly array $tools"
+        },
+        {
+          "name": "total",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly string $total"
+        },
+        {
+          "name": "__construct",
+          "kind": "constructor",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "__construct(string $input, string $cachedInput, string $cacheWrite, string $output, array $tools, string $total)"
+        }
+      ]
+    },
+    {
       "name": "Slen\\Sdk\\Modules\\Executions\\Data\\AttemptSummary",
       "kind": "class",
       "source": "src/Modules/Executions/Data/AttemptSummary.php",
@@ -3437,13 +3518,94 @@
           "signature": "readonly ?string $modelCode"
         },
         {
+          "name": "inputTokens",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly ?int $inputTokens"
+        },
+        {
+          "name": "outputTokens",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly ?int $outputTokens"
+        },
+        {
+          "name": "cachedInputTokens",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly ?int $cachedInputTokens"
+        },
+        {
+          "name": "cacheWriteTokens",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly ?int $cacheWriteTokens"
+        },
+        {
+          "name": "cacheWriteLongTokens",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly ?int $cacheWriteLongTokens"
+        },
+        {
+          "name": "reasoningTokens",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly ?int $reasoningTokens"
+        },
+        {
+          "name": "toolCalls",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly ?array $toolCalls"
+        },
+        {
+          "name": "costBreakdown",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly ?Slen\\Sdk\\Modules\\Executions\\Data\\AttemptCostBreakdown $costBreakdown"
+        },
+        {
+          "name": "costIncomplete",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly ?bool $costIncomplete"
+        },
+        {
           "name": "__construct",
           "kind": "constructor",
           "static": false,
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "__construct(string $attemptId, int $attemptNumber, string $connectionId, ?string $poolId, string $status, ?string $errorCode, ?int $latencyMs, ?string $cost, ?string $providerRequestId, ?string $modelCode)"
+          "signature": "__construct(string $attemptId, int $attemptNumber, string $connectionId, ?string $poolId, string $status, ?string $errorCode, ?int $latencyMs, ?string $cost, ?string $providerRequestId, ?string $modelCode, ?int $inputTokens, ?int $outputTokens, ?int $cachedInputTokens, ?int $cacheWriteTokens, ?int $cacheWriteLongTokens, ?int $reasoningTokens, ?array $toolCalls, ?Slen\\Sdk\\Modules\\Executions\\Data\\AttemptCostBreakdown $costBreakdown, ?bool $costIncomplete)"
         }
       ]
     },
@@ -4584,13 +4746,22 @@
           "signature": "readonly ?string $actual"
         },
         {
+          "name": "incomplete",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly bool $incomplete"
+        },
+        {
           "name": "__construct",
           "kind": "constructor",
           "static": false,
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "__construct(?string $estimated, ?string $actual)"
+          "signature": "__construct(?string $estimated, ?string $actual, bool $incomplete)"
         }
       ]
     },

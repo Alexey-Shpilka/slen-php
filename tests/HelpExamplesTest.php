@@ -250,7 +250,7 @@ class HelpExamplesTest extends TestCase
             'error' => null,
             'error_code' => null,
             'error_message' => null,
-            'cost' => ['estimated' => '0.02700000', 'actual' => null],
+            'cost' => ['estimated' => '0.02700000', 'actual' => null, 'incomplete' => false],
             'cache' => ['hit' => false, 'cached_at' => null],
             'replayed' => false,
             'waiting_on' => null,

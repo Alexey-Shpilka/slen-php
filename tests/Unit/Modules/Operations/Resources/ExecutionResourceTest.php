@@ -24,7 +24,7 @@ final class ExecutionResourceTest extends TestCase
         $executionResult = (new ExecutionResource())->map(Answers::execution([
             'status' => 'waiting',
             'output' => null,
-            'cost' => ['estimated' => '0.01000000', 'actual' => null],
+            'cost' => ['estimated' => '0.01000000', 'actual' => null, 'incomplete' => false],
             'waiting_on' => ['node_key' => 'delay', 'type' => 'queue_node', 'resume_at' => '2026-10-17T12:05:00+00:00'],
             'retry_after_seconds' => 300,
         ]));
@@ -36,7 +36,7 @@ final class ExecutionResourceTest extends TestCase
             output: null,
             errorCode: null,
             errorMessage: null,
-            cost: new ExecutionCost('0.01000000', null),
+            cost: new ExecutionCost('0.01000000', null, false),
             cache: new ExecutionCache(false, null),
             waitingOn: new WaitingOn('delay', 'queue_node', new DateTimeImmutable('2026-10-17T12:05:00+00:00')),
             traceUrl: '/v1/executions/74438200973594700',
@@ -68,7 +68,8 @@ final class ExecutionResourceTest extends TestCase
 
         yield 'no replayed' => [$answer, 'replayed'];
         yield 'a status the SDK does not know' => [Answers::execution(['status' => 'paused']), 'status'];
-        yield 'a cost as a float' => [Answers::execution(['cost' => ['estimated' => 0.0041, 'actual' => null]]), 'estimated'];
+        yield 'a cost as a float' => [Answers::execution(['cost' => ['estimated' => 0.0041, 'actual' => null, 'incomplete' => false]]), 'estimated'];
+        yield 'a cost that does not say whether it is complete' => [Answers::execution(['cost' => ['estimated' => '0.0041', 'actual' => null]]), 'incomplete'];
         yield 'no cache' => [Answers::execution(['cache' => null]), 'cache'];
         yield 'an error without a message' => [Answers::execution(['error' => ['code' => 'x']]), 'message'];
         yield 'an execution id as a number' => [Answers::execution(['execution_id' => 74438200973594700]), 'execution_id'];

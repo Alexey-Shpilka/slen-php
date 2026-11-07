@@ -13,7 +13,7 @@ $http = (new FakeHttpClient())->pushJson(200, ['data' => [
     'error' => null,
     'error_code' => null,
     'error_message' => null,
-    'cost' => ['estimated' => '0.00412500', 'actual' => null],
+    'cost' => ['estimated' => '0.00412500', 'actual' => null, 'incomplete' => false],
     'cache' => ['hit' => false, 'cached_at' => null],
     'replayed' => false,
     'waiting_on' => null,
