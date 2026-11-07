@@ -306,7 +306,7 @@ final class RequestIdTest extends TestCase
             'status' => 'completed',
             'error_code' => null,
             'error_message' => null,
-            'cost' => ['estimated' => '0.00412500', 'actual' => '0.00390000'],
+            'cost' => ['estimated' => '0.00412500', 'actual' => '0.00390000', 'incomplete' => false],
             'cache' => ['hit' => false, 'cached_at' => null],
             'started_at' => '2026-10-17T12:00:00.120+00:00',
             'finished_at' => '2026-10-17T12:00:01.010+00:00',

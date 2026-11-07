@@ -5,10 +5,13 @@ declare(strict_types=1);
 namespace Slen\Sdk\Tests\Unit\Modules\Executions;
 
 use DateTimeImmutable;
+use Iterator;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Slen\Sdk\Exceptions\CustomerNotFoundException;
 use Slen\Sdk\Exceptions\InvalidRequestException;
 use Slen\Sdk\Exceptions\InvalidResponseException;
+use Slen\Sdk\Modules\Executions\Data\AttemptCostBreakdown;
 use Slen\Sdk\Modules\Executions\Data\AttemptSummary;
 use Slen\Sdk\Modules\Executions\Data\FlowExecutionEvent;
 use Slen\Sdk\Modules\Executions\Data\FlowExecutionNode;
@@ -18,6 +21,7 @@ use Slen\Sdk\SlenSdk;
 use Slen\Sdk\Testing\FakeHttpClient;
 use Slen\Sdk\Testing\RecordingSpanRecorder;
 use Slen\Sdk\Tests\Unit\Support\Answers;
+use stdClass;
 
 final class ExecutionsFacadeTest extends TestCase
 {
@@ -52,7 +56,10 @@ final class ExecutionsFacadeTest extends TestCase
 
     public function testAWaitOnARunThatIsOverReadsItOnceAndLeavesOneSpan(): void
     {
-        $answer = Answers::status(['cost' => ['estimated' => '0.00412500', 'actual' => '0.00400000'], 'cache' => ['hit' => false, 'cached_at' => null]]);
+        $answer = Answers::status([
+            'cost' => ['estimated' => '0.00412500', 'actual' => '0.00400000', 'incomplete' => false],
+            'cache' => ['hit' => false, 'cached_at' => null],
+        ]);
         $fakeHttpClient = (new FakeHttpClient())->pushJson(200, ['data' => $answer]);
         $recordingSpanRecorder = new RecordingSpanRecorder();
 
@@ -121,13 +128,116 @@ final class ExecutionsFacadeTest extends TestCase
         }, $executionTrace->nodes));
         self::assertNull($executionTrace->nodes[1]->outputPort);
         self::assertEquals(
-            [new AttemptSummary('74438200973596001', 1, '74438200973597001', null, 'succeeded', null, 840, '0.00390000', 'req_abc', 'gpt-4o')],
+            [new AttemptSummary(
+                '74438200973596001',
+                1,
+                '74438200973597001',
+                null,
+                'succeeded',
+                null,
+                840,
+                '0.00390000',
+                'req_abc',
+                'gpt-4o',
+                1100,
+                179,
+                512,
+                0,
+                0,
+                0,
+                [],
+                new AttemptCostBreakdown('0.00147000', '0.00064000', '0.00000000', '0.00179000', [], '0.00390000'),
+                false,
+            )],
             $executionTrace->nodes[0]->attempts,
         );
         self::assertEquals(
             new FlowExecutionEvent(2, 'reserved', 'reply', new DateTimeImmutable('2026-10-17T12:00:00.150+00:00'), ['amount' => '0.00412500']),
             $executionTrace->events[1],
         );
+    }
+
+    public function testAnAttemptReadsItsPaidToolsAndACostSlenCouldNotPriceWhole(): void
+    {
+        $fakeHttpClient = (new FakeHttpClient())->pushJson(200, ['data' => self::trace([
+            'tool_calls' => ['web_search' => 2],
+            'cost_breakdown' => [
+                'input' => '0.00147000',
+                'cached_input' => '0.00064000',
+                'cache_write' => '0.00000000',
+                'output' => '0.00179000',
+                'tools' => ['web_search' => '0.02000000'],
+                'total' => '0.02390000',
+            ],
+            'cost' => '0.02390000',
+            'cost_incomplete' => true,
+        ])]);
+
+        $attempt = Answers::sdk($fakeHttpClient)->executions()->trace('74438200973594700')->nodes[0]->attempts[0];
+
+        self::assertSame(['web_search' => 2], $attempt->toolCalls);
+        self::assertSame(['web_search' => '0.02000000'], $attempt->costBreakdown?->tools);
+        self::assertTrue($attempt->costIncomplete);
+    }
+
+    public function testAnAttemptWithoutItsTokensAndItsBreakdownReadsThemAsNull(): void
+    {
+        $fakeHttpClient = (new FakeHttpClient())->pushJson(200, ['data' => self::trace([], [
+            'input_tokens',
+            'output_tokens',
+            'cached_input_tokens',
+            'cache_write_tokens',
+            'cache_write_long_tokens',
+            'reasoning_tokens',
+            'tool_calls',
+            'cost_breakdown',
+            'cost_incomplete',
+        ])]);
+
+        $attempt = Answers::sdk($fakeHttpClient)->executions()->trace('74438200973594700')->nodes[0]->attempts[0];
+
+        self::assertSame(
+            [null, null, null, null, null, null, null, null, null],
+            [
+                $attempt->inputTokens,
+                $attempt->outputTokens,
+                $attempt->cachedInputTokens,
+                $attempt->cacheWriteTokens,
+                $attempt->cacheWriteLongTokens,
+                $attempt->reasoningTokens,
+                $attempt->toolCalls,
+                $attempt->costBreakdown,
+                $attempt->costIncomplete,
+            ],
+        );
+    }
+
+    /**
+     * @param array<string, mixed> $attempt
+     */
+    #[DataProvider('unreadableAttemptProvider')]
+    public function testAnAttemptWhoseToolsAreNotCountsAndAmountsIsUnreadable(array $attempt, string $field): void
+    {
+        $fakeHttpClient = (new FakeHttpClient())->pushJson(200, ['data' => self::trace($attempt)]);
+
+        $this->expectException(InvalidResponseException::class);
+        $this->expectExceptionMessage('"' . $field . '"');
+
+        Answers::sdk($fakeHttpClient)->executions()->trace('74438200973594700');
+    }
+
+    /**
+     * @return Iterator<string, array{array<string, mixed>, string}>
+     */
+    public static function unreadableAttemptProvider(): Iterator
+    {
+        $breakdown = ['input' => '0', 'cached_input' => '0', 'cache_write' => '0', 'output' => '0', 'total' => '0'];
+
+        yield 'a count as a string' => [['tool_calls' => ['web_search' => '2']], 'tool_calls'];
+        yield 'counts as a list' => [['tool_calls' => [2]], 'tool_calls'];
+        yield 'an amount as a float' => [['cost_breakdown' => ['tools' => ['web_search' => 0.02], ...$breakdown]], 'tools'];
+        yield 'a breakdown without its tools' => [['cost_breakdown' => $breakdown], 'tools'];
+        yield 'an incomplete cost as a string' => [['cost_incomplete' => 'no'], 'cost_incomplete'];
     }
 
     public function testATraceWhoseNodesAreNotObjectsIsUnreadable(): void
@@ -150,9 +260,12 @@ final class ExecutionsFacadeTest extends TestCase
     }
 
     /**
+     * @param array<string, mixed> $attempt  on top of the one attempt of the model node
+     * @param list<string>         $leaveOut the keys that attempt goes without
+     *
      * @return array<string, mixed>
      */
-    private static function trace(): array
+    private static function trace(array $attempt = [], array $leaveOut = []): array
     {
         return [
             'execution_id' => '74438200973594700',
@@ -164,7 +277,7 @@ final class ExecutionsFacadeTest extends TestCase
             'status' => 'completed',
             'error_code' => null,
             'error_message' => null,
-            'cost' => ['estimated' => '0.00412500', 'actual' => '0.00390000'],
+            'cost' => ['estimated' => '0.00412500', 'actual' => '0.00390000', 'incomplete' => false],
             'cache' => ['hit' => false, 'cached_at' => null],
             'started_at' => '2026-10-17T12:00:00.120+00:00',
             'finished_at' => '2026-10-17T12:00:01.010+00:00',
@@ -180,7 +293,7 @@ final class ExecutionsFacadeTest extends TestCase
                     'started_at' => '2026-10-17T12:00:00.130+00:00',
                     'finished_at' => '2026-10-17T12:00:00.980+00:00',
                     'metadata' => ['ai_request_id' => '74438200973595001'],
-                    'attempts' => [[
+                    'attempts' => [array_diff_key([
                         'attempt_id' => '74438200973596001',
                         'attempt_number' => 1,
                         'connection_id' => '74438200973597001',
@@ -191,7 +304,24 @@ final class ExecutionsFacadeTest extends TestCase
                         'cost' => '0.00390000',
                         'provider_request_id' => 'req_abc',
                         'model_code' => 'gpt-4o',
-                    ]],
+                        'input_tokens' => 1100,
+                        'output_tokens' => 179,
+                        'cached_input_tokens' => 512,
+                        'cache_write_tokens' => 0,
+                        'cache_write_long_tokens' => 0,
+                        'reasoning_tokens' => 0,
+                        'tool_calls' => new stdClass(),
+                        'cost_breakdown' => [
+                            'input' => '0.00147000',
+                            'cached_input' => '0.00064000',
+                            'cache_write' => '0.00000000',
+                            'output' => '0.00179000',
+                            'tools' => new stdClass(),
+                            'total' => '0.00390000',
+                        ],
+                        'cost_incomplete' => false,
+                        ...$attempt,
+                    ], array_flip($leaveOut))],
                     'label' => 'Reply',
                     'model' => 'gpt-4o',
                     'code' => null,

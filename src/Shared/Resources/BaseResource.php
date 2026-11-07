@@ -59,6 +59,53 @@ abstract readonly class BaseResource
     }
 
     /** @param array<mixed> $data */
+    protected function nullableBool(array $data, string $key): ?bool
+    {
+        $value = $data[$key] ?? null;
+
+        return $value === null || \is_bool($value) === true ? $value : throw $this->unreadable($key, 'a boolean');
+    }
+
+    /**
+     * @param array<mixed> $data
+     *
+     * @return array<string, int>|null
+     */
+    protected function nullableCounts(array $data, string $key): ?array
+    {
+        $object = $this->nullableArray($data, $key);
+
+        if ($object === null) {
+            return null;
+        }
+
+        $counts = [];
+
+        foreach ($object as $name => $count) {
+            $counts[(string) $name] = \is_string($name) === true && \is_int($count) === true ? $count : throw $this->unreadable($key, 'an object of integers');
+        }
+
+        return $counts;
+    }
+
+    /**
+     * @param array<mixed> $data
+     *
+     * @return array<string, string>
+     */
+    protected function decimals(array $data, string $key): array
+    {
+        $amounts = [];
+
+        foreach ($this->array($data, $key) as $name => $amount) {
+            $decimal = \is_string($name) === true && \is_string($amount) === true && preg_match(self::DECIMAL, $amount) === 1;
+            $amounts[(string) $name] = $decimal === true ? $amount : throw $this->unreadable($key, 'an object of decimal strings');
+        }
+
+        return $amounts;
+    }
+
+    /** @param array<mixed> $data */
     protected function decimal(array $data, string $key): string
     {
         return $this->nullableDecimal($data, $key) ?? throw $this->unreadable($key, 'a decimal string');

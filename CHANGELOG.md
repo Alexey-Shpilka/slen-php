@@ -4,6 +4,10 @@ All notable changes to `slen/sdk` are written here. The format follows [Keep a C
 
 ## [Unreleased]
 
+### Added
+- `ExecutionCost::$incomplete`: `true` when a provider billed something Slen could not price for one of the run's calls — a usage field it does not know, a price tier, a cache write or a server tool without a price — and `$actual` is then what Slen knew. Set together with `$actual`; `false` until then. The API always sends it, and an answer without it is an `InvalidResponseException`; `new ExecutionCost()` takes it as its third argument.
+- On `AttemptSummary`, the attempts of a trace node: `$inputTokens` (the whole input, the cache read and writes included) and `$outputTokens` (the whole paid output, reasoning included); `$cachedInputTokens`, `$cacheWriteTokens`, `$cacheWriteLongTokens` and `$reasoningTokens`, the parts of those; `$toolCalls`, the paid server-tool calls by name (`['web_search' => 6]`); `$costBreakdown`, an `AttemptCostBreakdown` (`Slen\Sdk\Modules\Executions\Data`) — `$input`, `$cachedInput`, `$cacheWrite`, `$output`, `$tools` by name and `$total`, decimal strings — null until the attempt is priced; `$costIncomplete`, the attempt's own `incomplete`. Each is null when the answer leaves it out, as the spec allows.
+
 ## [0.4.1] - 2026-11-02
 
 ### Added
