@@ -45,6 +45,7 @@ final readonly class ExecutionTraceResource extends BaseResource
             nodes: array_map($this->node(...), $this->objects($data, 'nodes')),
             events: array_map($this->event(...), $this->objects($data, 'events')),
             requestId: $requestId,
+            warnings: $this->executionResource->warnings($data),
         );
     }
 
@@ -68,6 +69,9 @@ final readonly class ExecutionTraceResource extends BaseResource
             output: $this->nullableArray($node, 'output'),
             outputTruncated: $this->nullableBool($node, 'output_truncated'),
             outputStored: $this->nullableString($node, 'output_stored'),
+            estimatedCost: $this->nullableDecimal($node, 'estimated_cost'),
+            costStatus: $this->nullableString($node, 'cost_status'),
+            costIncomplete: $this->nullableBool($node, 'cost_incomplete'),
         );
     }
 

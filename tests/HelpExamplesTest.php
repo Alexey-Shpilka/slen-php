@@ -255,6 +255,7 @@ class HelpExamplesTest extends TestCase
             'replayed' => false,
             'waiting_on' => null,
             'trace_url' => '/v1/executions/900000000000000001',
+            'warnings' => [],
         ]]);
         $spans = new RecordingSpanRecorder();
         $built = SlenSdk::create(new SlenConfig(apiKey: 'key-of-the-example', baseUrl: 'https://example.test', spanRecorder: $spans));

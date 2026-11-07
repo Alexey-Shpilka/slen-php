@@ -3734,13 +3734,22 @@
           "signature": "readonly ?string $requestId"
         },
         {
+          "name": "warnings",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly array $warnings"
+        },
+        {
           "name": "__construct",
           "kind": "constructor",
           "static": false,
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "__construct(string $executionId, Slen\\Sdk\\Modules\\Operations\\Enums\\ExecutionStatus $status, string $operationCode, ?array $output, ?string $errorCode, ?string $errorMessage, Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionCost $cost, Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionCache $cache, ?Slen\\Sdk\\Modules\\Operations\\Data\\WaitingOn $waitingOn, string $traceUrl, ?int $retryAfterSeconds, ?string $requestId = null)"
+          "signature": "__construct(string $executionId, Slen\\Sdk\\Modules\\Operations\\Enums\\ExecutionStatus $status, string $operationCode, ?array $output, ?string $errorCode, ?string $errorMessage, Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionCost $cost, Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionCache $cache, ?Slen\\Sdk\\Modules\\Operations\\Data\\WaitingOn $waitingOn, string $traceUrl, ?int $retryAfterSeconds, ?string $requestId = null, array $warnings = [])"
         },
         {
           "name": "isCompleted",
@@ -3950,13 +3959,22 @@
           "signature": "readonly ?string $requestId"
         },
         {
+          "name": "warnings",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly array $warnings"
+        },
+        {
           "name": "__construct",
           "kind": "constructor",
           "static": false,
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "__construct(string $executionId, string $flowId, string $flowVersionId, ?string $flowName, ?string $operationCode, ?string $operationId, Slen\\Sdk\\Modules\\Operations\\Enums\\ExecutionStatus $status, ?string $errorCode, ?string $errorMessage, Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionCost $cost, Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionCache $cache, DateTimeImmutable $startedAt, ?DateTimeImmutable $finishedAt, ?int $durationMs, array $nodes, array $events, ?string $requestId = null)"
+          "signature": "__construct(string $executionId, string $flowId, string $flowVersionId, ?string $flowName, ?string $operationCode, ?string $operationId, Slen\\Sdk\\Modules\\Operations\\Enums\\ExecutionStatus $status, ?string $errorCode, ?string $errorMessage, Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionCost $cost, Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionCache $cache, DateTimeImmutable $startedAt, ?DateTimeImmutable $finishedAt, ?int $durationMs, array $nodes, array $events, ?string $requestId = null, array $warnings = [])"
         }
       ]
     },
@@ -4193,13 +4211,40 @@
           "signature": "readonly ?string $outputStored"
         },
         {
+          "name": "estimatedCost",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly ?string $estimatedCost"
+        },
+        {
+          "name": "costStatus",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly ?string $costStatus"
+        },
+        {
+          "name": "costIncomplete",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly ?bool $costIncomplete"
+        },
+        {
           "name": "__construct",
           "kind": "constructor",
           "static": false,
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "__construct(string $nodeKey, string $nodeType, string $status, ?string $outputPort, ?string $cost, ?int $durationMs, DateTimeImmutable $startedAt, ?DateTimeImmutable $finishedAt, ?array $metadata, array $attempts, ?string $label, ?string $model, ?string $code, ?array $output = null, ?bool $outputTruncated = null, ?string $outputStored = null)"
+          "signature": "__construct(string $nodeKey, string $nodeType, string $status, ?string $outputPort, ?string $cost, ?int $durationMs, DateTimeImmutable $startedAt, ?DateTimeImmutable $finishedAt, ?array $metadata, array $attempts, ?string $label, ?string $model, ?string $code, ?array $output = null, ?bool $outputTruncated = null, ?string $outputStored = null, ?string $estimatedCost = null, ?string $costStatus = null, ?bool $costIncomplete = null)"
         }
       ]
     },
@@ -4980,13 +5025,22 @@
           "signature": "readonly ?string $requestId"
         },
         {
+          "name": "warnings",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly array $warnings"
+        },
+        {
           "name": "__construct",
           "kind": "constructor",
           "static": false,
           "optional": false,
           "deprecated": false,
           "internal": false,
-          "signature": "__construct(string $executionId, Slen\\Sdk\\Modules\\Operations\\Enums\\ExecutionStatus $status, string $operationCode, ?array $output, ?string $errorCode, ?string $errorMessage, Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionCost $cost, Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionCache $cache, ?Slen\\Sdk\\Modules\\Operations\\Data\\WaitingOn $waitingOn, string $traceUrl, ?int $retryAfterSeconds, ?Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionError $error, bool $replayed, ?string $requestId = null)"
+          "signature": "__construct(string $executionId, Slen\\Sdk\\Modules\\Operations\\Enums\\ExecutionStatus $status, string $operationCode, ?array $output, ?string $errorCode, ?string $errorMessage, Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionCost $cost, Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionCache $cache, ?Slen\\Sdk\\Modules\\Operations\\Data\\WaitingOn $waitingOn, string $traceUrl, ?int $retryAfterSeconds, ?Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionError $error, bool $replayed, ?string $requestId = null, array $warnings = [])"
         },
         {
           "name": "isCompleted",
@@ -5023,6 +5077,60 @@
           "deprecated": false,
           "internal": false,
           "signature": "isRejected(): bool"
+        }
+      ]
+    },
+    {
+      "name": "Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionWarning",
+      "kind": "class",
+      "source": "src/Modules/Operations/Data/ExecutionWarning.php",
+      "deprecated": false,
+      "internal": false,
+      "alias_of": null,
+      "modifiers": [
+        "final",
+        "readonly"
+      ],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": null,
+      "members": [
+        {
+          "name": "code",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly string $code"
+        },
+        {
+          "name": "message",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly string $message"
+        },
+        {
+          "name": "keys",
+          "kind": "property",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "readonly ?array $keys"
+        },
+        {
+          "name": "__construct",
+          "kind": "constructor",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "__construct(string $code, string $message, ?array $keys = null)"
         }
       ]
     },
@@ -5458,6 +5566,15 @@
           "deprecated": false,
           "internal": false,
           "signature": "cost(array $data): Slen\\Sdk\\Modules\\Operations\\Data\\ExecutionCost"
+        },
+        {
+          "name": "warnings",
+          "kind": "method",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "warnings(array $data): array"
         },
         {
           "name": "cache",

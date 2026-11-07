@@ -7,6 +7,7 @@ namespace Slen\Sdk\Modules\Executions\Data;
 use DateTimeImmutable;
 use Slen\Sdk\Modules\Operations\Data\ExecutionCache;
 use Slen\Sdk\Modules\Operations\Data\ExecutionCost;
+use Slen\Sdk\Modules\Operations\Data\ExecutionWarning;
 use Slen\Sdk\Modules\Operations\Enums\ExecutionStatus;
 
 /** The story of one run: the run itself, every node it walked and every event, in order. */
@@ -16,6 +17,7 @@ final readonly class ExecutionTrace
      * @param string|null              $flowName the flow's name as it is now; null for a flow out of reach
      * @param list<FlowExecutionNode>  $nodes
      * @param list<FlowExecutionEvent> $events
+     * @param list<ExecutionWarning>   $warnings what the run said about its request when it started
      */
     public function __construct(
         public string $executionId,
@@ -35,6 +37,7 @@ final readonly class ExecutionTrace
         public array $nodes,
         public array $events,
         public ?string $requestId = null,
+        public array $warnings = [],
     ) {
     }
 }

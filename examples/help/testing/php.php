@@ -18,6 +18,7 @@ $http = (new FakeHttpClient())->pushJson(200, ['data' => [
     'replayed' => false,
     'waiting_on' => null,
     'trace_url' => '/v1/executions/74438200973594700',
+    'warnings' => [],
 ]]);
 // docs:end
 

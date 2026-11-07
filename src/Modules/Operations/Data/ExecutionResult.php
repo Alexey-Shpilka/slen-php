@@ -10,8 +10,9 @@ use Slen\Sdk\Modules\Operations\Enums\ExecutionStatus;
 final readonly class ExecutionResult
 {
     /**
-     * @param array<mixed>|null $output            what the flow returned; null until it returned something
-     * @param int|null          $retryAfterSeconds while the run is not over: when to read it again
+     * @param array<mixed>|null      $output            what the flow returned; null until it returned something
+     * @param int|null               $retryAfterSeconds while the run is not over: when to read it again
+     * @param list<ExecutionWarning> $warnings          what the run said about its request when it started
      */
     public function __construct(
         public string $executionId,
@@ -28,6 +29,7 @@ final readonly class ExecutionResult
         public ?ExecutionError $error,
         public bool $replayed,
         public ?string $requestId = null,
+        public array $warnings = [],
     ) {
     }
 
