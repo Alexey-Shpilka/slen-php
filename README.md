@@ -277,7 +277,7 @@ Every failure is a `SlenException` with `errorCode`, `statusCode`, `details`, `r
 | Exception | Codes | Fallback |
 |---|---|---|
 | `AuthenticationException` | `invalid_api_key`, `insufficient_scope`, `not_authenticated`, `not_a_member`, `account_suspended` | any other 401 / 403 |
-| `PolicyDeniedException` | `policy_denied`, `model_not_allowed` | |
+| `PolicyDeniedException` | `policy_denied`, `model_not_allowed`, `model_retired` | |
 | `CustomerBlockedException` (a `PolicyDeniedException`) | `customer_blocked` | |
 | `SpendRefusedException` (the family below) | `budget_exceeded`, `operation_limit_exceeded`, `concurrency_limit_exceeded`, `insufficient_credits`, `overrun_stopped`, `overrun_approval_required` | any other 402 |
 | `RateLimitException` | `rate_limit_exceeded` | any other 429 |
