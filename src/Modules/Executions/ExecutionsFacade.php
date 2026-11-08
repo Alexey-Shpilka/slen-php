@@ -33,8 +33,10 @@ final readonly class ExecutionsFacade
     public function get(string $executionId, ?RequestOptions $options = null): ExecutionStatusView
     {
         $getExecutionStatusTask = $this->executionsModuleFactory->getExecutionStatusTask();
+        $executionStatusView = $getExecutionStatusTask->execute($getExecutionStatusTask->request($executionId, $options ?? new RequestOptions()));
+        $this->executionsModuleFactory->executionWarningsJournal()->write($executionStatusView->executionId, $executionStatusView->warnings);
 
-        return $getExecutionStatusTask->execute($getExecutionStatusTask->request($executionId, $options ?? new RequestOptions()));
+        return $executionStatusView;
     }
 
     /**
@@ -58,6 +60,8 @@ final readonly class ExecutionsFacade
         }
 
         $spanScope->answered($this->executionsModuleFactory->executionSpanMapper()->map($executionStatusView));
+        // One line for the state the wait answers with, none for the reads before it.
+        $this->executionsModuleFactory->executionWarningsJournal()->write($executionStatusView->executionId, $executionStatusView->warnings);
 
         return $executionStatusView;
     }
@@ -79,7 +83,9 @@ final readonly class ExecutionsFacade
             requestId: $options->requestId,
         );
         $apiResponse = $this->executionsModuleFactory->api()->exchange($apiRequest);
+        $executionTrace = $this->executionsModuleFactory->executionTraceResource()->map($apiResponse->data(), $apiResponse->requestId());
+        $this->executionsModuleFactory->executionWarningsJournal()->write($executionTrace->executionId, $executionTrace->warnings);
 
-        return $this->executionsModuleFactory->executionTraceResource()->map($apiResponse->data(), $apiResponse->requestId());
+        return $executionTrace;
     }
 }

@@ -66,6 +66,7 @@ final readonly class OperationsFacade
         }
 
         $spanScope->answered($this->operationsModuleFactory->executionSpanMapper()->map($executionResult));
+        $this->operationsModuleFactory->executionWarningsJournal()->write($executionResult->executionId, $executionResult->warnings);
 
         return $executionResult;
     }

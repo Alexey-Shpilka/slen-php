@@ -15,12 +15,14 @@ use Slen\Sdk\Modules\Executions\Data\AttemptCostBreakdown;
 use Slen\Sdk\Modules\Executions\Data\AttemptSummary;
 use Slen\Sdk\Modules\Executions\Data\FlowExecutionEvent;
 use Slen\Sdk\Modules\Executions\Data\FlowExecutionNode;
+use Slen\Sdk\Modules\Executions\Options\WaitOptions;
 use Slen\Sdk\Modules\Operations\Enums\ExecutionStatus;
 use Slen\Sdk\Observability\SlenSpan;
 use Slen\Sdk\SlenSdk;
 use Slen\Sdk\Testing\FakeHttpClient;
 use Slen\Sdk\Testing\RecordingSpanRecorder;
 use Slen\Sdk\Tests\Unit\Support\Answers;
+use Slen\Sdk\Tests\Unit\Support\RecordingLogger;
 use stdClass;
 
 final class ExecutionsFacadeTest extends TestCase
@@ -296,6 +298,36 @@ final class ExecutionsFacadeTest extends TestCase
         $this->expectExceptionMessage('"nodes"');
 
         Answers::sdk($fakeHttpClient)->executions()->trace('74438200973594700');
+    }
+
+    public function testEachReadOfARunThatSaysSomethingAboutItsRequestWritesOneWarningAndAWaitOneForItsLastState(): void
+    {
+        $warnings = [['code' => 'input_key_ignored', 'keys' => ['tools'], 'message' => 'canary: the input carries tools.']];
+        $fakeHttpClient = (new FakeHttpClient())
+            ->pushJson(200, ['data' => Answers::status(['warnings' => $warnings])])
+            ->pushJson(200, ['data' => ['warnings' => $warnings] + self::trace()])
+            ->pushJson(200, ['data' => Answers::pending('running', 1, ['warnings' => $warnings])])
+            ->pushJson(200, ['data' => Answers::status(['warnings' => $warnings])])
+            ->pushJson(200, ['data' => Answers::status()]);
+        $recordingLogger = new RecordingLogger();
+        $executionsFacade = Answers::sdk($fakeHttpClient, logger: $recordingLogger)->executions();
+
+        $executionsFacade->get('74438200973594700');
+        $executionsFacade->trace('74438200973594700');
+        $executionsFacade->wait('74438200973594700', new WaitOptions(timeoutSeconds: 60));
+        $executionsFacade->get('74438200973594700');
+
+        $written = array_values(array_filter($recordingLogger->records, static function (array $record): bool {
+            return $record['message'] === 'slen.execution.warnings';
+        }));
+        $line = [
+            'level' => 'warning',
+            'message' => 'slen.execution.warnings',
+            'context' => ['execution_id' => '74438200973594700', 'warnings' => [['code' => 'input_key_ignored', 'keys' => ['tools']]]],
+        ];
+        self::assertCount(5, $fakeHttpClient->requests());
+        self::assertSame([$line, $line, $line], $written);
+        self::assertStringNotContainsString('canary', (string) json_encode($recordingLogger->records));
     }
 
     public function testTheFacadesAreBuiltOncePerSdk(): void
