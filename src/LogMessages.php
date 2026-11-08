@@ -23,6 +23,8 @@ final class LogMessages
 
     public const string WAIT_POLL_FAILED = 'slen.wait.poll_failed';
 
+    public const string EXECUTION_WARNINGS = 'slen.execution.warnings';
+
     public const string WEBHOOK_REJECTED = 'slen.webhook.rejected';
 
     public const string CONFIG_TIMEOUT_NOT_APPLIED = 'slen.config.timeout_not_applied';

@@ -8,6 +8,7 @@ use Slen\Sdk\Modules\Operations\Resources\ExecutionResource;
 use Slen\Sdk\Modules\Operations\Tasks\ExecuteOperationTask;
 use Slen\Sdk\Shared\Http\ApiCaller;
 use Slen\Sdk\Shared\Http\ApiTransport;
+use Slen\Sdk\Shared\Logging\ExecutionWarningsJournal;
 use Slen\Sdk\Shared\Observability\Data\SpanSubjectDTO;
 use Slen\Sdk\Shared\Observability\ExecutionSpanMapper;
 use Slen\Sdk\Shared\Observability\SpanScope;
@@ -35,5 +36,10 @@ final readonly class OperationsModuleFactory
     public function executionSpanMapper(): ExecutionSpanMapper
     {
         return new ExecutionSpanMapper();
+    }
+
+    public function executionWarningsJournal(): ExecutionWarningsJournal
+    {
+        return new ExecutionWarningsJournal($this->telemetry->journal);
     }
 }

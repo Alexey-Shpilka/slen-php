@@ -1401,6 +1401,15 @@
           "signature": "const WAIT_POLL_FAILED = 'slen.wait.poll_failed'"
         },
         {
+          "name": "EXECUTION_WARNINGS",
+          "kind": "constant",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "const EXECUTION_WARNINGS = 'slen.execution.warnings'"
+        },
+        {
           "name": "WEBHOOK_REJECTED",
           "kind": "constant",
           "static": false,
@@ -4443,6 +4452,15 @@
           "deprecated": false,
           "internal": false,
           "signature": "executionSpanMapper(): Slen\\Sdk\\Shared\\Observability\\ExecutionSpanMapper"
+        },
+        {
+          "name": "executionWarningsJournal",
+          "kind": "method",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "executionWarningsJournal(): Slen\\Sdk\\Shared\\Logging\\ExecutionWarningsJournal"
         }
       ]
     },
@@ -5384,6 +5402,15 @@
           "deprecated": false,
           "internal": false,
           "signature": "executionSpanMapper(): Slen\\Sdk\\Shared\\Observability\\ExecutionSpanMapper"
+        },
+        {
+          "name": "executionWarningsJournal",
+          "kind": "method",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "executionWarningsJournal(): Slen\\Sdk\\Shared\\Logging\\ExecutionWarningsJournal"
         }
       ]
     },
@@ -8839,6 +8866,42 @@
           "deprecated": false,
           "internal": false,
           "signature": "clientClass(): string"
+        }
+      ]
+    },
+    {
+      "name": "Slen\\Sdk\\Shared\\Logging\\ExecutionWarningsJournal",
+      "kind": "class",
+      "source": "src/Shared/Logging/ExecutionWarningsJournal.php",
+      "deprecated": false,
+      "internal": true,
+      "alias_of": null,
+      "modifiers": [
+        "final",
+        "readonly"
+      ],
+      "type_parameters": [],
+      "extends": [],
+      "implements": [],
+      "signature": null,
+      "members": [
+        {
+          "name": "__construct",
+          "kind": "constructor",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "__construct(Slen\\Sdk\\Shared\\Logging\\Journal $journal)"
+        },
+        {
+          "name": "write",
+          "kind": "method",
+          "static": false,
+          "optional": false,
+          "deprecated": false,
+          "internal": false,
+          "signature": "write(string $executionId, array $warnings): void"
         }
       ]
     },

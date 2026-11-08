@@ -49,6 +49,7 @@ final readonly class ErrorMapper
         'rate_limit_exceeded' => RateLimitException::class,
         'policy_denied' => PolicyDeniedException::class,
         'model_not_allowed' => PolicyDeniedException::class,
+        'model_retired' => PolicyDeniedException::class,
         'customer_blocked' => CustomerBlockedException::class,
         'idempotency_conflict' => IdempotencyConflictException::class,
         'idempotency_in_progress' => IdempotencyConflictException::class,

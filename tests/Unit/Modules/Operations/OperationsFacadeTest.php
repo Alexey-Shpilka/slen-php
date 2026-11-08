@@ -169,6 +169,38 @@ final class OperationsFacadeTest extends TestCase
         ];
     }
 
+    public function testARunThatSaysSomethingAboutItsRequestWritesOneWarningWithItsCodesAndKeys(): void
+    {
+        $warnings = [
+            ['code' => 'input_key_ignored', 'keys' => ['tools', 'temperature'], 'message' => 'canary: the input carries tools, temperature.'],
+            ['code' => 'later', 'message' => 'canary: another.'],
+        ];
+        $fakeHttpClient = (new FakeHttpClient())
+            ->pushJson(200, ['data' => Answers::execution(['warnings' => $warnings])])
+            ->pushJson(202, ['data' => Answers::pending('queued', 2, ['error' => null, 'replayed' => false, 'warnings' => $warnings])])
+            ->pushJson(200, ['data' => Answers::execution()]);
+        $recordingLogger = new RecordingLogger();
+        $operationsFacade = Answers::sdk($fakeHttpClient, logger: $recordingLogger)->operations();
+
+        $operationsFacade->execute('support.reply', self::INPUT);
+        $operationsFacade->executeAsync('support.reply', self::INPUT);
+        $operationsFacade->execute('support.reply', self::INPUT);
+
+        $written = array_values(array_filter($recordingLogger->records, static function (array $record): bool {
+            return $record['message'] === 'slen.execution.warnings';
+        }));
+        $line = [
+            'level' => 'warning',
+            'message' => 'slen.execution.warnings',
+            'context' => [
+                'execution_id' => '74438200973594700',
+                'warnings' => [['code' => 'input_key_ignored', 'keys' => ['tools', 'temperature']], ['code' => 'later', 'keys' => null]],
+            ],
+        ];
+        self::assertSame([$line, $line], $written);
+        self::assertStringNotContainsString('canary', (string) json_encode($recordingLogger->records));
+    }
+
     public function testExecuteAsyncHandsTheRunToAWorkerAndAnswersItQueued(): void
     {
         $fakeHttpClient = (new FakeHttpClient())->pushJson(202, ['data' => Answers::pending('queued', 2, ['replayed' => false, 'error' => null])]);
