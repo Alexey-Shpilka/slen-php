@@ -107,6 +107,27 @@ $finished = $slen->executions()->wait($queued->executionId, new WaitOptions(
 
 `wait()` reads the run until it is over, at the pace the server asks for (`retry_after_seconds`; otherwise 1 s doubling up to 30 s). When the timeout is up it answers the last state it read, which may still be pending — that is not an error. A read that gets no answer, a 429 or a 5xx is told to `onPollError` and the wait goes on; any other failure is thrown at once, and so is what the listener throws. `timeoutSeconds` defaults to 300. Each read is sent once and lasts no longer than the time the wait has left (at least 5 s, at most the config's `timeout`), so a wait ends within `timeoutSeconds` and five seconds where the client takes the timeout of a call.
 
+**Waiting for a slot.** A Queue node that limits calls at once — at most three model calls of one customer, say — never holds the call while its limit is full: `execute()` answers at once with status `Waiting` and `waitingOn->type` `queue_slot`, and the run goes on by itself when a slot is freed, in turn.
+
+```php
+$execution = $slen->operations()->execute(
+    'support.reply',
+    ['messages' => [['role' => 'user', 'content' => 'Where is my order?']]],
+    new ExecuteOptions(customer: 'user_8421', idempotencyKey: 'ticket-42:reply'),
+);
+
+if ($execution->waitingOn?->type === 'queue_slot') {
+    // In a queue job, not in an HTTP handler: the run waits its turn behind the customer's other calls.
+    $finished = $slen->executions()->wait($execution->executionId, new WaitOptions(timeoutSeconds: 120));
+
+    if ($finished->errorCode === 'concurrency_limit_exceeded') {
+        error_log('no slot was freed before the deadline');
+    }
+}
+```
+
+`wait()` needs nothing more: the answer asks for a read every 2 s (`retry_after_seconds`), since a freed slot wakes the run within seconds. `waitingOn->resumeAt` is the deadline — a run still without a slot then leaves by the node's `busy` port, and when nothing is connected there it ends `Rejected` with `errorCode` `concurrency_limit_exceeded`. A node that refuses at once, or whose queue is full, ends the run during the call: `execute()` throws `ConcurrencyLimitException`, and its `details` are the node's `busy` output — `reason` (`refused`, `queue_full`), `key`, `limit`, `in_flight`, `waiting`, `waited_seconds`.
+
 `$slen->executions()->get($id)` reads the run once; `trace($id)` reads the nodes it walked and its events. Both take `RequestOptions`. A node's `cost` is the estimate its hold was taken on until the hold is captured, then what the provider billed — `costStatus` says which (`estimated`, `actual`), `estimatedCost` keeps the estimate, and the fact arrives up to a minute after the run ended. A model node carries what it left in `output` — its answer, or its error on a failure port — cut to the limit when `outputTruncated`, and `null` when it was not kept (`outputStored`: `disabled_by_project`, `withheld`, `history_paused`); its attempts carry their tokens and `costBreakdown`. No span or journal record carries an answer.
 
 ## End customers

@@ -4,6 +4,12 @@ All notable changes to `slen/sdk` are written here. The format follows [Keep a C
 
 ## [Unreleased]
 
+### Added
+- `queue_slot`, a value of `WaitingOn::$type`: the run waits for a slot of a Queue node's limit of calls at once. `execute()` answers such a run at once — status `Waiting`, `$retryAfterSeconds` 2 — and the run goes on by itself when a slot is freed; `wait()` follows it as it follows any other wait. `$resumeAt` is the deadline: a run still without a slot then leaves by the node's `busy` port, and with nothing connected there it ends `Rejected` with `$errorCode` `concurrency_limit_exceeded`. `$type` stays a string; its doc comment names the value, and the README shows the wait.
+
+### Changed
+- `ConcurrencyLimitException` (`concurrency_limit_exceeded`, 402) is the refusal of a flow's Queue node whose limit of calls at once is full and whose `busy` port leads nowhere — no longer of a `concurrency` budget, a type the API no longer creates. Its `$details` are the node's `busy` output: `reason` (`timeout`, `refused`, `queue_full`), `key`, `limit`, `in_flight`, `waiting`, `waited_seconds`. The doc comment says so; the class and the code it maps are as they were.
+
 ## [0.5.0] - 2026-11-08
 
 ### Changed
